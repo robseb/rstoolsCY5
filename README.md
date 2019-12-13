@@ -184,7 +184,7 @@ For informations how to use Microsoft Visual Studio 2019 for embedded Linux deve
 # Author
 * **Robin Sebastian**
 
-*meta-rstools* and *rstools* is a project, that I have fully developed on my own. No companies are involved in this project.
+*meta-rstools* and *rstools* are projects, that I have fully developed on my own. No companies are involved in this projects.
 Today I'm a Master Student of electronic engineering with the major embedded systems. 
 
 [![Ask Me Anything !](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](mailto:mail@robseb.de)
