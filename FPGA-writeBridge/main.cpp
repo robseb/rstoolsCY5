@@ -276,8 +276,8 @@ int main(int argc, const char* argv[])
 
 				if (ConsloeOutput)
 					cout << "Writing was successful" << endl;
-				else
-					cout << 1;
+			/*	else
+					cout << 1;*/
 
 			} while (0);
 		}
