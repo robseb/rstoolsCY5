@@ -4,7 +4,7 @@
  * @author  Robin Sebastian (https://github.com/robseb)
  * @mainpage
  * rstools application to read any bridge to FPGA
- * address
+ * address for Intel Arria 10 SX
  */
 
 #include <cstdio>
@@ -64,7 +64,7 @@ int main(int argc, const char* argv[])
 			if (lwBdrige)
 			{
 				// check the range of the lightwight Bridge Interface 
-				if (addressOffset > 2097150)
+				if (addressOffset > 0x200000)
 				{
 					if (ConsloeOutput)
 						cout << "	ERROR: selected address is outside of"\
@@ -75,7 +75,7 @@ int main(int argc, const char* argv[])
 			else
 			{
 				// check the range of the AXI HPS to FPGA Bridge Interface 
-				if (addressOffset > 8143)
+				if (addressOffset > 0x3c000000)
 				{
 					if (ConsloeOutput)
 						cout << "	ERROR: selected address is outside of the HPS to "\
@@ -100,9 +100,9 @@ int main(int argc, const char* argv[])
 			{
 				cout << "		-- Read registers on the FPGA part " << endl;
 				cout << "	Bridge:      " << (lwBdrige ? "Lightwight HPS to FPGA" : "HPS to FPGA AXI") << endl;
-				cout << "	Brige Base:  0x" << hex << (lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST) << dec << endl;
+				cout << "	Brige Base:  0x" << hex << (lwBdrige ? ALT_FPGA_BRIDGE_LWH2F_OFST : ALT_FPGA_BRIDGE_H2F128_OFST) << dec << endl;
 				cout << "	your Offset: 0x" << hex << addressOffset << dec << endl;
-				cout << "	Address:     0x" << hex << ((lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST) + addressOffset) << dec << endl;
+				cout << "	Address:     0x" << hex << ((lwBdrige ? ALT_FPGA_BRIDGE_LWH2F_OFST : ALT_FPGA_BRIDGE_H2F128_OFST) + addressOffset) << dec << endl;
 			}
 
 			do
@@ -124,8 +124,8 @@ int main(int argc, const char* argv[])
 				}
 
 				// configure a virtual memory interface to the bridge
-				bridgeMap = mmap(NULL, sysconf(_SC_PAGE_SIZE), PROT_READ, MAP_SHARED, fd, \
-					(lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST));
+				bridgeMap = mmap(NULL, lwBdrige ? 0x200000 : 0x3c000000, PROT_READ, MAP_SHARED, fd, \
+					(lwBdrige ? ALT_FPGA_BRIDGE_LWH2F_OFST : ALT_FPGA_BRIDGE_H2F128_OFST));
 
 				// check if opening was sucsessful
 				if (bridgeMap == MAP_FAILED)
@@ -162,7 +162,7 @@ int main(int argc, const char* argv[])
 				}
 
 				// Close the MAP 
-				int res = munmap(bridgeMap, sysconf(_SC_PAGE_SIZE));
+				int res = munmap(bridgeMap, lwBdrige ? 0x200000 : 0x3c000000);
 
 				if (res < 0)
 				{

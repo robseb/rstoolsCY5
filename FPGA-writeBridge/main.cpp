@@ -3,7 +3,7 @@
  * @brief	FPGA-writeBridge
  * @author  Robin Sebastian (https://github.com/robseb)
  * @mainpage
- * rstools application to write to any HPS-FPGA Bridge
+ * rstools application to write to any HPS-FPGA Bridge for Intel Arria 10 SX
  * address
  */
 
@@ -102,7 +102,7 @@ int main(int argc, const char* argv[])
 			if (lwBdrige)
 			{
 				// check the range of the lightwight Bridge Interface 
-				if (addressOffset > 2097150)
+				if (addressOffset > 0x200000)
 				{
 					if (ConsloeOutput)
 						cout << "	ERROR: selected address is outside of"\
@@ -113,7 +113,7 @@ int main(int argc, const char* argv[])
 			else
 			{
 				// check the range of the AXI HPS to FPGA Bridge Interface 
-				if (addressOffset > 8143)
+				if (addressOffset > 0x3c000000)
 				{
 					if (ConsloeOutput)
 						cout << "	ERROR: selected address is outside of the HPS to "\
@@ -197,9 +197,9 @@ int main(int argc, const char* argv[])
 			{
 				cout << "		-- Write following through a Bridge--" << endl;
 				cout << "	Bridge:      " << (lwBdrige ? "Lightwight HPS to FPGA" : "HPS to FPGA AXI") << endl;
-				cout << "	Brige Base:  0x" << hex << (lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST) << dec << endl;
+				cout << "	Brige Base:  0x" << hex << (lwBdrige ? ALT_FPGA_BRIDGE_LWH2F_OFST : ALT_FPGA_BRIDGE_H2F128_OFST) << dec << endl;
 				cout << "	your Offset: 0x" << hex << addressOffset << dec << endl;
-				cout << "	Address:     0x" << hex << ((lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST) + addressOffset) << dec << endl;
+				cout << "	Address:     0x" << hex << ((lwBdrige ? ALT_FPGA_BRIDGE_LWH2F_OFST : ALT_FPGA_BRIDGE_H2F128_OFST) + addressOffset) << dec << endl;
 
 				if (DecHexBin == BIN_INPUT)
 					cout << "	Value:	 Bit Pos:" << BitPosValue << " Output:" << SetResetBit << endl;
@@ -227,8 +227,8 @@ int main(int argc, const char* argv[])
 				}
 
 				// configure a virtual memory interface to the bridge
-				bridgeMap = mmap(NULL, sysconf(_SC_PAGE_SIZE), PROT_WRITE | PROT_READ, MAP_SHARED, fd, \
-					(lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST));
+				bridgeMap = mmap(NULL, lwBdrige ?  0x200000 : 0x3c000000, PROT_WRITE | PROT_READ, MAP_SHARED, fd, \
+					(lwBdrige ? ALT_FPGA_BRIDGE_LWH2F_OFST : ALT_FPGA_BRIDGE_H2F128_OFST));
 
 				// check if opening was sucsessful
 				if (bridgeMap == MAP_FAILED)
@@ -250,7 +250,7 @@ int main(int argc, const char* argv[])
 				if (ConsloeOutput)
 				{
 					uint32_t oldValue = *write_bridge;
-					cout << "	old Value:	     " << oldValue << " [0x" << hex << oldValue << "]" << dec << endl;
+					cout << "	old Value:	" << oldValue << " [0x" << hex << oldValue << "]" << dec << endl;
 				}
 
 				// write the new value to the selected register
@@ -263,7 +263,7 @@ int main(int argc, const char* argv[])
 					*write_bridge = ValueInput;
 
 				// Close the MAP 
-				int res = munmap(bridgeMap, sysconf(_SC_PAGE_SIZE));
+				int res = munmap(bridgeMap, lwBdrige ? 0x200000 : 0x3c000000);
 
 				if (res < 0)
 				{
@@ -292,7 +292,7 @@ int main(int argc, const char* argv[])
 	else
 	{
 		// help output 
-		cout << "	Command write to address of a HPS-FPGA Bridge" << endl;
+		cout << "	Command to write to address of a HPS-FPGA Bridge" << endl;
 		cout << "	address" << endl;
 		cout << "	FPGA-readBridge -lw [offset module address hex]" << endl;
 		cout << "		read the register on the Lightweight HPS-FPGA Brige" << endl;

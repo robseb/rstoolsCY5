@@ -31,7 +31,7 @@
 ******************************************************************************/
 
 /*
- * $Id: //acds/rel/18.1std/embedded/ip/hps/altera_hps/hwlib/src/socal/socal.h#1 $
+ * $Id: //acds/rel/19.1std/embedded/ip/hps/altera_hps/hwlib/src/socal/socal.h#1 $
  */
 
 /*! \file Altera - ALT_SOCAL */

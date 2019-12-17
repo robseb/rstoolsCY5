@@ -1,6 +1,6 @@
-# rstools
+# rstoolsCY5
 
- **`rstools`is the source code of  [*meta-rstools*](https://github.com/robseb/meta-rstools).**
+ **`rstoolsCY5`is the source code of  [*meta-rstools*](https://github.com/robseb/meta-rstools).**
 
 `meta-rstools` is a Layer for the Yocto project to add a simple way for fully accessing the FPGA Manager of the Intel (ALTERA) Cyclone V SoC-FPGA (SoCFPGA).
 

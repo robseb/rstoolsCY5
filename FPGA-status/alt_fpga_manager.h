@@ -1,45 +1,44 @@
 /******************************************************************************
-*
-* Copyright 2013 Altera Corporation. All Rights Reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright notice,
-* this list of conditions and the following disclaimer in the documentation
-* and/or other materials provided with the distribution.
-*
-* 3. Neither the name of the copyright holder nor the names of its contributors
-* may be used to endorse or promote products derived from this software without
-* specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-******************************************************************************/
+ *
+ * Copyright 2015 Altera Corporation. All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************/
 
 /*
- * $Id: //acds/rel/18.1std/embedded/ip/hps/altera_hps/hwlib/include/soc_cv_av/alt_fpga_manager.h#1 $
+ * $Id: //acds/rel/19.1std/embedded/ip/hps/altera_hps/hwlib/include/soc_a10/alt_fpga_manager.h#1 $
  */
 
-#ifndef __ALT_FPGA_MGR_H__
-#define __ALT_FPGA_MGR_H__
+#ifndef __ALT_FPGA_MANAGER_H__
+#define __ALT_FPGA_MANAGER_H__
 
 #include "hwlib.h"
 //#include "alt_dma.h"
-#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -47,20 +46,24 @@ extern "C"
 #endif /* __cplusplus */
 
 /*!
- * \addtogroup FPGA_MGR FPGA Manager
+ * \addtogroup FPGA_MGR_A10 FPGA Manager
  *
  * This module defines the FPGA Manager API for accessing, configuring, and
- * controlling the FPGA fabric and the FPGA/HPS interface.
+ * controlling the FPGA fabric and the FPGA/HPS interface. This API is specific
+ * to Arria 10 SoC FPGA devices.
  *
  * @{
  */
-
 
 /*!
  * This preprocessor definition determines if DMA support for FPGA programming
  * is enabled or not. Enabling DMA support enables the following API:
  *  * alt_fpga_configure_dma()
+ *  * alt_fpga_configure_list_dma()
  *  * alt_fpga_istream_configure_dma()
+ *
+ * Please note that DMA support for Arria 10 SoC is not yet mature and may not
+ * be functional or tested.
  *
  * To enable DMA support, define ALT_FPGA_ENABLE_DMA_SUPPORT=1 in the Makefile.
  */
@@ -69,13 +72,69 @@ extern "C"
 #endif
 
 /*!
+ * This type definition enumerates the available modes for configuring the
+ * FPGA.
+ */
+typedef enum ALT_FPGA_CFG_MODE_e
+{
+    /*!
+     * 16-bit Passive Parallel with Fast power on reset delay; No Design
+     * Security; No Data Compression.
+     */
+    ALT_FPGA_CFG_MODE_PP16_FAST_NOAES_NODC,
+
+    /*!
+     * 16-bit Passive Parallel with Fast power on reset delay; With Design
+     * Security; No Data Compression.
+     */
+    ALT_FPGA_CFG_MODE_PP16_FAST_AES_NODC,
+
+    /*!
+     * 16-bit Passive Parallel with Fast power on reset delay; No design
+     * security; With Data Compression.
+     */
+    ALT_FPGA_CFG_MODE_PP16_FAST_NOAES_DC,
+
+    /*!
+     * 16-bit Passive Parallel with Fast power on reset delay; With design
+     * security; With Data Compression.
+     */
+    ALT_FPGA_CFG_MODE_PP16_FAST_AES_DC,
+
+    /*!
+     * 32-bit Passive Parallel with Fast power on reset delay; No Design
+     * Security; No Data Compression.
+     */
+    ALT_FPGA_CFG_MODE_PP32_FAST_NOAES_NODC,
+
+    /*!
+     * 32-bit Passive Parallel with Fast power on reset delay; With design
+     * security; No Data Comression.
+     */
+    ALT_FPGA_CFG_MODE_PP32_FAST_AES_NODC,
+
+    /*!
+     * 32-bit Passive Parallel with Fast power on reset delay; No design
+     * security; With Data Compression. This is the default configuration.
+     */
+    ALT_FPGA_CFG_MODE_PP32_FAST_NOAES_DC,
+
+    /*!
+     * 32-bit Passive Parallel with Fast power on reset delay; With design
+     * security; With Data Compression.
+     */
+    ALT_FPGA_CFG_MODE_PP32_FAST_AES_DC
+
+} ALT_FPGA_CFG_MODE_t;
+
+/*!
  * Initializes the FPGA manager. This should be the first API called when using
  * the FPGA manager API.
  *
  * \retval      ALT_E_SUCCESS   The operation was successful.
  * \retval      ALT_E_ERROR     The operation failed.
  */
-	ALT_STATUS_CODE alt_fpga_init(void);
+ALT_STATUS_CODE alt_fpga_init(void);
 
 /*!
  * Uninitializes the FPGA manager
@@ -86,17 +145,11 @@ extern "C"
 ALT_STATUS_CODE alt_fpga_uninit(void);
 
 /*!
- * \addtogroup FPGA_MGR_STATUS FPGA Manager Status and Control
+ * Instructs the CPU core to acquire control of the FPGA control block. Control
+ * is required before asserting reset or FPGA configuration is possible.
  *
- * This group provides functions for controlling and determining status of the
- * FPGA Manager.
- *
- * @{
- */
-
-/*!
- * Instructs the CPU core to acquire control of the FPGA control block. This
- * must API must be called before any other API is issued.
+ * \param       mode
+ *              FPGA programming mode for the subsequent images.
  *
  * \retval      ALT_E_SUCCESS       Successful status.
  * \retval      ALT_E_ERROR         Error acquiring control of the FPGA control
@@ -105,7 +158,7 @@ ALT_STATUS_CODE alt_fpga_uninit(void);
  *                                  block or a repeat call to this API without
  *                                  first being released.
  */
-ALT_STATUS_CODE alt_fpga_control_enable(void);
+ALT_STATUS_CODE alt_fpga_control_enable(ALT_FPGA_CFG_MODE_t mode);
 
 /*!
  * Instructs the CPU core to release control of the FPGA control block. This
@@ -128,197 +181,13 @@ ALT_STATUS_CODE alt_fpga_control_disable(void);
 bool alt_fpga_control_is_enabled(void);
 
 /*!
- * This type definition enumerates the possible states the FPGA can be in at
- * any one time.
- */
-typedef enum ALT_FPGA_STATE_e
-{
-    /*!
-     * FPGA in Power Up Phase. This is the state of the FPGA just after
-     * powering up.
-     *
-     * \internal
-     * Register documentation calls it "PWR_OFF" which is really a misnomer as
-     * the FPGA is powered as evident from alt_fpga_mon_status_get() and
-     * looking at the ALT_FPGA_MON_FPGA_POWER_ON bit.
-     * \endinternal
-     */
-    ALT_FPGA_STATE_POWER_UP = 0x0,
-
-    /*!
-     * FPGA in Reset Phase. In this phase, the FPGA resets, clears the FPGA
-     * configuration RAM bits, tri-states all FPGA user I/O pins, pulls the
-     * nSTATUS and CONF_DONE pins low, and determines the configuration mode
-     * by reading the value of the MSEL pins.
-     */
-    ALT_FPGA_STATE_RESET = 0x1,
-
-    /*!
-     * FPGA in Configuration Phase. This state represents the phase when the
-     * configuration bitstream is loaded into the FPGA fabric. The
-     * configuration phase is complete after the FPGA has received all the
-     * configuration data.
-     */
-    ALT_FPGA_STATE_CFG = 0x2,
-
-    /*!
-     * FPGA in Initialization Phase. In this state the FPGA prepares to enter
-     * User Mode. In Configuration via PCI Express (CVP), this state indicates
-     * I/O configuration has completed.
-     */
-    ALT_FPGA_STATE_INIT = 0x3,
-
-    /*!
-     * FPGA in User Mode. In this state, the FPGA performs the function loaded
-     * during the configuration phase. The FPGA user I/O are functional as
-     * determined at design time.
-     */
-    ALT_FPGA_STATE_USER_MODE = 0x4,
-
-    /*!
-     * FPGA state has not yet been determined. This only occurs briefly after
-     * reset.
-     */
-    ALT_FPGA_STATE_UNKNOWN = 0x5,
-
-    /*!
-     * FPGA is powered off.
-     *
-     * \internal
-     * This is a software only state which is determined by
-     * alt_fpga_mon_status_get() and looking at the ALT_FPGA_MON_FPGA_POWER_ON
-     * bit. The hardware register sourced for ALT_FPGA_STATE_t is only 3 bits
-     * wide so this will never occur in hardware.
-     * \endinternal
-     */
-    ALT_FPGA_STATE_POWER_OFF = 0xF
-
-} ALT_FPGA_STATE_t;
-
-/*!
- * Returns the current operational state of the FPGA fabric.
- *
- * \returns     The current operational state of the FPGA.
- */
-ALT_FPGA_STATE_t alt_fpga_state_get(void);
-
-/*!
- * This type definition enumerates the monitored status conditions for the FPGA
- * Control Block (CB).
- */
-typedef enum ALT_FPGA_MON_STATUS_e
-{
-    /*!
-     * 0 if the FPGA is in Reset Phase or if the FPGA detected an error during
-     * the Configuration Phase.
-     */
-    ALT_FPGA_MON_nSTATUS = 0x0001,
-
-    /*!
-     * 0 during the FPGA Reset Phase and 1 when the FPGA Configuration Phase is
-     * done.
-     */
-    ALT_FPGA_MON_CONF_DONE = 0x0002,
-
-    /*!
-     * 0 during the FPGA Configuration Phase and 1 when the FPGA Initialization
-     * Phase is done.
-     */
-    ALT_FPGA_MON_INIT_DONE = 0x0004,
-
-    /*!
-     * CRC error indicator. A 1 indicates that the FPGA detected a CRC error
-     * while in User Mode.
-     */
-    ALT_FPGA_MON_CRC_ERROR = 0x0008,
-
-    /*!
-     * Configuration via PCIe (CVP) Done indicator. A 1 indicates that CVP is
-     * done.
-     */
-    ALT_FPGA_MON_CVP_CONF_DONE = 0x0010,
-
-    /*!
-     * Partial Reconfiguration ready indicator. A 1 indicates that the FPGA is
-     * ready to receive partial reconfiguration or external scrubbing data.
-     */
-    ALT_FPGA_MON_PR_READY = 0x0020,
-
-    /*!
-     * Partial Reconfiguration error indicator. A 1 indicates that the FPGA
-     * detected an error during partial reconfiguration or external scrubbing.
-     */
-    ALT_FPGA_MON_PR_ERROR = 0x0040,
-
-    /*!
-     * Partial Reconfiguration done indicator. A 1 indicates partial
-     * reconfiguration or external scrubbing is done.
-     */
-    ALT_FPGA_MON_PR_DONE = 0x0080,
-
-    /*!
-     * Value of the nCONFIG pin. This can be pulled-down by the FPGA in this
-     * device or logic external to this device connected to the nCONFIG pin.
-     * See the description of the nCONFIG field in this register to understand
-     * when the FPGA in this device pulls-down the nCONFIG pin. Logic external
-     * to this device pulls-down the nCONFIG pin to put the FPGA into the Reset
-     * Phase.
-     */
-    ALT_FPGA_MON_nCONFIG_PIN = 0x0100,
-
-    /*!
-     * Value of the nSTATUS pin. This can be pulled-down by the FPGA in this
-     * device or logic external to this device connected to the nSTATUS pin.
-     * See the description of the nSTATUS field in this register to understand
-     * when the FPGA in this device pulls-down the nSTATUS pin. Logic external
-     * to this device pulls-down the nSTATUS pin during Configuration Phase or
-     * Initialization Phase if it detected an error.
-     */
-    ALT_FPGA_MON_nSTATUS_PIN = 0x0200,
-
-    /*!
-     * Value of the CONF_DONE pin. This can be pulled-down by the FPGA in this
-     * device or logic external to this device connected to the CONF_DONE pin.
-     * See the description of the CONF_DONE field in this register to
-     * understand when the FPGA in this device pulls-down the CONF_DONE pin.
-     * See FPGA documentation to determine how logic external to this device
-     * drives CONF_DONE.
-     */
-    ALT_FPGA_MON_CONF_DONE_PIN = 0x0400,
-
-    /*!
-     * FPGA powered on indicator.
-     */
-    ALT_FPGA_MON_FPGA_POWER_ON = 0x0800
-
-} ALT_FPGA_MON_STATUS_t;
-
-/*!
- * Returns the FPGA Control Block monitor status conditions.
- *
- * This function returns the current value of the FPGA Control Block monitor
- * status conditions.
- *
- * \returns     The current values of the FPGA Control Block monitor status
- *              conditions as defined by the \ref ALT_FPGA_MON_STATUS_t mask
- *              bits. If the corresponding bit is set then the condition is
- *              asserted.
- *
- * \internal
- * Use the Raw Interrupt Status Register \b hps::fpgamgrregs::mon::gpio_ext_porta
- * to retrieve the monitor status conditions.
- * \endinternal
- */
-uint32_t alt_fpga_mon_status_get(void);
-
-/*!
  * Assert and hold the FPGA in reset.
  *
  * This function asserts and holds the FPGA in reset. Any FPGA configuration is
  * cleared. The FPGA must be reconfigured to resume operation.
  *
  * The FPGA is reset by the assertion of the nCONFIG signal. The signal remains
- * asserted until alt_fpga_reset_deassert() is called.
+ * asserted until alt_fgpa_reset_deassert() is called.
  *
  * \retval      ALT_E_SUCCESS           Successful status.
  * \retval      ALT_E_FPGA_PWR_OFF      FPGA is not powered on.
@@ -345,137 +214,130 @@ ALT_STATUS_CODE alt_fpga_reset_assert(void);
 ALT_STATUS_CODE alt_fpga_reset_deassert(void);
 
 /*!
- * @}
+ * This type definition enumerates the status conditions for the FPGA Control
+ * Block (CB).
  */
-
-/*!
- * \addtogroup FPGA_MGR_CFG FPGA Configuration
- *
- * This functional group provides the following services:
- *  * Determination of the FPGA configuration mode.
- *  * Software control for full configuration of the FPGA.
- *  * Software control for partial reconfiguration of the FPGA \e (Future).
- *
- * @{
- */
-
-/*!
- * This type definition enumerates the available modes for configuring the
- * FPGA.
- */
-typedef enum ALT_FPGA_CFG_MODE_e
+typedef enum ALT_FPGA_STATUS_e
 {
     /*!
-     * 16-bit Passive Parallel with Fast Power on Reset Delay; No AES
-     * Encryption; No Data Compression. CDRATIO must be programmed to x1.
+     * CRC Error detected while in usermode.
      */
-    ALT_FPGA_CFG_MODE_PP16_FAST_NOAES_NODC = 0x0,
+    ALT_FPGA_STATUS_F2S_CRC_ERROR      = 1 <<  0,
 
     /*!
-     * 16-bit Passive Parallel with Fast Power on Reset Delay; With AES
-     * Encryption; No Data Compression. CDRATIO must be programmed to x4.
+     * Early usermode signal from CSS. This can be used by software to
+     * determine status when HPS is configured the shared IOs via sending the
+     * POF to the CSS.
      */
-    ALT_FPGA_CFG_MODE_PP16_FAST_AES_NODC = 0x1,
+    ALT_FPGA_STATUS_F2S_EARLY_USERMODE = 1 <<  1,
 
     /*!
-     * 16-bit Passive Parallel with Fast Power on Reset Delay; AES Optional;
-     * With Data Compression. CDRATIO must be programmed to x8.
+     * Usermode status. Asserted only when the FPGA has finally entered
+     * usermode.
      */
-    ALT_FPGA_CFG_MODE_PP16_FAST_AESOPT_DC = 0x2,
+    ALT_FPGA_STATUS_F2S_USERMODE       = 1 <<  2,
 
     /*!
-     * 16-bit Passive Parallel with Slow Power on Reset Delay; No AES
-     * Encryption; No Data Compression. CDRATIO must be programmed to x1.
+     * Driven enable of \b initdone signal.
      */
-    ALT_FPGA_CFG_MODE_PP16_SLOW_NOAES_NODC = 0x4,
+    ALT_FPGA_STATUS_F2S_INITDONE_OE    = 1 <<  3,
 
     /*!
-     * 16-bit Passive Parallel with Slow Power on Reset Delay; With AES
-     * Encryption; No Data Compression. CDRATIO must be programmed to x4.
+     * Sampled pin value of \b nstatus signal. This can be overridden by an
+     * external device.
      */
-    ALT_FPGA_CFG_MODE_PP16_SLOW_AES_NODC = 0x5,
+    ALT_FPGA_STATUS_F2S_NSTATUS_PIN    = 1 <<  4,
 
     /*!
-     * 16-bit Passive Parallel with Slow Power on Reset Delay; AES Optional;
-     * With Data Compression. CDRATIO must be programmed to x8.
+     * Driven enable of \b nstatus signal.
      */
-    ALT_FPGA_CFG_MODE_PP16_SLOW_AESOPT_DC = 0x6,
+    ALT_FPGA_STATUS_F2S_NSTATUS_OE     = 1 <<  5,
 
     /*!
-     * 32-bit Passive Parallel with Fast Power on Reset Delay; No AES
-     * Encryption; No Data Compression. CDRATIO must be programmed to x1.
+     * Sampled pin value of \b condone signal. This can be overridden by an
+     * external devices.
      */
-    ALT_FPGA_CFG_MODE_PP32_FAST_NOAES_NODC = 0x8,
+    ALT_FPGA_STATUS_F2S_CONDONE_PIN    = 1 <<  6,
 
     /*!
-     * 32-bit Passive Parallel with Fast Power on Reset Delay; With AES
-     * Encryption; No Data Compression. CDRATIO must be programmed to x4.
+     * Driven enable of \b condone signal from CSS.
      */
-    ALT_FPGA_CFG_MODE_PP32_FAST_AES_NODC = 0x9,
+    ALT_FPGA_STATUS_F2S_CONDONE_OE     = 1 <<  7,
 
     /*!
-     * 32-bit Passive Parallel with Fast Power on Reset Delay; AES Optional;
-     * With Data Compression. CDRATIO must be programmed to x8.
+     * Configuration via PCIe (CVP) done indicator.
      */
-    ALT_FPGA_CFG_MODE_PP32_FAST_AESOPT_DC = 0xa,
+    ALT_FPGA_STATUS_F2S_CVP_CONF_DONE  = 1 <<  8,
 
     /*!
-     * 32-bit Passive Parallel with Slow Power on Reset Delay; No AES
-     * Encryption; No Data Compression. CDRATIO must be programmed to x1.
-         */
-    ALT_FPGA_CFG_MODE_PP32_SLOW_NOAES_NODC = 0xc,
+     * Partial Reconfiguration (PR) ready.
+     */
+    ALT_FPGA_STATUS_F2S_PR_READY       = 1 <<  9,
 
     /*!
-     * 32-bit Passive Parallel with Slow Power on Reset Delay; With AES
-     * Encryption; No Data Compression. CDRATIO must be programmed to x4.
+     * Partial Reconfiguration (PR) done.
      */
-    ALT_FPGA_CFG_MODE_PP32_SLOW_AES_NODC = 0xd,
+    ALT_FPGA_STATUS_F2S_PR_DONE        = 1 << 10,
 
     /*!
-     * 32-bit Passive Parallel with Slow Power on Reset Delay; AES Optional;
-     * With Data Compression. CDRATIO must be programmed to x8.
+     * Partial Reconfiguration (PR) error.
      */
-    ALT_FPGA_CFG_MODE_PP32_SLOW_AESOPT_DC = 0xe,
+    ALT_FPGA_STATUS_F2S_PR_ERROR       = 1 << 11,
 
     /*!
-     * Unknown FPGA Configuration Mode.
+     * Sampled pin value of \b nconfig signal.
      */
-    ALT_FPGA_CFG_MODE_UNKNOWN = 0x20
+    ALT_FPGA_STATUS_F2S_NCONFIG_PIN    = 1 << 12,
 
-} ALT_FPGA_CFG_MODE_t;
+    /*!
+     * Chip select output driven from CSS block.
+     */
+    ALT_FPGA_STATUS_F2S_NCEO_OE        = 1 << 13,
+
+    /*!
+     * Sampled pin value of MSEL[0].
+     */
+    ALT_FPGA_STATUS_F2S_MSEL0          = 1 << 16,
+
+    /*!
+     * Sampled pin value of MSEL[1].
+     */
+    ALT_FPGA_STATUS_F2S_MSEL1          = 1 << 17,
+
+    /*!
+     * Sampled pin value of MSEL[2].
+     */
+    ALT_FPGA_STATUS_F2S_MSEL2          = 1 << 18,
+
+    /*!
+     * FIFO Empty status of the FPGA image configuration FIFO.
+     */
+    ALT_FPGA_STATUS_IMGCFG_FIFOEMPTY   = 1 << 24,
+
+    /*!
+     * FIFO Full status of the FPGA image configuration FIFO.
+     */
+    ALT_FPGA_STATUS_IMGCFG_FIFOFULL    = 1 << 25,
+
+    /*!
+     * JTAG Master Session Status.
+     */
+    ALT_FPGA_STATUS_JTAGM              = 1 << 28,
+
+    /*!
+     * EMR valid bit.
+     */
+    ALT_FPGA_STATUS_EMR                = 1 << 29
+
+} ALT_FPGA_STATUS_t;
 
 /*!
- * Gets the FPGA configuration mode currently in effect.
+ * Gets the current status conditions that are active.
  *
- * Presently, the FPGA configuration mode is statically set by the external MSEL
- * pin values and cannot be programmatically overridden by HPS software.
- *
- * \returns     The current FPGA configuration mode as determined by the MSEL
- *              pin values.
+ * \retval      Mask of logically OR'ed \ref ALT_FPGA_STATUS_t values that are
+ *              active.
  */
-ALT_FPGA_CFG_MODE_t alt_fpga_cfg_mode_get(void);
-
-/*!
- * Sets the FPGA configuration mode.
- *
- * Presently, the FPGA configuration mode is statically set by the external
- * MSEL pin values and cannot be programmatically overridden by HPS software.
- * This function should always return ALT_E_ERROR at least for Hammerhead-P.
- * This may change with future SoCFPGA devices.
- *
- * \param       cfg_mode
- *              The desired FPGA configuration mode.
- *
- * \retval      ALT_E_SUCCESS   Successful status.
- * \retval      ALT_E_ERROR     Failed to set the FPGA configuration mode.
- *
- * \internal
- * This should set the fpgamgrregs::stat::msel. The full configuration reads
- * this to program the fpgamgrregs::ctrl with the appropriate parameters
- * decoded from msel.
- * \endinternal
- */
-ALT_STATUS_CODE alt_fpga_cfg_mode_set(ALT_FPGA_CFG_MODE_t cfg_mode);
+uint32_t alt_fpga_status_get(void);
 
 /*!
  * Type definition for the callback function prototype used by the FPGA Manager
@@ -506,7 +368,7 @@ ALT_STATUS_CODE alt_fpga_cfg_mode_set(ALT_FPGA_CFG_MODE_t cfg_mode);
  *              A pointer to a buffer to fill with FPGA configuration bitstream
  *              data bytes.
  *
- * \param       buf_len
+ * \param       len
  *              The length of the input buffer \e buf in bytes. The number of
  *              FPGA configuration bitstream data bytes copied into \e buf
  *              should not exceed \e buf_len.
@@ -520,7 +382,7 @@ ALT_STATUS_CODE alt_fpga_cfg_mode_set(ALT_FPGA_CFG_MODE_t cfg_mode);
  * \retval      =0      The end of the input stream has been reached.
  * \retval      <0      An error occurred on the input stream.
  */
-typedef int32_t (*alt_fpga_istream_t)(void* buf, size_t buf_len, void* user_data);
+typedef int32_t (*alt_fpga_istream_t)(void * buf, size_t len, void * user_data);
 
 /*!
  * \addtogroup FPGA_MGR_CFG_FULL FPGA Full Configuration
@@ -535,22 +397,11 @@ typedef int32_t (*alt_fpga_istream_t)(void* buf, size_t buf_len, void* user_data
  * Perform a full configuration of the FPGA from the specified configuration
  * bitstream located in addressable memory.
  *
- * Due to the nature of FPGA configuration, there may be intermittent and
- * recoverable errors during the process. When the API returns ALT_E_FPGA_CFG,
- * it is advisable to retry configuration up to 5 times. If the error still
- * persists, there may be an unrecoverable configuration error or a problem
- * with configuration image bitstream data.
- *
- * \internal
- * Source: FPGA Manager NPP, section 4.2.1.3 "Error handling and corrupted
- * configuration file"
- * \endinternal
- *
- * \param       cfg_buf
+ * \param       buf
  *              A pointer to a buffer containing FPGA configuration bitstream
  *              data.
  *
- * \param       cfg_buf_len
+ * \param       len
  *              The length of the configuration bitstream data in bytes.
  *
  * \retval      ALT_E_SUCCESS           FPGA configuration was successful.
@@ -561,8 +412,36 @@ typedef int32_t (*alt_fpga_istream_t)(void* buf, size_t buf_len, void* user_data
  *                                      FPGA. Use alt_fpga_control_enable() to
  *                                      gain control.
  */
-ALT_STATUS_CODE alt_fpga_configure(const void* cfg_buf,
-                                   size_t cfg_buf_len);
+ALT_STATUS_CODE alt_fpga_configure(const void * buf,
+                                   size_t len);
+
+/*!
+ * Perform a full configuration of the FPGA from the specified list of
+ * configuration bitstream(s) located in addressable memory.
+ *
+ * \param       buf_list
+ *              A pointer to an array of buffer(s) containing the FPGA
+ *              configuration bitstream data.
+ *
+ * \param       len_list
+ *              A pointer to an array of length(s) corresponding to the
+ *              configuration bitstream data length in bytes.
+ *
+ * \param       list_count
+ *              The number of items in \b buf_list and \b len_list.
+ *
+ * \retval      ALT_E_SUCCESS           FPGA configuration was successful.
+ * \retval      ALT_E_FPGA_CFG          FPGA configuration error detected.
+ * \retval      ALT_E_FPGA_CRC          FPGA CRC error detected.
+ * \retval      ALT_E_FPGA_PWR_OFF      FPGA is not powered on.
+ * \retval      ALT_E_FPGA_NO_SOC_CTRL  SoC software is not in control of the
+ *                                      FPGA. Use alt_fpga_control_enable() to
+ *                                      gain control.
+ */
+ALT_STATUS_CODE alt_fpga_configure_list(const void ** buf_list,
+                                        const size_t * len_list,
+                                        size_t list_count);
+
 
 #if ALT_FPGA_ENABLE_DMA_SUPPORT
 
@@ -571,23 +450,18 @@ ALT_STATUS_CODE alt_fpga_configure(const void* cfg_buf,
  * bitstream located in addressable memory using the DMA engine. Using DMA can
  * have a large performance benefit in FPGA programming time.
  *
- * Due to the nature of FPGA configuration, there may be intermittent and
- * recoverable errors during the process. When the API returns ALT_E_FPGA_CFG,
- * it is advisable to retry configuration up to 5 times. If the error still
- * persists, there may be an unrecoverable configuration error or a problem
- * with configuration image bitstream data.
+ * The DMA subsystem must be initialized and the DMA channel allocated before
+ * using this API.
  *
- * \internal
- * Source: FPGA Manager NPP, section 4.2.1.3 "Error handling and corrupted
- * configuration file"
- * \endinternal
- *
- * \param       cfg_buf
+ * \param       buf
  *              A pointer to a buffer containing FPGA configuration bitstream
  *              data.
  *
- * \param       cfg_buf_len
+ * \param       len
  *              The length of the configuration bitstream data in bytes.
+ *
+ * \param       dma_channel
+ *              DMA channel to use for performing configuration.
  *
  * \retval      ALT_E_SUCCESS           FPGA configuration was successful.
  * \retval      ALT_E_FPGA_CFG          FPGA configuration error detected.
@@ -599,27 +473,53 @@ ALT_STATUS_CODE alt_fpga_configure(const void* cfg_buf,
  * \retval      ALT_E_BAD_ARG           The user provided buffer is unaligned
  *                                      to the 32-bit boundary.
  */
-
-ALT_STATUS_CODE alt_fpga_configure_dma(const void* cfg_buf,
-                                       size_t cfg_buf_len,
+ALT_STATUS_CODE alt_fpga_configure_dma(const void * buf,
+                                       size_t len,
                                        ALT_DMA_CHANNEL_t dma_channel);
+
+/*!
+ * Perform a full configuration of the FPGA from the specified list of
+ * configuration bitstream(s) located in addressable memory using the DMA
+ * engine. Using DMA can have a large performance benefit in FPGA programming
+ * time.
+ *
+ * The DMA subsystem must be initialized and the DMA channel allocated before
+ * using this API.
+ *
+ * \param       buf_list
+ *              A pointer to an array of buffer(s) containing the FPGA
+ *              configuration bitstream data.
+ *
+ * \param       len_list
+ *              A pointer to an array of length(s) corresponding to the
+ *              configuration bitstream data length in bytes.
+ *
+ * \param       list_count
+ *              The number of items in \b buf_list and \b len_list.
+ *
+ * \param       dma_channel
+ *              DMA channel to use for performing configuration.
+ *
+ * \retval      ALT_E_SUCCESS           FPGA configuration was successful.
+ * \retval      ALT_E_FPGA_CFG          FPGA configuration error detected.
+ * \retval      ALT_E_FPGA_CRC          FPGA CRC error detected.
+ * \retval      ALT_E_FPGA_PWR_OFF      FPGA is not powered on.
+ * \retval      ALT_E_FPGA_NO_SOC_CTRL  SoC software is not in control of the
+ *                                      FPGA. Use alt_fpga_control_enable() to
+ *                                      gain control.
+ * \retval      ALT_E_BAD_ARG           The user provided buffer is unaligned
+ *                                      to the 32-bit boundary.
+ */
+ALT_STATUS_CODE alt_fpga_configure_list_dma(const void ** buf_list,
+                                            const size_t * len_list,
+                                            size_t list_count,
+                                            ALT_DMA_CHANNEL_t dma_channel);
 
 #endif
 
 /*!
  * Perform a full configuration of the FPGA from the user defined configuration
  * bitstream input source.
- *
- * Due to the nature of FPGA configuration, there may be intermittent and
- * recoverable errors during the process. When the API returns ALT_E_FPGA_CFG,
- * it is advisable to retry configuration up to 5 times. If the error still
- * persists, there may be an unrecoverable configuration error or a problem
- * with configuration image bitstream data.
- *
- * \internal
- * Source: FPGA Manager NPP, section 4.2.1.3 "Error handling and corrupted
- * configuration file"
- * \endinternal
  *
  * \param       cfg_stream
  *              A pointer to a callback function used to consecutively read
@@ -650,16 +550,8 @@ ALT_STATUS_CODE alt_fpga_istream_configure(alt_fpga_istream_t cfg_stream,
  * bitstream input source using the DMA engine. Using DMA can have a large
  * performance benefit in FPGA programming time.
  *
- * Due to the nature of FPGA configuration, there may be intermittent and
- * recoverable errors during the process. When the API returns ALT_E_FPGA_CFG,
- * it is advisable to retry configuration up to 5 times. If the error still
- * persists, there may be an unrecoverable configuration error or a problem
- * with configuration image bitstream data.
- *
- * \internal
- * Source: FPGA Manager NPP, section 4.2.1.3 "Error handling and corrupted
- * configuration file"
- * \endinternal
+ * The DMA subsystem must be initialized and the DMA channel allocated before
+ * using this API.
  *
  * \param       cfg_stream
  *              A pointer to a callback function used to consecutively read
@@ -669,6 +561,9 @@ ALT_STATUS_CODE alt_fpga_istream_configure(alt_fpga_istream_t cfg_stream,
  *              A 32-bit user defined data word. The content of this parameter
  *              is user defined. The FPGA Manager merely forwards the \e
  *              user_data value when it invokes the \e cfg_stream callback.
+ *
+ * \param       dma_channel
+ *              DMA channel to use for performing configuration.
  *
  * \retval      ALT_E_SUCCESS           FPGA configuration FPGA was successful.
  * \retval      ALT_E_FPGA_CFG          FPGA configuration error detected.
@@ -699,139 +594,79 @@ ALT_STATUS_CODE alt_fpga_istream_configure_dma(alt_fpga_istream_t cfg_stream,
 /*!
  * \addtogroup FPGA_MGR_INT FPGA Manager Interrupt Control
  *
- * The functions in this group provide management of interrupts originating
- * from the FPGA Manager.
+ * The functions in ths group provide management of interrupts originating from
+ * the FPGA Manager.
  *
  * The following interrupt request (IRQ) signal is sourced from the FPGA
  * Manager:
  *
- * * \b fpga_man_IRQ - FPGA Manager control block interrupt output. Provides
- *                     monitoring of the configuration and operational status
- *                     of the FPGA.  The interrupt signal assertion value is
- *                     the logical \e OR of twelve sources that monitor the
- *                     status of the FPGA control block (CB).  The twelve FPGA
- *                     CB interrupt sources are enumerated and described by the
- *                     type \ref ALT_FPGA_MON_STATUS_t.
- *
- *                     Each FPGA monitor status condition may be individually
- *                     disabled/enabled as a contributor to the determination
- *                     of the \b fpga_man_IRQ assertion status.
- *
- *                     The \b fpga_man_IRQ and its contributing FPGA monitor
- *                     status conditions are treated as a level sensitive
- *                     interrupt. As as consequence, there are no explicit
- *                     functions to explicitly clear an asserted FPGA monitor
- *                     status conditions.
+ *  * \b gpio_intr_flag
  *
  * @{
  */
 
 /*!
- * Disable the \b fpga_man_IRQ interrupt signal source monitor status
- * condition(s).
+ * Enable the FPGA Manager to interrupt on status condition(s) identified in
+ * the mask. To clear the interrupting condition, call
+ * alt_fpga_int_clear().
  *
- * This function disables one or more of the monitor status conditions as
- * contributors to the \b fpga_man_IRQ interrupt signal state.
+ * \param       mask
+ *              Specifies the status conditions to enable as the interrupt
+ *              source contributor(s). \e mask is a mask of logically OR'ed
+ *              \ref ALT_FPGA_STATUS_t values that designates the conditions to
+ *              enable.
  *
- * NOTE: A set bit for a monitor status condition in the mask value does not
- * have the effect of enabling it as a contributor to the \b fpga_man_IRQ
- * interrupt signal state. The function alt_fpga_man_irq_enable() is used to
- * enable monitor status source condition(s).
- *
- * \param       mon_stat_mask
- *              Specifies the monitor status conditions to disable as interrupt
- *              source contributors. \e mon_stat_mask is a mask of logically
- *              OR'ed ALT_FPGA_MON_STATUS_t values that designate the monitor
- *              status conditions to disable.
- *
- * \retval      ALT_E_SUCCESS   Successful status.
- * \retval      ALT_E_BAD_ARG   The \e mon_stat_mask argument contains an
- *                              unknown monitor status value.
+ * \retval      ALT_E_SUCCESS           Successful status.
+ * \retval      ALT_E_BAD_ARG           Specified mask includes invalid status
+ *                                      condition(s).
+ * \retval      ALT_E_FPGA_PWR_OFF      FPGA is not powered on.
  */
-ALT_STATUS_CODE alt_fpga_man_irq_disable(ALT_FPGA_MON_STATUS_t mon_stat_mask);
+ALT_STATUS_CODE alt_fpga_int_enable(uint32_t mask);
 
 /*!
- * Enable the \b fpga_man_IRQ interrupt signal source monitor status
- * condition(s).
+ * Disable the FPGA Manager to interrupt status condition(s) identified in the
+ * mask.
  *
- * This function enables one or more of the monitor status conditions as
- * contributors to the \b fpga_man_IRQ interrupt signal state.
+ * \param       mask
+ *              Specifies the status conditions to disable as the interrupt
+ *              source contributor(s). \e mask is a mask of logically OR'ed
+ *              \ref ALT_FPGA_STATUS_t values that designates the conditions to
+ *              disable.
  *
- * NOTE: A cleared bit for any monitor status condition in the mask value does
- * not have the effect of disabling it as a contributor to the \b fpga_man_IRQ
- * interrupt signal state. The function alt_fpga_man_irq_disable() is used to
- * disable monitor status source condition(s).
- *
- * \param       mon_stat_mask
- *              Specifies the monitor status conditions to enable as interrupt
- *              source contributors. \e mon_stat_mask is a mask of logically
- *              OR'ed ALT_FPGA_MON_STATUS_t values that designate the monitor
- *              conditions to enable.
- *
- * \retval      ALT_E_SUCCESS   Successful status.
- * \retval      ALT_E_BAD_ARG   The \e mon_stat_mask argument contains an
- *                              unknown monitor status value.
+ * \retval      ALT_E_SUCCESS           Successful status.
+ * \retval      ALT_E_BAD_ARG           Specified mask includes invalid status
+ *                                      condition(s).
+ * \retval      ALT_E_FPGA_PWR_OFF      FPGA is not powered on.
  */
-ALT_STATUS_CODE alt_fpga_man_irq_enable(ALT_FPGA_MON_STATUS_t mon_stat_mask);
+ALT_STATUS_CODE alt_fpga_int_disable(uint32_t mask);
 
 /*!
- * Returns the interrupt configuration (level-triggered or edge-triggered) for
- * the specified monitor status condition(s).
+ * Gets the current status conditions contributing to the interrupt generation.
+ * Only enabled status conditions will be returned. To query all active status
+ * condition(s), call alt_fpga_status_get(). To clear the current interrupt
+ * generation, call alt_fpga_int_clear().
  *
- * \param       mon_stat_mask
- *              Specifies the monitor status conditions interrupt type to
- *              return.
- *
- * \returns     The current interrupt source configuration for the given mask.
- *              Bits with 0 are level-triggered and 1 are edge-triggered.
+ * \retval      Mask of logically OR'ed \ref ALT_FPGA_STATUS_t values that are
+ *              enabled and contributiong to the interrupt generation.
  */
-uint32_t alt_fpga_man_irq_type_get(ALT_FPGA_MON_STATUS_t mon_stat_mask);
+uint32_t        alt_fpga_int_get(void);
 
 /*!
- * Sets the trigger condition configuration for specified status mask.
+ * Clears the interrupt status condition(s) identified in the mask.
  *
- * \param       mon_stat_mask
- *              Specifies the monitor status conditions interrupt type to
- *              update.
+ * \param       mask
+ *              Specifies the status conditions to clear as the interrupt
+ *              source contributor(s). \e mask is a mask of logically OR'ed
+ *              \ref ALT_FPGA_STATUS_t values that designates the conditions to
+ *              disable.
  *
- * \param       mon_stat_config
- *              The interrupt configuration to update. Bits with 0 is
- *              level-triggered and 1 is edge-triggered.
- *
- * \retval      ALT_E_SUCCESS   The operation was successful.
- * \retval      ALT_E_ERROR     The operation failed.
- */
-ALT_STATUS_CODE alt_fpga_man_irq_type_set(ALT_FPGA_MON_STATUS_t mon_stat_mask,
-                                          ALT_FPGA_MON_STATUS_t mon_stat_config);
+ * \retval      ALT_E_SUCCESS           Successful status.
+ * \retval      ALT_E_BAD_ARG           Specified mask includes invalid status
+ *                                      condition(s).
+ * \retval      ALT_E_FPGA_PWR_OFF      FPGA is not powered on.
 
-/*!
- * Returns the active-high or active-low polarity configuration for the FPGA
- * monitor signals.
- *
- * \param       mon_stat_mask
- *              Specifies the monitor status condition polarity to return.
- *
- * \returns     The current interrupt polarity condition. Bits with 0 are
- *              active low and 1 are active high.
  */
-uint32_t alt_fpga_man_irq_pol_get(ALT_FPGA_MON_STATUS_t mon_stat_mask);
-
-/*!
- * Sets the active level configuration for the specified status mask.
- *
- * \param       mon_stat_mask
- *              Specifies the monitor status conditions interrupt type to
- *              update.
- *
- * \param       mon_stat_config
- *              The interrupt configuration to update. Bits with 0 is
- *              active low and 1 is active high.
- *
- * \retval      ALT_E_SUCCESS   The operation was successful.
- * \retval      ALT_E_ERROR     The operation failed.
- */
-ALT_STATUS_CODE alt_fpga_man_irq_pol_set(ALT_FPGA_MON_STATUS_t mon_stat_mask,
-                                         ALT_FPGA_MON_STATUS_t mon_stat_config);
+ALT_STATUS_CODE alt_fpga_int_clear(uint32_t mask);
 
 /*!
  * @}
@@ -855,100 +690,100 @@ ALT_STATUS_CODE alt_fpga_man_irq_pol_set(ALT_FPGA_MON_STATUS_t mon_stat_mask,
  */
 typedef enum ALT_FPGA_GPI_e
 {
-    /*! Signal driven from the FPGA fabric on f2s_gp[0] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[0] */
     ALT_FPGA_GPI_0  = (int32_t)(1UL <<  0),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[1] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[1] */
     ALT_FPGA_GPI_1  = (int32_t)(1UL <<  1),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[2] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[2] */
     ALT_FPGA_GPI_2  = (int32_t)(1UL <<  2),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[3] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[3] */
     ALT_FPGA_GPI_3  = (int32_t)(1UL <<  3),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[4] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[4] */
     ALT_FPGA_GPI_4  = (int32_t)(1UL <<  4),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[5] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[5] */
     ALT_FPGA_GPI_5  = (int32_t)(1UL <<  5),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[6] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[6] */
     ALT_FPGA_GPI_6  = (int32_t)(1UL <<  6),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[7] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[7] */
     ALT_FPGA_GPI_7  = (int32_t)(1UL <<  7),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[8] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[8] */
     ALT_FPGA_GPI_8  = (int32_t)(1UL <<  8),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[9] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[9] */
     ALT_FPGA_GPI_9  = (int32_t)(1UL <<  9),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[10] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[10] */
     ALT_FPGA_GPI_10 = (int32_t)(1UL << 10),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[11] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[11] */
     ALT_FPGA_GPI_11 = (int32_t)(1UL << 11),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[12] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[12] */
     ALT_FPGA_GPI_12 = (int32_t)(1UL << 12),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[13] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[13] */
     ALT_FPGA_GPI_13 = (int32_t)(1UL << 13),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[14] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[14] */
     ALT_FPGA_GPI_14 = (int32_t)(1UL << 14),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[15] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[15] */
     ALT_FPGA_GPI_15 = (int32_t)(1UL << 15),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[16] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[16] */
     ALT_FPGA_GPI_16 = (int32_t)(1UL << 16),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[17] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[17] */
     ALT_FPGA_GPI_17 = (int32_t)(1UL << 17),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[18] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[18] */
     ALT_FPGA_GPI_18 = (int32_t)(1UL << 18),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[19] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[19] */
     ALT_FPGA_GPI_19 = (int32_t)(1UL << 19),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[20] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[20] */
     ALT_FPGA_GPI_20 = (int32_t)(1UL << 20),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[21] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[21] */
     ALT_FPGA_GPI_21 = (int32_t)(1UL << 21),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[22] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[22] */
     ALT_FPGA_GPI_22 = (int32_t)(1UL << 22),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[23] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[23] */
     ALT_FPGA_GPI_23 = (int32_t)(1UL << 23),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[24] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[24] */
     ALT_FPGA_GPI_24 = (int32_t)(1UL << 24),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[25] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[25] */
     ALT_FPGA_GPI_25 = (int32_t)(1UL << 25),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[26] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[26] */
     ALT_FPGA_GPI_26 = (int32_t)(1UL << 26),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[27] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[27] */
     ALT_FPGA_GPI_27 = (int32_t)(1UL << 27),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[28] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[28] */
     ALT_FPGA_GPI_28 = (int32_t)(1UL << 28),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[29] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[29] */
     ALT_FPGA_GPI_29 = (int32_t)(1UL << 29),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[30] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[30] */
     ALT_FPGA_GPI_30 = (int32_t)(1UL << 30),
 
-    /*! Signal driven from the FPGA fabric on f2s_gp[31] */
+    /*! Signal driven to the FPGA fabric on f2s_gp[31] */
     ALT_FPGA_GPI_31 = (int32_t)(1UL << 31)
 
 } ALT_FPGA_GPI_t;
@@ -1114,4 +949,4 @@ ALT_STATUS_CODE alt_fpga_gpo_write(uint32_t mask, uint32_t value);
 }
 #endif  /* __cplusplus */
 
-#endif  /* __ALT_FPGA_MGR_H__ */
+#endif /* __ALT_FPGA_MANAGER_H__ */

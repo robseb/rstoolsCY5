@@ -32,998 +32,23 @@
 
 /* Altera - ALT_FPGAMGR */
 
-#ifndef __ALTERA_ALT_FPGAMGR_H__
-#define __ALTERA_ALT_FPGAMGR_H__
+#ifndef __ALT_SOCAL_FPGAMGR_H__
+#define __ALT_SOCAL_FPGAMGR_H__
 
+#ifndef __ASSEMBLY__
 #ifdef __cplusplus
+#include <cstdint>
 extern "C"
 {
-#endif  /* __cplusplus */
-
-/*
- * Component : FPGA Manager Module - ALT_FPGAMGR
- * FPGA Manager Module
- * 
- * Registers in the FPGA Manager module accessible via its APB slave
- * 
- */
-/*
- * Register : Status Register - stat
- * 
- * Provides status fields for software for the FPGA Manager.
- * 
- * The Mode field tells software what configuration phase the FPGA currently is in.
- * For regular configuration through the PINs or through the HPS, these states map
- * directly to customer configuration documentation.
- * 
- * For Configuration Via PCI Express (CVP), the IOCSR configuration is done through
- * the PINS or through HPS.  Then the complete configuration is done through the
- * PCI Express Bus.   When CVP is being done, InitPhase indicates only IOCSR
- * configuration has completed.  CVP_CONF_DONE is available in the CB Monitor for
- * observation by software.
- * 
- * The MSEL field provides a read only register for software to read the MSEL value
- * driven from the external pins.
- * 
- * Register Layout
- * 
- *  Bits   | Access | Reset | Description
- * :-------|:-------|:------|:------------
- *  [2:0]  | RW     | 0x5   | Mode       
- *  [7:3]  | R      | 0x8   | MSEL       
- *  [31:8] | ???    | 0x0   | *UNDEFINED*
- * 
- */
-/*
- * Field : Mode - mode
- * 
- * Reports FPGA state
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description                                 
- * :---------------------------------|:------|:---------------------------------------------
- *  ALT_FPGAMGR_STAT_MOD_E_FPGAOFF   | 0x0   | FPGA Powered Off                            
- *  ALT_FPGAMGR_STAT_MOD_E_RSTPHASE  | 0x1   | FPGA in Reset Phase                         
- *  ALT_FPGAMGR_STAT_MOD_E_CFGPHASE  | 0x2   | FPGA in Configuration Phase                 
- *  ALT_FPGAMGR_STAT_MOD_E_INITPHASE | 0x3   | FPGA in Initialization Phase. In CVP        
- * :                                 |       | configuration, this state indicates IO      
- * :                                 |       | configuration has completed.                
- *  ALT_FPGAMGR_STAT_MOD_E_USERMOD   | 0x4   | FPGA in User Mode                           
- *  ALT_FPGAMGR_STAT_MOD_E_UNKNOWN   | 0x5   | FPGA state has not yet been determined. This
- * :                                 |       | only occurs briefly after reset.            
- * 
- * Field Access Macros:
- * 
- */
+#else   /* __cplusplus */
 #include <stdint.h>
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MOD
- * 
- * FPGA Powered Off
- */
-#define ALT_FPGAMGR_STAT_MOD_E_FPGAOFF      0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MOD
- * 
- * FPGA in Reset Phase
- */
-#define ALT_FPGAMGR_STAT_MOD_E_RSTPHASE     0x1
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MOD
- * 
- * FPGA in Configuration Phase
- */
-#define ALT_FPGAMGR_STAT_MOD_E_CFGPHASE     0x2
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MOD
- * 
- * FPGA in Initialization Phase. In CVP configuration, this state indicates IO
- * configuration has completed.
- */
-#define ALT_FPGAMGR_STAT_MOD_E_INITPHASE    0x3
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MOD
- * 
- * FPGA in User Mode
- */
-#define ALT_FPGAMGR_STAT_MOD_E_USERMOD      0x4
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MOD
- * 
- * FPGA state has not yet been determined. This only occurs briefly after reset.
- */
-#define ALT_FPGAMGR_STAT_MOD_E_UNKNOWN      0x5
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_STAT_MOD register field. */
-#define ALT_FPGAMGR_STAT_MOD_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_STAT_MOD register field. */
-#define ALT_FPGAMGR_STAT_MOD_MSB        2
-/* The width in bits of the ALT_FPGAMGR_STAT_MOD register field. */
-#define ALT_FPGAMGR_STAT_MOD_WIDTH      3
-/* The mask used to set the ALT_FPGAMGR_STAT_MOD register field value. */
-#define ALT_FPGAMGR_STAT_MOD_SET_MSK    0x00000007
-/* The mask used to clear the ALT_FPGAMGR_STAT_MOD register field value. */
-#define ALT_FPGAMGR_STAT_MOD_CLR_MSK    0xfffffff8
-/* The reset value of the ALT_FPGAMGR_STAT_MOD register field. */
-#define ALT_FPGAMGR_STAT_MOD_RESET      0x5
-/* Extracts the ALT_FPGAMGR_STAT_MOD field value from a register. */
-#define ALT_FPGAMGR_STAT_MOD_GET(value) (((value) & 0x00000007) >> 0)
-/* Produces a ALT_FPGAMGR_STAT_MOD register field value suitable for setting the register. */
-#define ALT_FPGAMGR_STAT_MOD_SET(value) (((value) << 0) & 0x00000007)
-
-/*
- * Field : MSEL - msel
- * 
- * This read-only field allows software to observe the MSEL inputs from the device
- * pins. The MSEL pins define the FPGA configuration mode.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                         | Value | Description                                     
- * :---------------------------------------------|:------|:-------------------------------------------------
- *  ALT_FPGAMGR_STAT_MSEL_E_PP16_FAST_NOAES_NODC | 0x0   | 16-bit Passive Parallel with Fast Power on Reset
- * :                                             |       | Delay;  No AES Encryption; No Data Compression. 
- * :                                             |       | CDRATIO must be programmed to x1                
- *  ALT_FPGAMGR_STAT_MSEL_E_PP16_FAST_AES_NODC   | 0x1   | 16-bit Passive Parallel with Fast Power on Reset
- * :                                             |       | Delay; With AES Encryption; No Data Compression.
- * :                                             |       | CDRATIO must be programmed to x4                
- *  ALT_FPGAMGR_STAT_MSEL_E_PP16_FAST_AESOPT_DC  | 0x2   | 16-bit Passive Parallel with Fast Power on Reset
- * :                                             |       | Delay; AES Optional; With Data Compression.     
- * :                                             |       | CDRATIO must be programmed to x8                
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD3                | 0x3   | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_PP16_SLOW_NOAES_NODC | 0x4   | 16-bit Passive Parallel with Slow Power on Reset
- * :                                             |       | Delay;  No AES Encryption; No Data Compression. 
- * :                                             |       | CDRATIO must be programmed to x1                
- *  ALT_FPGAMGR_STAT_MSEL_E_PP16_SLOW_AES_NODC   | 0x5   | 16-bit Passive Parallel with Slow Power on Reset
- * :                                             |       | Delay; With AES Encryption; No Data Compression.
- * :                                             |       | CDRATIO must be programmed to x4                
- *  ALT_FPGAMGR_STAT_MSEL_E_PP16_SLOW_AESOPT_DC  | 0x6   | 16-bit Passive Parallel with Slow Power on Reset
- * :                                             |       | Delay; AES Optional; With Data Compression.     
- * :                                             |       | CDRATIO must be programmed to x8                
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD7                | 0x7   | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_PP32_FAST_NOAES_NODC | 0x8   | 32-bit Passive Parallel with Fast Power on Reset
- * :                                             |       | Delay;  No AES Encryption; No Data Compression. 
- * :                                             |       | CDRATIO must be programmed to x1                
- *  ALT_FPGAMGR_STAT_MSEL_E_PP32_FAST_AES_NODC   | 0x9   | 32-bit Passive Parallel with Fast Power on Reset
- * :                                             |       | Delay; With AES Encryption; No Data Compression.
- * :                                             |       | CDRATIO must be programmed to x4                
- *  ALT_FPGAMGR_STAT_MSEL_E_PP32_FAST_AESOPT_DC  | 0xa   | 32-bit Passive Parallel with Fast Power on Reset
- * :                                             |       | Delay; AES Optional; With Data Compression.     
- * :                                             |       | CDRATIO must be programmed to x8                
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD11               | 0xb   | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_PP32_SLOW_NOAES_NODC | 0xc   | 32-bit Passive Parallel with Slow Power on Reset
- * :                                             |       | Delay;  No AES Encryption; No Data Compression. 
- * :                                             |       | CDRATIO must be programmed to x1                
- *  ALT_FPGAMGR_STAT_MSEL_E_PP32_SLOW_AES_NODC   | 0xd   | 32-bit Passive Parallel with Slow Power on Reset
- * :                                             |       | Delay; With AES Encryption; No Data Compression.
- * :                                             |       | CDRATIO must be programmed to x4                
- *  ALT_FPGAMGR_STAT_MSEL_E_PP32_SLOW_AESOPT_DC  | 0xe   | 32-bit Passive Parallel with Slow Power on Reset
- * :                                             |       | Delay; AES Optional; With Data Compression.     
- * :                                             |       | CDRATIO must be programmed to x8                
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD15               | 0xf   | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD16               | 0x10  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD17               | 0x11  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD18               | 0x12  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD19               | 0x13  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD20               | 0x14  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD21               | 0x15  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD22               | 0x16  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD23               | 0x17  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD24               | 0x18  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD25               | 0x19  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD26               | 0x1a  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD27               | 0x1b  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD28               | 0x1c  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD29               | 0x1d  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD30               | 0x1e  | Reserved                                        
- *  ALT_FPGAMGR_STAT_MSEL_E_RSVD31               | 0x1f  | Reserved                                        
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 16-bit Passive Parallel with Fast Power on Reset Delay;  No AES Encryption; No
- * Data Compression.
- * 
- * CDRATIO must be programmed to x1
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP16_FAST_NOAES_NODC    0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 16-bit Passive Parallel with Fast Power on Reset Delay; With AES Encryption; No
- * Data Compression.
- * 
- * CDRATIO must be programmed to x4
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP16_FAST_AES_NODC      0x1
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 16-bit Passive Parallel with Fast Power on Reset Delay; AES Optional; With Data
- * Compression.
- * 
- * CDRATIO must be programmed to x8
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP16_FAST_AESOPT_DC     0x2
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD3                   0x3
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 16-bit Passive Parallel with Slow Power on Reset Delay;  No AES Encryption; No
- * Data Compression.
- * 
- * CDRATIO must be programmed to x1
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP16_SLOW_NOAES_NODC    0x4
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 16-bit Passive Parallel with Slow Power on Reset Delay; With AES Encryption; No
- * Data Compression.
- * 
- * CDRATIO must be programmed to x4
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP16_SLOW_AES_NODC      0x5
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 16-bit Passive Parallel with Slow Power on Reset Delay; AES Optional; With Data
- * Compression.
- * 
- * CDRATIO must be programmed to x8
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP16_SLOW_AESOPT_DC     0x6
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD7                   0x7
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 32-bit Passive Parallel with Fast Power on Reset Delay;  No AES Encryption; No
- * Data Compression.
- * 
- * CDRATIO must be programmed to x1
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP32_FAST_NOAES_NODC    0x8
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 32-bit Passive Parallel with Fast Power on Reset Delay; With AES Encryption; No
- * Data Compression.
- * 
- * CDRATIO must be programmed to x4
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP32_FAST_AES_NODC      0x9
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 32-bit Passive Parallel with Fast Power on Reset Delay; AES Optional; With Data
- * Compression.
- * 
- * CDRATIO must be programmed to x8
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP32_FAST_AESOPT_DC     0xa
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD11                  0xb
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 32-bit Passive Parallel with Slow Power on Reset Delay;  No AES Encryption; No
- * Data Compression.
- * 
- * CDRATIO must be programmed to x1
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP32_SLOW_NOAES_NODC    0xc
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 32-bit Passive Parallel with Slow Power on Reset Delay; With AES Encryption; No
- * Data Compression.
- * 
- * CDRATIO must be programmed to x4
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP32_SLOW_AES_NODC      0xd
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * 32-bit Passive Parallel with Slow Power on Reset Delay; AES Optional; With Data
- * Compression.
- * 
- * CDRATIO must be programmed to x8
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_PP32_SLOW_AESOPT_DC     0xe
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD15                  0xf
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD16                  0x10
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD17                  0x11
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD18                  0x12
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD19                  0x13
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD20                  0x14
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD21                  0x15
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD22                  0x16
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD23                  0x17
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD24                  0x18
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD25                  0x19
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD26                  0x1a
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD27                  0x1b
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD28                  0x1c
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD29                  0x1d
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD30                  0x1e
-/*
- * Enumerated value for register field ALT_FPGAMGR_STAT_MSEL
- * 
- * Reserved
- */
-#define ALT_FPGAMGR_STAT_MSEL_E_RSVD31                  0x1f
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_STAT_MSEL register field. */
-#define ALT_FPGAMGR_STAT_MSEL_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_STAT_MSEL register field. */
-#define ALT_FPGAMGR_STAT_MSEL_MSB        7
-/* The width in bits of the ALT_FPGAMGR_STAT_MSEL register field. */
-#define ALT_FPGAMGR_STAT_MSEL_WIDTH      5
-/* The mask used to set the ALT_FPGAMGR_STAT_MSEL register field value. */
-#define ALT_FPGAMGR_STAT_MSEL_SET_MSK    0x000000f8
-/* The mask used to clear the ALT_FPGAMGR_STAT_MSEL register field value. */
-#define ALT_FPGAMGR_STAT_MSEL_CLR_MSK    0xffffff07
-/* The reset value of the ALT_FPGAMGR_STAT_MSEL register field. */
-#define ALT_FPGAMGR_STAT_MSEL_RESET      0x8
-/* Extracts the ALT_FPGAMGR_STAT_MSEL field value from a register. */
-#define ALT_FPGAMGR_STAT_MSEL_GET(value) (((value) & 0x000000f8) >> 3)
-/* Produces a ALT_FPGAMGR_STAT_MSEL register field value suitable for setting the register. */
-#define ALT_FPGAMGR_STAT_MSEL_SET(value) (((value) << 3) & 0x000000f8)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for writing
- * hardware drivers is to use the SoCAL access macros and alt_read_word() and
- * alt_write_word() functions.
- * 
- * The struct declaration for register ALT_FPGAMGR_STAT.
- */
-struct ALT_FPGAMGR_STAT_s
-{
-    uint32_t        mode :  3;  /* Mode */
-    const uint32_t  msel :  5;  /* MSEL */
-    uint32_t             : 24;  /* *UNDEFINED* */
-};
-
-/* The typedef declaration for register ALT_FPGAMGR_STAT. */
-typedef volatile struct ALT_FPGAMGR_STAT_s  ALT_FPGAMGR_STAT_t;
+#endif  /* __cplusplus */
 #endif  /* __ASSEMBLY__ */
 
-/* The byte offset of the ALT_FPGAMGR_STAT register from the beginning of the component. */
-#define ALT_FPGAMGR_STAT_OFST        0x0
-
 /*
- * Register : Control Register - ctrl
- * 
- * Allows HPS to control FPGA configuration.
- * 
- * The NCONFIGPULL, NSTATUSPULL, and CONFDONEPULL fields drive signals to the FPGA
- * Control Block that are logically ORed into their respective pins. These signals
- * are always driven independent of the value of EN. The polarity of the
- * NCONFIGPULL, NSTATUSPULL, and CONFDONEPULL fields is inverted relative to their
- * associated pins.
- * 
- * The MSEL (external pins), CDRATIO and CFGWDTH signals determine the mode of
- * operation for Normal Configuration. For Partial Reconfiguration, CDRATIO is used
- * to set the appropriate clock to data ratio, and CFGWDTH should always be set to
- * 16-bit Passive Parallel.
- * 
- * AXICFGEN is used to enable transfer of configuration data by enabling or
- * disabling DCLK during data transfers.
- * 
- * Register Layout
- * 
- *  Bits    | Access | Reset | Description             
- * :--------|:-------|:------|:-------------------------
- *  [0]     | RW     | 0x0   | Enable                  
- *  [1]     | RW     | 0x0   | nCE                     
- *  [2]     | RW     | 0x0   | nCONFIG Pull-Down       
- *  [3]     | RW     | 0x0   | nSTATUS Pull-Down       
- *  [4]     | RW     | 0x0   | CONF_DONE Pull-Down     
- *  [5]     | RW     | 0x0   | Partial Reconfiguration 
- *  [7:6]   | RW     | 0x0   | CD Ratio                
- *  [8]     | RW     | 0x0   | AXI Configuration Enable
- *  [9]     | RW     | 0x1   | Configuration Data Width
- *  [31:10] | ???    | 0x0   | *UNDEFINED*             
+ * Component : ALT_FPGAMGR
  * 
  */
-/*
- * Field : Enable - en
- * 
- * Controls whether the FPGA configuration pins or HPS FPGA Manager drive
- * configuration inputs to the CB.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description                                    
- * :---------------------------------------|:------|:------------------------------------------------
- *  ALT_FPGAMGR_CTL_EN_E_FPGA_PINS_CTL_CFG | 0x0   | FPGA configuration pins drive configuration    
- * :                                       |       | inputs to the CB. Used when FPGA is configured 
- * :                                       |       | by means other than the HPS.                   
- *  ALT_FPGAMGR_CTL_EN_E_FPGAMGR_CTLS_CFG  | 0x1   | FPGA Manager drives configuration inputs to the
- * :                                       |       | CB. Used when HPS configures the FPGA.         
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_EN
- * 
- * FPGA configuration pins drive configuration inputs to the CB. Used when FPGA is
- * configured by means other than the HPS.
- */
-#define ALT_FPGAMGR_CTL_EN_E_FPGA_PINS_CTL_CFG  0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_EN
- * 
- * FPGA Manager drives configuration inputs to the CB. Used when HPS configures the
- * FPGA.
- */
-#define ALT_FPGAMGR_CTL_EN_E_FPGAMGR_CTLS_CFG   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_CTL_EN register field. */
-#define ALT_FPGAMGR_CTL_EN_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_CTL_EN register field. */
-#define ALT_FPGAMGR_CTL_EN_MSB        0
-/* The width in bits of the ALT_FPGAMGR_CTL_EN register field. */
-#define ALT_FPGAMGR_CTL_EN_WIDTH      1
-/* The mask used to set the ALT_FPGAMGR_CTL_EN register field value. */
-#define ALT_FPGAMGR_CTL_EN_SET_MSK    0x00000001
-/* The mask used to clear the ALT_FPGAMGR_CTL_EN register field value. */
-#define ALT_FPGAMGR_CTL_EN_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_FPGAMGR_CTL_EN register field. */
-#define ALT_FPGAMGR_CTL_EN_RESET      0x0
-/* Extracts the ALT_FPGAMGR_CTL_EN field value from a register. */
-#define ALT_FPGAMGR_CTL_EN_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_FPGAMGR_CTL_EN register field value suitable for setting the register. */
-#define ALT_FPGAMGR_CTL_EN_SET(value) (((value) << 0) & 0x00000001)
-
-/*
- * Field : nCE - nce
- * 
- * This field drives the active-low Chip Enable (nCE) signal to the CB. It should
- * be set to 0 (configuration enabled) before CTRL.EN is set.
- * 
- * This field only effects the FPGA if CTRL.EN is 1.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                           | Value | Description                                    
- * :-------------------------------|:------|:------------------------------------------------
- *  ALT_FPGAMGR_CTL_NCE_E_CFG_END  | 0x0   | Configuration is enabled. The nCE to the CB is 
- * :                               |       | driven to 0.                                   
- *  ALT_FPGAMGR_CTL_NCE_E_CFG_DISD | 0x1   | Configuration is disabled. The nCE to the CB is
- * :                               |       | driven to 1.                                   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_NCE
- * 
- * Configuration is enabled. The nCE to the CB is driven to 0.
- */
-#define ALT_FPGAMGR_CTL_NCE_E_CFG_END   0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_NCE
- * 
- * Configuration is disabled. The nCE to the CB is driven to 1.
- */
-#define ALT_FPGAMGR_CTL_NCE_E_CFG_DISD  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_CTL_NCE register field. */
-#define ALT_FPGAMGR_CTL_NCE_LSB        1
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_CTL_NCE register field. */
-#define ALT_FPGAMGR_CTL_NCE_MSB        1
-/* The width in bits of the ALT_FPGAMGR_CTL_NCE register field. */
-#define ALT_FPGAMGR_CTL_NCE_WIDTH      1
-/* The mask used to set the ALT_FPGAMGR_CTL_NCE register field value. */
-#define ALT_FPGAMGR_CTL_NCE_SET_MSK    0x00000002
-/* The mask used to clear the ALT_FPGAMGR_CTL_NCE register field value. */
-#define ALT_FPGAMGR_CTL_NCE_CLR_MSK    0xfffffffd
-/* The reset value of the ALT_FPGAMGR_CTL_NCE register field. */
-#define ALT_FPGAMGR_CTL_NCE_RESET      0x0
-/* Extracts the ALT_FPGAMGR_CTL_NCE field value from a register. */
-#define ALT_FPGAMGR_CTL_NCE_GET(value) (((value) & 0x00000002) >> 1)
-/* Produces a ALT_FPGAMGR_CTL_NCE register field value suitable for setting the register. */
-#define ALT_FPGAMGR_CTL_NCE_SET(value) (((value) << 1) & 0x00000002)
-
-/*
- * Field : nCONFIG Pull-Down - nconfigpull
- * 
- * The nCONFIG input is used to put the FPGA into its reset phase. If the FPGA was
- * configured, its operation stops and it will have to be configured again to start
- * operation.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                     | Value | Description                                     
- * :-----------------------------------------|:------|:-------------------------------------------------
- *  ALT_FPGAMGR_CTL_NCFGPULL_E_DONT_PULLDOWN | 0x0   | Don't pull-down nCONFIG input to the CB.        
- *  ALT_FPGAMGR_CTL_NCFGPULL_E_PULLDOWN      | 0x1   | Pull-down nCONFIG input to the CB. This puts the
- * :                                         |       | FPGA in reset phase and restarts configuration. 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_NCFGPULL
- * 
- * Don't pull-down nCONFIG input to the CB.
- */
-#define ALT_FPGAMGR_CTL_NCFGPULL_E_DONT_PULLDOWN    0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_NCFGPULL
- * 
- * Pull-down nCONFIG input to the CB. This puts the FPGA in reset phase and
- * restarts configuration.
- */
-#define ALT_FPGAMGR_CTL_NCFGPULL_E_PULLDOWN         0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_CTL_NCFGPULL register field. */
-#define ALT_FPGAMGR_CTL_NCFGPULL_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_CTL_NCFGPULL register field. */
-#define ALT_FPGAMGR_CTL_NCFGPULL_MSB        2
-/* The width in bits of the ALT_FPGAMGR_CTL_NCFGPULL register field. */
-#define ALT_FPGAMGR_CTL_NCFGPULL_WIDTH      1
-/* The mask used to set the ALT_FPGAMGR_CTL_NCFGPULL register field value. */
-#define ALT_FPGAMGR_CTL_NCFGPULL_SET_MSK    0x00000004
-/* The mask used to clear the ALT_FPGAMGR_CTL_NCFGPULL register field value. */
-#define ALT_FPGAMGR_CTL_NCFGPULL_CLR_MSK    0xfffffffb
-/* The reset value of the ALT_FPGAMGR_CTL_NCFGPULL register field. */
-#define ALT_FPGAMGR_CTL_NCFGPULL_RESET      0x0
-/* Extracts the ALT_FPGAMGR_CTL_NCFGPULL field value from a register. */
-#define ALT_FPGAMGR_CTL_NCFGPULL_GET(value) (((value) & 0x00000004) >> 2)
-/* Produces a ALT_FPGAMGR_CTL_NCFGPULL register field value suitable for setting the register. */
-#define ALT_FPGAMGR_CTL_NCFGPULL_SET(value) (((value) << 2) & 0x00000004)
-
-/*
- * Field : nSTATUS Pull-Down - nstatuspull
- * 
- * Pulls down nSTATUS input to the CB
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                      | Value | Description                             
- * :------------------------------------------|:------|:-----------------------------------------
- *  ALT_FPGAMGR_CTL_NSTATPULL_E_DONT_PULLDOWN | 0x0   | Don't pull-down nSTATUS input to the CB.
- *  ALT_FPGAMGR_CTL_NSTATPULL_E_PULLDOWN      | 0x1   | Pull-down nSTATUS input to the CB.      
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_NSTATPULL
- * 
- * Don't pull-down nSTATUS input to the CB.
- */
-#define ALT_FPGAMGR_CTL_NSTATPULL_E_DONT_PULLDOWN   0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_NSTATPULL
- * 
- * Pull-down nSTATUS input to the CB.
- */
-#define ALT_FPGAMGR_CTL_NSTATPULL_E_PULLDOWN        0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_CTL_NSTATPULL register field. */
-#define ALT_FPGAMGR_CTL_NSTATPULL_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_CTL_NSTATPULL register field. */
-#define ALT_FPGAMGR_CTL_NSTATPULL_MSB        3
-/* The width in bits of the ALT_FPGAMGR_CTL_NSTATPULL register field. */
-#define ALT_FPGAMGR_CTL_NSTATPULL_WIDTH      1
-/* The mask used to set the ALT_FPGAMGR_CTL_NSTATPULL register field value. */
-#define ALT_FPGAMGR_CTL_NSTATPULL_SET_MSK    0x00000008
-/* The mask used to clear the ALT_FPGAMGR_CTL_NSTATPULL register field value. */
-#define ALT_FPGAMGR_CTL_NSTATPULL_CLR_MSK    0xfffffff7
-/* The reset value of the ALT_FPGAMGR_CTL_NSTATPULL register field. */
-#define ALT_FPGAMGR_CTL_NSTATPULL_RESET      0x0
-/* Extracts the ALT_FPGAMGR_CTL_NSTATPULL field value from a register. */
-#define ALT_FPGAMGR_CTL_NSTATPULL_GET(value) (((value) & 0x00000008) >> 3)
-/* Produces a ALT_FPGAMGR_CTL_NSTATPULL register field value suitable for setting the register. */
-#define ALT_FPGAMGR_CTL_NSTATPULL_SET(value) (((value) << 3) & 0x00000008)
-
-/*
- * Field : CONF_DONE Pull-Down - confdonepull
- * 
- * Pulls down CONF_DONE input to the CB
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                         | Value | Description                               
- * :---------------------------------------------|:------|:-------------------------------------------
- *  ALT_FPGAMGR_CTL_CONFDONEPULL_E_DONT_PULLDOWN | 0x0   | Don't pull-down CONF_DONE input to the CB.
- *  ALT_FPGAMGR_CTL_CONFDONEPULL_E_PULLDOWN      | 0x1   | Pull-down CONF_DONE input to the CB.      
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_CONFDONEPULL
- * 
- * Don't pull-down CONF_DONE input to the CB.
- */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_E_DONT_PULLDOWN    0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_CONFDONEPULL
- * 
- * Pull-down CONF_DONE input to the CB.
- */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_E_PULLDOWN         0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_CTL_CONFDONEPULL register field. */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_CTL_CONFDONEPULL register field. */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_MSB        4
-/* The width in bits of the ALT_FPGAMGR_CTL_CONFDONEPULL register field. */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_WIDTH      1
-/* The mask used to set the ALT_FPGAMGR_CTL_CONFDONEPULL register field value. */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_SET_MSK    0x00000010
-/* The mask used to clear the ALT_FPGAMGR_CTL_CONFDONEPULL register field value. */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_CLR_MSK    0xffffffef
-/* The reset value of the ALT_FPGAMGR_CTL_CONFDONEPULL register field. */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_RESET      0x0
-/* Extracts the ALT_FPGAMGR_CTL_CONFDONEPULL field value from a register. */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_FPGAMGR_CTL_CONFDONEPULL register field value suitable for setting the register. */
-#define ALT_FPGAMGR_CTL_CONFDONEPULL_SET(value) (((value) << 4) & 0x00000010)
-
-/*
- * Field : Partial Reconfiguration - prreq
- * 
- * This field is used to assert PR_REQUEST to request partial reconfiguration while
- * the FPGA is in User Mode. This field only affects the FPGA if CTRL.EN is 1.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description                        
- * :---------------------------------|:------|:------------------------------------
- *  ALT_FPGAMGR_CTL_PRREQ_E_DEASSERT | 0x0   | De-assert PR_REQUEST (driven to 0).
- *  ALT_FPGAMGR_CTL_PRREQ_E_ASSERT   | 0x1   | Assert PR_REQUEST (driven to 1).   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_PRREQ
- * 
- * De-assert PR_REQUEST (driven to 0).
- */
-#define ALT_FPGAMGR_CTL_PRREQ_E_DEASSERT    0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_PRREQ
- * 
- * Assert PR_REQUEST (driven to 1).
- */
-#define ALT_FPGAMGR_CTL_PRREQ_E_ASSERT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_CTL_PRREQ register field. */
-#define ALT_FPGAMGR_CTL_PRREQ_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_CTL_PRREQ register field. */
-#define ALT_FPGAMGR_CTL_PRREQ_MSB        5
-/* The width in bits of the ALT_FPGAMGR_CTL_PRREQ register field. */
-#define ALT_FPGAMGR_CTL_PRREQ_WIDTH      1
-/* The mask used to set the ALT_FPGAMGR_CTL_PRREQ register field value. */
-#define ALT_FPGAMGR_CTL_PRREQ_SET_MSK    0x00000020
-/* The mask used to clear the ALT_FPGAMGR_CTL_PRREQ register field value. */
-#define ALT_FPGAMGR_CTL_PRREQ_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_FPGAMGR_CTL_PRREQ register field. */
-#define ALT_FPGAMGR_CTL_PRREQ_RESET      0x0
-/* Extracts the ALT_FPGAMGR_CTL_PRREQ field value from a register. */
-#define ALT_FPGAMGR_CTL_PRREQ_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_FPGAMGR_CTL_PRREQ register field value suitable for setting the register. */
-#define ALT_FPGAMGR_CTL_PRREQ_SET(value) (((value) << 5) & 0x00000020)
-
-/*
- * Field : CD Ratio - cdratio
- * 
- * This field controls the Clock to Data Ratio (CDRATIO) for Normal Configuration
- * and Partial Reconfiguration data transfer from the AXI Slave to the FPGA.
- * 
- * For Normal Configuration, the value in this field must be set to be consistent
- * to the implied CD ratio of the MSEL setting.
- * 
- * For Partial Reconfiguration, the value in this field must be set to the same
- * clock to data ratio in the options bits in the Normal Configuration file.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description 
- * :-----------------------------|:------|:-------------
- *  ALT_FPGAMGR_CTL_CDRATIO_E_X1 | 0x0   | CDRATIO of 1
- *  ALT_FPGAMGR_CTL_CDRATIO_E_X2 | 0x1   | CDRATIO of 2
- *  ALT_FPGAMGR_CTL_CDRATIO_E_X4 | 0x2   | CDRATIO of 4
- *  ALT_FPGAMGR_CTL_CDRATIO_E_X8 | 0x3   | CDRATIO of 8
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_CDRATIO
- * 
- * CDRATIO of 1
- */
-#define ALT_FPGAMGR_CTL_CDRATIO_E_X1    0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_CDRATIO
- * 
- * CDRATIO of 2
- */
-#define ALT_FPGAMGR_CTL_CDRATIO_E_X2    0x1
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_CDRATIO
- * 
- * CDRATIO of 4
- */
-#define ALT_FPGAMGR_CTL_CDRATIO_E_X4    0x2
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_CDRATIO
- * 
- * CDRATIO of 8
- */
-#define ALT_FPGAMGR_CTL_CDRATIO_E_X8    0x3
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_CTL_CDRATIO register field. */
-#define ALT_FPGAMGR_CTL_CDRATIO_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_CTL_CDRATIO register field. */
-#define ALT_FPGAMGR_CTL_CDRATIO_MSB        7
-/* The width in bits of the ALT_FPGAMGR_CTL_CDRATIO register field. */
-#define ALT_FPGAMGR_CTL_CDRATIO_WIDTH      2
-/* The mask used to set the ALT_FPGAMGR_CTL_CDRATIO register field value. */
-#define ALT_FPGAMGR_CTL_CDRATIO_SET_MSK    0x000000c0
-/* The mask used to clear the ALT_FPGAMGR_CTL_CDRATIO register field value. */
-#define ALT_FPGAMGR_CTL_CDRATIO_CLR_MSK    0xffffff3f
-/* The reset value of the ALT_FPGAMGR_CTL_CDRATIO register field. */
-#define ALT_FPGAMGR_CTL_CDRATIO_RESET      0x0
-/* Extracts the ALT_FPGAMGR_CTL_CDRATIO field value from a register. */
-#define ALT_FPGAMGR_CTL_CDRATIO_GET(value) (((value) & 0x000000c0) >> 6)
-/* Produces a ALT_FPGAMGR_CTL_CDRATIO register field value suitable for setting the register. */
-#define ALT_FPGAMGR_CTL_CDRATIO_SET(value) (((value) << 6) & 0x000000c0)
-
-/*
- * Field : AXI Configuration Enable - axicfgen
- * 
- * There are strict SW initialization steps for configuration, partial
- * configuration and error cases.  When SW is sending configuration files, this bit
- * must be set before the file is transferred on the AXI bus.  This bit enables the
- * DCLK during the AXI configuration data transfers.
- * 
- * Note, the AXI and configuration datapaths remain active irregardless of the
- * state of this bit.   Simply, if the AXI slave is enabled, the DCLK to the CB
- * will be active.   If disabled, the DCLK to the CB will not be active.   So AXI
- * transfers destined to the FPGA Manager when AXIEN is 0, will complete normally
- * from the HPS perspective.
- * 
- * This field only affects the FPGA if CTRL.EN is 1.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                            | Value | Description                                 
- * :--------------------------------|:------|:---------------------------------------------
- *  ALT_FPGAMGR_CTL_AXICFGEN_E_DISD | 0x0   | Incoming AXI data transfers will be ignored.
- * :                                |       | DCLK will not toggle during data transfer.  
- *  ALT_FPGAMGR_CTL_AXICFGEN_E_END  | 0x1   | AXI data transfer to CB is active. DCLK will
- * :                                |       | toggle during data transfer.                
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_AXICFGEN
- * 
- * Incoming AXI data transfers will be ignored. DCLK will not toggle during data
- * transfer.
- */
-#define ALT_FPGAMGR_CTL_AXICFGEN_E_DISD 0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_AXICFGEN
- * 
- * AXI data transfer to CB is active. DCLK will toggle during data transfer.
- */
-#define ALT_FPGAMGR_CTL_AXICFGEN_E_END  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_CTL_AXICFGEN register field. */
-#define ALT_FPGAMGR_CTL_AXICFGEN_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_CTL_AXICFGEN register field. */
-#define ALT_FPGAMGR_CTL_AXICFGEN_MSB        8
-/* The width in bits of the ALT_FPGAMGR_CTL_AXICFGEN register field. */
-#define ALT_FPGAMGR_CTL_AXICFGEN_WIDTH      1
-/* The mask used to set the ALT_FPGAMGR_CTL_AXICFGEN register field value. */
-#define ALT_FPGAMGR_CTL_AXICFGEN_SET_MSK    0x00000100
-/* The mask used to clear the ALT_FPGAMGR_CTL_AXICFGEN register field value. */
-#define ALT_FPGAMGR_CTL_AXICFGEN_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_FPGAMGR_CTL_AXICFGEN register field. */
-#define ALT_FPGAMGR_CTL_AXICFGEN_RESET      0x0
-/* Extracts the ALT_FPGAMGR_CTL_AXICFGEN field value from a register. */
-#define ALT_FPGAMGR_CTL_AXICFGEN_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_FPGAMGR_CTL_AXICFGEN register field value suitable for setting the register. */
-#define ALT_FPGAMGR_CTL_AXICFGEN_SET(value) (((value) << 8) & 0x00000100)
-
-/*
- * Field : Configuration Data Width - cfgwdth
- * 
- * This field determines the Configuration Passive Parallel data bus width when HPS
- * configures the FPGA.   Only 32-bit Passive Parallel or 16-bit Passive Parallel
- * are supported.
- * 
- * When HPS does Normal Configuration, configuration should use 32-bit Passive
- * Parallel Mode.   The external pins MSEL must be set appropriately for the
- * configuration selected.
- * 
- * For Partial Reconfiguration, 16-bit Passive Parallel must be used.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                            | Value | Description            
- * :--------------------------------|:------|:------------------------
- *  ALT_FPGAMGR_CTL_CFGWDTH_E_PPX16 | 0x0   | 16-bit Passive Parallel
- *  ALT_FPGAMGR_CTL_CFGWDTH_E_PPX32 | 0x1   | 32-bit Passive Parallel
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_CFGWDTH
- * 
- * 16-bit Passive Parallel
- */
-#define ALT_FPGAMGR_CTL_CFGWDTH_E_PPX16 0x0
-/*
- * Enumerated value for register field ALT_FPGAMGR_CTL_CFGWDTH
- * 
- * 32-bit Passive Parallel
- */
-#define ALT_FPGAMGR_CTL_CFGWDTH_E_PPX32 0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_CTL_CFGWDTH register field. */
-#define ALT_FPGAMGR_CTL_CFGWDTH_LSB        9
-/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_CTL_CFGWDTH register field. */
-#define ALT_FPGAMGR_CTL_CFGWDTH_MSB        9
-/* The width in bits of the ALT_FPGAMGR_CTL_CFGWDTH register field. */
-#define ALT_FPGAMGR_CTL_CFGWDTH_WIDTH      1
-/* The mask used to set the ALT_FPGAMGR_CTL_CFGWDTH register field value. */
-#define ALT_FPGAMGR_CTL_CFGWDTH_SET_MSK    0x00000200
-/* The mask used to clear the ALT_FPGAMGR_CTL_CFGWDTH register field value. */
-#define ALT_FPGAMGR_CTL_CFGWDTH_CLR_MSK    0xfffffdff
-/* The reset value of the ALT_FPGAMGR_CTL_CFGWDTH register field. */
-#define ALT_FPGAMGR_CTL_CFGWDTH_RESET      0x1
-/* Extracts the ALT_FPGAMGR_CTL_CFGWDTH field value from a register. */
-#define ALT_FPGAMGR_CTL_CFGWDTH_GET(value) (((value) & 0x00000200) >> 9)
-/* Produces a ALT_FPGAMGR_CTL_CFGWDTH register field value suitable for setting the register. */
-#define ALT_FPGAMGR_CTL_CFGWDTH_SET(value) (((value) << 9) & 0x00000200)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for writing
- * hardware drivers is to use the SoCAL access macros and alt_read_word() and
- * alt_write_word() functions.
- * 
- * The struct declaration for register ALT_FPGAMGR_CTL.
- */
-struct ALT_FPGAMGR_CTL_s
-{
-    uint32_t  en           :  1;  /* Enable */
-    uint32_t  nce          :  1;  /* nCE */
-    uint32_t  nconfigpull  :  1;  /* nCONFIG Pull-Down */
-    uint32_t  nstatuspull  :  1;  /* nSTATUS Pull-Down */
-    uint32_t  confdonepull :  1;  /* CONF_DONE Pull-Down */
-    uint32_t  prreq        :  1;  /* Partial Reconfiguration */
-    uint32_t  cdratio      :  2;  /* CD Ratio */
-    uint32_t  axicfgen     :  1;  /* AXI Configuration Enable */
-    uint32_t  cfgwdth      :  1;  /* Configuration Data Width */
-    uint32_t               : 22;  /* *UNDEFINED* */
-};
-
-/* The typedef declaration for register ALT_FPGAMGR_CTL. */
-typedef volatile struct ALT_FPGAMGR_CTL_s  ALT_FPGAMGR_CTL_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The byte offset of the ALT_FPGAMGR_CTL register from the beginning of the component. */
-#define ALT_FPGAMGR_CTL_OFST        0x4
-
 /*
  * Register : DCLK Count Register - dclkcnt
  * 
@@ -1106,6 +131,8 @@ struct ALT_FPGAMGR_DCLKCNT_s
 typedef volatile struct ALT_FPGAMGR_DCLKCNT_s  ALT_FPGAMGR_DCLKCNT_t;
 #endif  /* __ASSEMBLY__ */
 
+/* The reset value of the ALT_FPGAMGR_DCLKCNT register. */
+#define ALT_FPGAMGR_DCLKCNT_RESET       0x00000000
 /* The byte offset of the ALT_FPGAMGR_DCLKCNT register from the beginning of the component. */
 #define ALT_FPGAMGR_DCLKCNT_OFST        0x8
 
@@ -1192,6 +219,8 @@ struct ALT_FPGAMGR_DCLKSTAT_s
 typedef volatile struct ALT_FPGAMGR_DCLKSTAT_s  ALT_FPGAMGR_DCLKSTAT_t;
 #endif  /* __ASSEMBLY__ */
 
+/* The reset value of the ALT_FPGAMGR_DCLKSTAT register. */
+#define ALT_FPGAMGR_DCLKSTAT_RESET       0x00000000
 /* The byte offset of the ALT_FPGAMGR_DCLKSTAT register from the beginning of the component. */
 #define ALT_FPGAMGR_DCLKSTAT_OFST        0xc
 
@@ -1211,7 +240,7 @@ typedef volatile struct ALT_FPGAMGR_DCLKSTAT_s  ALT_FPGAMGR_DCLKSTAT_t;
 /*
  * Field : Value - value
  * 
- * Drives h2f_gp[31:0] with specified value. When read, returns the current value
+ * Drives s2f_gp[31:0] with specified value. When read, returns the current value
  * being driven to the FPGA fabric.
  * 
  * Field Access Macros:
@@ -1254,6 +283,8 @@ struct ALT_FPGAMGR_GPO_s
 typedef volatile struct ALT_FPGAMGR_GPO_s  ALT_FPGAMGR_GPO_t;
 #endif  /* __ASSEMBLY__ */
 
+/* The reset value of the ALT_FPGAMGR_GPO register. */
+#define ALT_FPGAMGR_GPO_RESET       0x00000000
 /* The byte offset of the ALT_FPGAMGR_GPO register from the beginning of the component. */
 #define ALT_FPGAMGR_GPO_OFST        0x10
 
@@ -1265,15 +296,15 @@ typedef volatile struct ALT_FPGAMGR_GPO_s  ALT_FPGAMGR_GPO_t;
  * 
  * Register Layout
  * 
- *  Bits   | Access | Reset   | Description
- * :-------|:-------|:--------|:------------
- *  [31:0] | R      | Unknown | Value      
+ *  Bits   | Access | Reset | Description
+ * :-------|:-------|:------|:------------
+ *  [31:0] | R      | 0x0   | Value      
  * 
  */
 /*
  * Field : Value - value
  * 
- * The value being driven from the FPGA fabric on f2h_gp[31:0]. If the FPGA is not
+ * The value being driven from the FPGA fabric on f2s_gp[31:0]. If the FPGA is not
  * in User Mode, the value of this field is undefined.
  * 
  * Field Access Macros:
@@ -1289,7 +320,7 @@ typedef volatile struct ALT_FPGAMGR_GPO_s  ALT_FPGAMGR_GPO_t;
 #define ALT_FPGAMGR_GPI_VALUE_SET_MSK    0xffffffff
 /* The mask used to clear the ALT_FPGAMGR_GPI_VALUE register field value. */
 #define ALT_FPGAMGR_GPI_VALUE_CLR_MSK    0x00000000
-/* The reset value of the ALT_FPGAMGR_GPI_VALUE register field is UNKNOWN. */
+/* The reset value of the ALT_FPGAMGR_GPI_VALUE register field. */
 #define ALT_FPGAMGR_GPI_VALUE_RESET      0x0
 /* Extracts the ALT_FPGAMGR_GPI_VALUE field value from a register. */
 #define ALT_FPGAMGR_GPI_VALUE_GET(value) (((value) & 0xffffffff) >> 0)
@@ -1316,6 +347,8 @@ struct ALT_FPGAMGR_GPI_s
 typedef volatile struct ALT_FPGAMGR_GPI_s  ALT_FPGAMGR_GPI_t;
 #endif  /* __ASSEMBLY__ */
 
+/* The reset value of the ALT_FPGAMGR_GPI register. */
+#define ALT_FPGAMGR_GPI_RESET       0x00000000
 /* The byte offset of the ALT_FPGAMGR_GPI register from the beginning of the component. */
 #define ALT_FPGAMGR_GPI_OFST        0x14
 
@@ -1337,7 +370,7 @@ typedef volatile struct ALT_FPGAMGR_GPI_s  ALT_FPGAMGR_GPI_t;
 /*
  * Field : Boot From FPGA on Failure - bootFPGAfail
  * 
- * The value of the f2h_boot_from_fpga_on_failure signal from the FPGA fabric. If
+ * The value of the f2s_boot_from_fpga_on_failure signal from the FPGA fabric. If
  * the FPGA is not in User Mode, the value of this field is undefined.
  * 
  * 1 = Boot ROM will boot from FPGA if boot from normal boot device fails.
@@ -1367,7 +400,7 @@ typedef volatile struct ALT_FPGAMGR_GPI_s  ALT_FPGAMGR_GPI_t;
 /*
  * Field : Boot From FPGA Ready - bootFPGArdy
  * 
- * The value of the f2h_boot_from_fpga_ready signal from the FPGA fabric. If the
+ * The value of the f2s_boot_from_fpga_ready signal from the FPGA fabric. If the
  * FPGA is not in User Mode, the value of this field is undefined.
  * 
  * 1 = FPGA fabric is ready to accept AXI master requests from the HPS2FPGA bridge.
@@ -1416,617 +449,47 @@ struct ALT_FPGAMGR_MISCI_s
 typedef volatile struct ALT_FPGAMGR_MISCI_s  ALT_FPGAMGR_MISCI_t;
 #endif  /* __ASSEMBLY__ */
 
+/* The reset value of the ALT_FPGAMGR_MISCI register. */
+#define ALT_FPGAMGR_MISCI_RESET       0x00000000
 /* The byte offset of the ALT_FPGAMGR_MISCI register from the beginning of the component. */
 #define ALT_FPGAMGR_MISCI_OFST        0x18
 
 /*
- * Register Group : Configuration Monitor (MON) Registers - ALT_MON
- * Configuration Monitor (MON) Registers
+ * Register : Extracted EMR register content - emr_data0
  * 
- * The Configuration Monitor allows software to poll or be interrupted by changes
- * in the FPGA state. The Configuration Monitor is an instantiation of a Synopsys
- * GPIO. Only registers relevant to the MON operation are shown.
- * 
- * The GPIO inputs are connected to the following signals:[list][*]nSTATUS - Driven
- * to 0 by the FPGA in this device if the FPGA is in Reset Phase or if the FPGA
- * detected an error during the Configuration Phase.[*]CONF_DONE - Driven to 0 by
- * the FPGA in this device during the Reset Phase and driven to 1 when the FPGA
- * Configuration Phase is done.[*]INIT_DONE - Driven to 0 by the FPGA in this
- * device during the Configuration Phase and driven to 1 when the FPGA
- * Initialization Phase is done.[*]CRC_ERROR - CRC error indicator. A CRC_ERROR
- * value of 1 indicates that the FPGA detected a CRC error while in User
- * Mode.[*]CVP_CONF_DONE - Configuration via PCIe done indicator. A CVP_CONF_DONE
- * value of 1 indicates that CVP is done.[*]PR_READY - Partial reconfiguration
- * ready indicator. A PR_READY value of 1 indicates that the FPGA is ready to
- * receive partial reconfiguration or external scrubbing data.[*]PR_ERROR - Partial
- * reconfiguration error indicator. A PR_ERROR value of 1 indicates that the FPGA
- * detected an error during partial reconfiguration or external
- * scrubbing.[*]PR_DONE - Partial reconfiguration done indicator. A PR_DONE value
- * of 1 indicates partial reconfiguration or external scrubbing is done.[*]nCONFIG
- * Pin - Value of the nCONFIG pin. This can be pulled-down by the FPGA in this
- * device or logic external to this device connected to the nCONFIG pin. See the
- * description of the nCONFIG field in this register to understand when the FPGA in
- * this device pulls-down the nCONFIG pin. Logic external to this device pulls-down
- * the nCONFIG pin to put the FPGA into the Reset Phase.[*]nSTATUS Pin - Value of
- * the nSTATUS pin. This can be pulled-down by the FPGA in this device or logic
- * external to this device connected to the nSTATUS pin. See the description of the
- * nSTATUS field in this register to understand when the FPGA in this device pulls-
- * down the nSTATUS pin. Logic external to this device pulls-down the nSTATUS pin
- * during Configuration Phase or Initialization Phase if it detected an
- * error.[*]CONF_DONE Pin - Value of the CONF_DONE pin. This can be pulled-down by
- * the FPGA in this device or logic external to this device connected to the
- * CONF_DONE pin. See the description of the CONF_DONE field in this register to
- * understand when the FPGA in this device pulls-down the CONF_DONE pin. See FPGA
- * documentation to determine how logic external to this device drives
- * CONF_DONE.[*]FPGA_POWER_ON - FPGA powered on indicator
- * 
- * [list][*]0 = FPGA portion of device is powered off.[*]1 = FPGA portion of device
- * is powered on.[/list][/list]
- * 
- */
-/*
- * Register : Interrupt Enable Register - gpio_inten
- * 
- * Allows each bit of Port A to be configured to generate an interrupt or not.
+ * bits [31:0] of EMR register
  * 
  * Register Layout
  * 
- *  Bits    | Access | Reset | Description                           
- * :--------|:-------|:------|:---------------------------------------
- *  [0]     | RW     | 0x0   | Interrupt Enable Field (nSTATUS)      
- *  [1]     | RW     | 0x0   | Interrupt Enable Field (CONF_DONE)    
- *  [2]     | RW     | 0x0   | Interrupt Enable Field (INIT_DONE)    
- *  [3]     | RW     | 0x0   | Interrupt Enable Field (CRC_ERROR)    
- *  [4]     | RW     | 0x0   | Interrupt Enable Field (CVP_CONF_DONE)
- *  [5]     | RW     | 0x0   | Interrupt Enable Field (PR_READY)     
- *  [6]     | RW     | 0x0   | Interrupt Enable Field (PR_ERROR)     
- *  [7]     | RW     | 0x0   | Interrupt Enable Field (PR_DONE)      
- *  [8]     | RW     | 0x0   | Interrupt Enable Field (nCONFIG Pin)  
- *  [9]     | RW     | 0x0   | Interrupt Enable Field (nSTATUS Pin)  
- *  [10]    | RW     | 0x0   | Interrupt Enable Field (CONF_DONE Pin)
- *  [11]    | RW     | 0x0   | Interrupt Enable Field (FPGA_POWER_ON)
- *  [31:12] | ???    | 0x0   | *UNDEFINED*                           
+ *  Bits   | Access | Reset | Description
+ * :-------|:-------|:------|:------------
+ *  [31:0] | R      | 0x0   | Value      
  * 
  */
 /*
- * Field : Interrupt Enable Field (nSTATUS) - ns
+ * Field : Value - value
  * 
- * Enables interrupt generation for nSTATUS
- * 
- * Field Enumeration Values:
- * 
- *  Enum                        | Value | Description      
- * :----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_NS_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_NS_E_EN  | 0x1   | Enable Interrupt 
+ * EMR register bits
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_NS
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_NS_E_DIS 0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_NS
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_NS_E_EN  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_NS register field. */
-#define ALT_MON_GPIO_INTEN_NS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_NS register field. */
-#define ALT_MON_GPIO_INTEN_NS_MSB        0
-/* The width in bits of the ALT_MON_GPIO_INTEN_NS register field. */
-#define ALT_MON_GPIO_INTEN_NS_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_NS register field value. */
-#define ALT_MON_GPIO_INTEN_NS_SET_MSK    0x00000001
-/* The mask used to clear the ALT_MON_GPIO_INTEN_NS register field value. */
-#define ALT_MON_GPIO_INTEN_NS_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_MON_GPIO_INTEN_NS register field. */
-#define ALT_MON_GPIO_INTEN_NS_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_NS field value from a register. */
-#define ALT_MON_GPIO_INTEN_NS_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_MON_GPIO_INTEN_NS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_NS_SET(value) (((value) << 0) & 0x00000001)
-
-/*
- * Field : Interrupt Enable Field (CONF_DONE) - cd
- * 
- * Enables interrupt generation for CONF_DONE
- * 
- * Field Enumeration Values:
- * 
- *  Enum                        | Value | Description      
- * :----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_CD_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_CD_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_CD
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_CD_E_DIS 0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_CD
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_CD_E_EN  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_CD register field. */
-#define ALT_MON_GPIO_INTEN_CD_LSB        1
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_CD register field. */
-#define ALT_MON_GPIO_INTEN_CD_MSB        1
-/* The width in bits of the ALT_MON_GPIO_INTEN_CD register field. */
-#define ALT_MON_GPIO_INTEN_CD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_CD register field value. */
-#define ALT_MON_GPIO_INTEN_CD_SET_MSK    0x00000002
-/* The mask used to clear the ALT_MON_GPIO_INTEN_CD register field value. */
-#define ALT_MON_GPIO_INTEN_CD_CLR_MSK    0xfffffffd
-/* The reset value of the ALT_MON_GPIO_INTEN_CD register field. */
-#define ALT_MON_GPIO_INTEN_CD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_CD field value from a register. */
-#define ALT_MON_GPIO_INTEN_CD_GET(value) (((value) & 0x00000002) >> 1)
-/* Produces a ALT_MON_GPIO_INTEN_CD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_CD_SET(value) (((value) << 1) & 0x00000002)
-
-/*
- * Field : Interrupt Enable Field (INIT_DONE) - id
- * 
- * Enables interrupt generation for INIT_DONE
- * 
- * Field Enumeration Values:
- * 
- *  Enum                        | Value | Description      
- * :----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_ID_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_ID_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_ID
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_ID_E_DIS 0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_ID
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_ID_E_EN  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_ID register field. */
-#define ALT_MON_GPIO_INTEN_ID_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_ID register field. */
-#define ALT_MON_GPIO_INTEN_ID_MSB        2
-/* The width in bits of the ALT_MON_GPIO_INTEN_ID register field. */
-#define ALT_MON_GPIO_INTEN_ID_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_ID register field value. */
-#define ALT_MON_GPIO_INTEN_ID_SET_MSK    0x00000004
-/* The mask used to clear the ALT_MON_GPIO_INTEN_ID register field value. */
-#define ALT_MON_GPIO_INTEN_ID_CLR_MSK    0xfffffffb
-/* The reset value of the ALT_MON_GPIO_INTEN_ID register field. */
-#define ALT_MON_GPIO_INTEN_ID_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_ID field value from a register. */
-#define ALT_MON_GPIO_INTEN_ID_GET(value) (((value) & 0x00000004) >> 2)
-/* Produces a ALT_MON_GPIO_INTEN_ID register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_ID_SET(value) (((value) << 2) & 0x00000004)
-
-/*
- * Field : Interrupt Enable Field (CRC_ERROR) - crc
- * 
- * Enables interrupt generation for CRC_ERROR
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description      
- * :-----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_CRC_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_CRC_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_CRC
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_CRC_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_CRC
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_CRC_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_CRC register field. */
-#define ALT_MON_GPIO_INTEN_CRC_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_CRC register field. */
-#define ALT_MON_GPIO_INTEN_CRC_MSB        3
-/* The width in bits of the ALT_MON_GPIO_INTEN_CRC register field. */
-#define ALT_MON_GPIO_INTEN_CRC_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_CRC register field value. */
-#define ALT_MON_GPIO_INTEN_CRC_SET_MSK    0x00000008
-/* The mask used to clear the ALT_MON_GPIO_INTEN_CRC register field value. */
-#define ALT_MON_GPIO_INTEN_CRC_CLR_MSK    0xfffffff7
-/* The reset value of the ALT_MON_GPIO_INTEN_CRC register field. */
-#define ALT_MON_GPIO_INTEN_CRC_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_CRC field value from a register. */
-#define ALT_MON_GPIO_INTEN_CRC_GET(value) (((value) & 0x00000008) >> 3)
-/* Produces a ALT_MON_GPIO_INTEN_CRC register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_CRC_SET(value) (((value) << 3) & 0x00000008)
-
-/*
- * Field : Interrupt Enable Field (CVP_CONF_DONE) - ccd
- * 
- * Enables interrupt generation for CVP_CONF_DONE
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description      
- * :-----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_CCD_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_CCD_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_CCD
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_CCD_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_CCD
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_CCD_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_CCD register field. */
-#define ALT_MON_GPIO_INTEN_CCD_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_CCD register field. */
-#define ALT_MON_GPIO_INTEN_CCD_MSB        4
-/* The width in bits of the ALT_MON_GPIO_INTEN_CCD register field. */
-#define ALT_MON_GPIO_INTEN_CCD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_CCD register field value. */
-#define ALT_MON_GPIO_INTEN_CCD_SET_MSK    0x00000010
-/* The mask used to clear the ALT_MON_GPIO_INTEN_CCD register field value. */
-#define ALT_MON_GPIO_INTEN_CCD_CLR_MSK    0xffffffef
-/* The reset value of the ALT_MON_GPIO_INTEN_CCD register field. */
-#define ALT_MON_GPIO_INTEN_CCD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_CCD field value from a register. */
-#define ALT_MON_GPIO_INTEN_CCD_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_MON_GPIO_INTEN_CCD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_CCD_SET(value) (((value) << 4) & 0x00000010)
-
-/*
- * Field : Interrupt Enable Field (PR_READY) - prr
- * 
- * Enables interrupt generation for PR_READY
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description      
- * :-----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_PRR_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_PRR_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_PRR
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_PRR_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_PRR
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_PRR_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_PRR register field. */
-#define ALT_MON_GPIO_INTEN_PRR_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_PRR register field. */
-#define ALT_MON_GPIO_INTEN_PRR_MSB        5
-/* The width in bits of the ALT_MON_GPIO_INTEN_PRR register field. */
-#define ALT_MON_GPIO_INTEN_PRR_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_PRR register field value. */
-#define ALT_MON_GPIO_INTEN_PRR_SET_MSK    0x00000020
-/* The mask used to clear the ALT_MON_GPIO_INTEN_PRR register field value. */
-#define ALT_MON_GPIO_INTEN_PRR_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_MON_GPIO_INTEN_PRR register field. */
-#define ALT_MON_GPIO_INTEN_PRR_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_PRR field value from a register. */
-#define ALT_MON_GPIO_INTEN_PRR_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_MON_GPIO_INTEN_PRR register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_PRR_SET(value) (((value) << 5) & 0x00000020)
-
-/*
- * Field : Interrupt Enable Field (PR_ERROR) - pre
- * 
- * Enables interrupt generation for PR_ERROR
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description      
- * :-----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_PRE_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_PRE_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_PRE
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_PRE_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_PRE
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_PRE_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_PRE register field. */
-#define ALT_MON_GPIO_INTEN_PRE_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_PRE register field. */
-#define ALT_MON_GPIO_INTEN_PRE_MSB        6
-/* The width in bits of the ALT_MON_GPIO_INTEN_PRE register field. */
-#define ALT_MON_GPIO_INTEN_PRE_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_PRE register field value. */
-#define ALT_MON_GPIO_INTEN_PRE_SET_MSK    0x00000040
-/* The mask used to clear the ALT_MON_GPIO_INTEN_PRE register field value. */
-#define ALT_MON_GPIO_INTEN_PRE_CLR_MSK    0xffffffbf
-/* The reset value of the ALT_MON_GPIO_INTEN_PRE register field. */
-#define ALT_MON_GPIO_INTEN_PRE_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_PRE field value from a register. */
-#define ALT_MON_GPIO_INTEN_PRE_GET(value) (((value) & 0x00000040) >> 6)
-/* Produces a ALT_MON_GPIO_INTEN_PRE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_PRE_SET(value) (((value) << 6) & 0x00000040)
-
-/*
- * Field : Interrupt Enable Field (PR_DONE) - prd
- * 
- * Enables interrupt generation for PR_DONE
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description      
- * :-----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_PRD_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_PRD_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_PRD
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_PRD_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_PRD
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_PRD_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_PRD register field. */
-#define ALT_MON_GPIO_INTEN_PRD_LSB        7
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_PRD register field. */
-#define ALT_MON_GPIO_INTEN_PRD_MSB        7
-/* The width in bits of the ALT_MON_GPIO_INTEN_PRD register field. */
-#define ALT_MON_GPIO_INTEN_PRD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_PRD register field value. */
-#define ALT_MON_GPIO_INTEN_PRD_SET_MSK    0x00000080
-/* The mask used to clear the ALT_MON_GPIO_INTEN_PRD register field value. */
-#define ALT_MON_GPIO_INTEN_PRD_CLR_MSK    0xffffff7f
-/* The reset value of the ALT_MON_GPIO_INTEN_PRD register field. */
-#define ALT_MON_GPIO_INTEN_PRD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_PRD field value from a register. */
-#define ALT_MON_GPIO_INTEN_PRD_GET(value) (((value) & 0x00000080) >> 7)
-/* Produces a ALT_MON_GPIO_INTEN_PRD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_PRD_SET(value) (((value) << 7) & 0x00000080)
-
-/*
- * Field : Interrupt Enable Field (nCONFIG Pin) - ncp
- * 
- * Enables interrupt generation for nCONFIG Pin
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description      
- * :-----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_NCP_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_NCP_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_NCP
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_NCP_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_NCP
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_NCP_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_NCP register field. */
-#define ALT_MON_GPIO_INTEN_NCP_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_NCP register field. */
-#define ALT_MON_GPIO_INTEN_NCP_MSB        8
-/* The width in bits of the ALT_MON_GPIO_INTEN_NCP register field. */
-#define ALT_MON_GPIO_INTEN_NCP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_NCP register field value. */
-#define ALT_MON_GPIO_INTEN_NCP_SET_MSK    0x00000100
-/* The mask used to clear the ALT_MON_GPIO_INTEN_NCP register field value. */
-#define ALT_MON_GPIO_INTEN_NCP_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_MON_GPIO_INTEN_NCP register field. */
-#define ALT_MON_GPIO_INTEN_NCP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_NCP field value from a register. */
-#define ALT_MON_GPIO_INTEN_NCP_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_MON_GPIO_INTEN_NCP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_NCP_SET(value) (((value) << 8) & 0x00000100)
-
-/*
- * Field : Interrupt Enable Field (nSTATUS Pin) - nsp
- * 
- * Enables interrupt generation for nSTATUS Pin
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description      
- * :-----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_NSP_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_NSP_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_NSP
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_NSP_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_NSP
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_NSP_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_NSP register field. */
-#define ALT_MON_GPIO_INTEN_NSP_LSB        9
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_NSP register field. */
-#define ALT_MON_GPIO_INTEN_NSP_MSB        9
-/* The width in bits of the ALT_MON_GPIO_INTEN_NSP register field. */
-#define ALT_MON_GPIO_INTEN_NSP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_NSP register field value. */
-#define ALT_MON_GPIO_INTEN_NSP_SET_MSK    0x00000200
-/* The mask used to clear the ALT_MON_GPIO_INTEN_NSP register field value. */
-#define ALT_MON_GPIO_INTEN_NSP_CLR_MSK    0xfffffdff
-/* The reset value of the ALT_MON_GPIO_INTEN_NSP register field. */
-#define ALT_MON_GPIO_INTEN_NSP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_NSP field value from a register. */
-#define ALT_MON_GPIO_INTEN_NSP_GET(value) (((value) & 0x00000200) >> 9)
-/* Produces a ALT_MON_GPIO_INTEN_NSP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_NSP_SET(value) (((value) << 9) & 0x00000200)
-
-/*
- * Field : Interrupt Enable Field (CONF_DONE Pin) - cdp
- * 
- * Enables interrupt generation for CONF_DONE Pin
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description      
- * :-----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_CDP_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_CDP_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_CDP
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_CDP_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_CDP
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_CDP_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_CDP register field. */
-#define ALT_MON_GPIO_INTEN_CDP_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_CDP register field. */
-#define ALT_MON_GPIO_INTEN_CDP_MSB        10
-/* The width in bits of the ALT_MON_GPIO_INTEN_CDP register field. */
-#define ALT_MON_GPIO_INTEN_CDP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_CDP register field value. */
-#define ALT_MON_GPIO_INTEN_CDP_SET_MSK    0x00000400
-/* The mask used to clear the ALT_MON_GPIO_INTEN_CDP register field value. */
-#define ALT_MON_GPIO_INTEN_CDP_CLR_MSK    0xfffffbff
-/* The reset value of the ALT_MON_GPIO_INTEN_CDP register field. */
-#define ALT_MON_GPIO_INTEN_CDP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_CDP field value from a register. */
-#define ALT_MON_GPIO_INTEN_CDP_GET(value) (((value) & 0x00000400) >> 10)
-/* Produces a ALT_MON_GPIO_INTEN_CDP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_CDP_SET(value) (((value) << 10) & 0x00000400)
-
-/*
- * Field : Interrupt Enable Field (FPGA_POWER_ON) - fpo
- * 
- * Enables interrupt generation for FPGA_POWER_ON
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description      
- * :-----------------------------|:------|:------------------
- *  ALT_MON_GPIO_INTEN_FPO_E_DIS | 0x0   | Disable Interrupt
- *  ALT_MON_GPIO_INTEN_FPO_E_EN  | 0x1   | Enable Interrupt 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_FPO
- * 
- * Disable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_FPO_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTEN_FPO
- * 
- * Enable Interrupt
- */
-#define ALT_MON_GPIO_INTEN_FPO_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTEN_FPO register field. */
-#define ALT_MON_GPIO_INTEN_FPO_LSB        11
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTEN_FPO register field. */
-#define ALT_MON_GPIO_INTEN_FPO_MSB        11
-/* The width in bits of the ALT_MON_GPIO_INTEN_FPO register field. */
-#define ALT_MON_GPIO_INTEN_FPO_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTEN_FPO register field value. */
-#define ALT_MON_GPIO_INTEN_FPO_SET_MSK    0x00000800
-/* The mask used to clear the ALT_MON_GPIO_INTEN_FPO register field value. */
-#define ALT_MON_GPIO_INTEN_FPO_CLR_MSK    0xfffff7ff
-/* The reset value of the ALT_MON_GPIO_INTEN_FPO register field. */
-#define ALT_MON_GPIO_INTEN_FPO_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTEN_FPO field value from a register. */
-#define ALT_MON_GPIO_INTEN_FPO_GET(value) (((value) & 0x00000800) >> 11)
-/* Produces a ALT_MON_GPIO_INTEN_FPO register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTEN_FPO_SET(value) (((value) << 11) & 0x00000800)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_EMR_DATA0_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA0_VALUE_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_EMR_DATA0_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA0_VALUE_MSB        31
+/* The width in bits of the ALT_FPGAMGR_EMR_DATA0_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA0_VALUE_WIDTH      32
+/* The mask used to set the ALT_FPGAMGR_EMR_DATA0_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA0_VALUE_SET_MSK    0xffffffff
+/* The mask used to clear the ALT_FPGAMGR_EMR_DATA0_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA0_VALUE_CLR_MSK    0x00000000
+/* The reset value of the ALT_FPGAMGR_EMR_DATA0_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA0_VALUE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_EMR_DATA0_VALUE field value from a register. */
+#define ALT_FPGAMGR_EMR_DATA0_VALUE_GET(value) (((value) & 0xffffffff) >> 0)
+/* Produces a ALT_FPGAMGR_EMR_DATA0_VALUE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_EMR_DATA0_VALUE_SET(value) (((value) << 0) & 0xffffffff)
 
 #ifndef __ASSEMBLY__
 /*
@@ -2037,626 +500,58 @@ typedef volatile struct ALT_FPGAMGR_MISCI_s  ALT_FPGAMGR_MISCI_t;
  * hardware drivers is to use the SoCAL access macros and alt_read_word() and
  * alt_write_word() functions.
  * 
- * The struct declaration for register ALT_MON_GPIO_INTEN.
+ * The struct declaration for register ALT_FPGAMGR_EMR_DATA0.
  */
-struct ALT_MON_GPIO_INTEN_s
+struct ALT_FPGAMGR_EMR_DATA0_s
 {
-    uint32_t  ns  :  1;  /* Interrupt Enable Field (nSTATUS) */
-    uint32_t  cd  :  1;  /* Interrupt Enable Field (CONF_DONE) */
-    uint32_t  id  :  1;  /* Interrupt Enable Field (INIT_DONE) */
-    uint32_t  crc :  1;  /* Interrupt Enable Field (CRC_ERROR) */
-    uint32_t  ccd :  1;  /* Interrupt Enable Field (CVP_CONF_DONE) */
-    uint32_t  prr :  1;  /* Interrupt Enable Field (PR_READY) */
-    uint32_t  pre :  1;  /* Interrupt Enable Field (PR_ERROR) */
-    uint32_t  prd :  1;  /* Interrupt Enable Field (PR_DONE) */
-    uint32_t  ncp :  1;  /* Interrupt Enable Field (nCONFIG Pin) */
-    uint32_t  nsp :  1;  /* Interrupt Enable Field (nSTATUS Pin) */
-    uint32_t  cdp :  1;  /* Interrupt Enable Field (CONF_DONE Pin) */
-    uint32_t  fpo :  1;  /* Interrupt Enable Field (FPGA_POWER_ON) */
-    uint32_t      : 20;  /* *UNDEFINED* */
+    const uint32_t  value : 32;  /* Value */
 };
 
-/* The typedef declaration for register ALT_MON_GPIO_INTEN. */
-typedef volatile struct ALT_MON_GPIO_INTEN_s  ALT_MON_GPIO_INTEN_t;
+/* The typedef declaration for register ALT_FPGAMGR_EMR_DATA0. */
+typedef volatile struct ALT_FPGAMGR_EMR_DATA0_s  ALT_FPGAMGR_EMR_DATA0_t;
 #endif  /* __ASSEMBLY__ */
 
-/* The byte offset of the ALT_MON_GPIO_INTEN register from the beginning of the component. */
-#define ALT_MON_GPIO_INTEN_OFST        0x30
-/* The address of the ALT_MON_GPIO_INTEN register. */
-#define ALT_MON_GPIO_INTEN_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_INTEN_OFST))
+/* The reset value of the ALT_FPGAMGR_EMR_DATA0 register. */
+#define ALT_FPGAMGR_EMR_DATA0_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_EMR_DATA0 register from the beginning of the component. */
+#define ALT_FPGAMGR_EMR_DATA0_OFST        0x30
 
 /*
- * Register : Interrupt Mask Register - gpio_intmask
+ * Register : Extracted EMR register content - emr_data1
  * 
- * This register has 12 individual interrupt masks for the MON. Controls whether an
- * interrupt on Port A can create an interrupt for the interrupt controller by not
- * masking it. By default, all interrupts bits are unmasked. Whenever a 1 is
- * written to a bit in this register, it masks the interrupt generation capability
- * for this signal; otherwise interrupts are allowed through. The unmasked status
- * can be read as well as the resultant status after masking.
+ * bits [63:32] of EMR register
  * 
  * Register Layout
  * 
- *  Bits    | Access | Reset | Description                         
- * :--------|:-------|:------|:-------------------------------------
- *  [0]     | RW     | 0x0   | Interrupt Mask Field (nSTATUS)      
- *  [1]     | RW     | 0x0   | Interrupt Mask Field (CONF_DONE)    
- *  [2]     | RW     | 0x0   | Interrupt Mask Field (INIT_DONE)    
- *  [3]     | RW     | 0x0   | Interrupt Mask Field (CRC_ERROR)    
- *  [4]     | RW     | 0x0   | Interrupt Mask Field (CVP_CONF_DONE)
- *  [5]     | RW     | 0x0   | Interrupt Mask Field (PR_READY)     
- *  [6]     | RW     | 0x0   | Interrupt Mask Field (PR_ERROR)     
- *  [7]     | RW     | 0x0   | Interrupt Mask Field (PR_DONE)      
- *  [8]     | RW     | 0x0   | Interrupt Mask Field (nCONFIG Pin)  
- *  [9]     | RW     | 0x0   | Interrupt Mask Field (nSTATUS Pin)  
- *  [10]    | RW     | 0x0   | Interrupt Mask Field (CONF_DONE Pin)
- *  [11]    | RW     | 0x0   | Interrupt Mask Field (FPGA_POWER_ON)
- *  [31:12] | ???    | 0x0   | *UNDEFINED*                         
+ *  Bits   | Access | Reset | Description
+ * :-------|:-------|:------|:------------
+ *  [31:0] | R      | 0x0   | Value      
  * 
  */
 /*
- * Field : Interrupt Mask Field (nSTATUS) - ns
+ * Field : Value - value
  * 
- * Controls whether an interrupt for nSTATUS can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description     
- * :-----------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_NS_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_NS_E_EN  | 0x1   | Mask Interrupt  
+ * EMR register bits
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_NS
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_NS_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_NS
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_NS_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_NS register field. */
-#define ALT_MON_GPIO_INTMSK_NS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_NS register field. */
-#define ALT_MON_GPIO_INTMSK_NS_MSB        0
-/* The width in bits of the ALT_MON_GPIO_INTMSK_NS register field. */
-#define ALT_MON_GPIO_INTMSK_NS_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_NS register field value. */
-#define ALT_MON_GPIO_INTMSK_NS_SET_MSK    0x00000001
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_NS register field value. */
-#define ALT_MON_GPIO_INTMSK_NS_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_MON_GPIO_INTMSK_NS register field. */
-#define ALT_MON_GPIO_INTMSK_NS_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_NS field value from a register. */
-#define ALT_MON_GPIO_INTMSK_NS_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_MON_GPIO_INTMSK_NS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_NS_SET(value) (((value) << 0) & 0x00000001)
-
-/*
- * Field : Interrupt Mask Field (CONF_DONE) - cd
- * 
- * Controls whether an interrupt for CONF_DONE can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description     
- * :-----------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_CD_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_CD_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_CD
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_CD_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_CD
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_CD_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_CD register field. */
-#define ALT_MON_GPIO_INTMSK_CD_LSB        1
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_CD register field. */
-#define ALT_MON_GPIO_INTMSK_CD_MSB        1
-/* The width in bits of the ALT_MON_GPIO_INTMSK_CD register field. */
-#define ALT_MON_GPIO_INTMSK_CD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_CD register field value. */
-#define ALT_MON_GPIO_INTMSK_CD_SET_MSK    0x00000002
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_CD register field value. */
-#define ALT_MON_GPIO_INTMSK_CD_CLR_MSK    0xfffffffd
-/* The reset value of the ALT_MON_GPIO_INTMSK_CD register field. */
-#define ALT_MON_GPIO_INTMSK_CD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_CD field value from a register. */
-#define ALT_MON_GPIO_INTMSK_CD_GET(value) (((value) & 0x00000002) >> 1)
-/* Produces a ALT_MON_GPIO_INTMSK_CD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_CD_SET(value) (((value) << 1) & 0x00000002)
-
-/*
- * Field : Interrupt Mask Field (INIT_DONE) - id
- * 
- * Controls whether an interrupt for INIT_DONE can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                         | Value | Description     
- * :-----------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_ID_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_ID_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_ID
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_ID_E_DIS    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_ID
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_ID_E_EN     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_ID register field. */
-#define ALT_MON_GPIO_INTMSK_ID_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_ID register field. */
-#define ALT_MON_GPIO_INTMSK_ID_MSB        2
-/* The width in bits of the ALT_MON_GPIO_INTMSK_ID register field. */
-#define ALT_MON_GPIO_INTMSK_ID_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_ID register field value. */
-#define ALT_MON_GPIO_INTMSK_ID_SET_MSK    0x00000004
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_ID register field value. */
-#define ALT_MON_GPIO_INTMSK_ID_CLR_MSK    0xfffffffb
-/* The reset value of the ALT_MON_GPIO_INTMSK_ID register field. */
-#define ALT_MON_GPIO_INTMSK_ID_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_ID field value from a register. */
-#define ALT_MON_GPIO_INTMSK_ID_GET(value) (((value) & 0x00000004) >> 2)
-/* Produces a ALT_MON_GPIO_INTMSK_ID register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_ID_SET(value) (((value) << 2) & 0x00000004)
-
-/*
- * Field : Interrupt Mask Field (CRC_ERROR) - crc
- * 
- * Controls whether an interrupt for CRC_ERROR can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                          | Value | Description     
- * :------------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_CRC_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_CRC_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_CRC
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_CRC_E_DIS   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_CRC
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_CRC_E_EN    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_CRC register field. */
-#define ALT_MON_GPIO_INTMSK_CRC_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_CRC register field. */
-#define ALT_MON_GPIO_INTMSK_CRC_MSB        3
-/* The width in bits of the ALT_MON_GPIO_INTMSK_CRC register field. */
-#define ALT_MON_GPIO_INTMSK_CRC_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_CRC register field value. */
-#define ALT_MON_GPIO_INTMSK_CRC_SET_MSK    0x00000008
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_CRC register field value. */
-#define ALT_MON_GPIO_INTMSK_CRC_CLR_MSK    0xfffffff7
-/* The reset value of the ALT_MON_GPIO_INTMSK_CRC register field. */
-#define ALT_MON_GPIO_INTMSK_CRC_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_CRC field value from a register. */
-#define ALT_MON_GPIO_INTMSK_CRC_GET(value) (((value) & 0x00000008) >> 3)
-/* Produces a ALT_MON_GPIO_INTMSK_CRC register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_CRC_SET(value) (((value) << 3) & 0x00000008)
-
-/*
- * Field : Interrupt Mask Field (CVP_CONF_DONE) - ccd
- * 
- * Controls whether an interrupt for CVP_CONF_DONE can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                          | Value | Description     
- * :------------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_CCD_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_CCD_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_CCD
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_CCD_E_DIS   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_CCD
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_CCD_E_EN    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_CCD register field. */
-#define ALT_MON_GPIO_INTMSK_CCD_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_CCD register field. */
-#define ALT_MON_GPIO_INTMSK_CCD_MSB        4
-/* The width in bits of the ALT_MON_GPIO_INTMSK_CCD register field. */
-#define ALT_MON_GPIO_INTMSK_CCD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_CCD register field value. */
-#define ALT_MON_GPIO_INTMSK_CCD_SET_MSK    0x00000010
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_CCD register field value. */
-#define ALT_MON_GPIO_INTMSK_CCD_CLR_MSK    0xffffffef
-/* The reset value of the ALT_MON_GPIO_INTMSK_CCD register field. */
-#define ALT_MON_GPIO_INTMSK_CCD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_CCD field value from a register. */
-#define ALT_MON_GPIO_INTMSK_CCD_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_MON_GPIO_INTMSK_CCD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_CCD_SET(value) (((value) << 4) & 0x00000010)
-
-/*
- * Field : Interrupt Mask Field (PR_READY) - prr
- * 
- * Controls whether an interrupt for PR_READY can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                          | Value | Description     
- * :------------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_PRR_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_PRR_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_PRR
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_PRR_E_DIS   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_PRR
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_PRR_E_EN    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_PRR register field. */
-#define ALT_MON_GPIO_INTMSK_PRR_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_PRR register field. */
-#define ALT_MON_GPIO_INTMSK_PRR_MSB        5
-/* The width in bits of the ALT_MON_GPIO_INTMSK_PRR register field. */
-#define ALT_MON_GPIO_INTMSK_PRR_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_PRR register field value. */
-#define ALT_MON_GPIO_INTMSK_PRR_SET_MSK    0x00000020
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_PRR register field value. */
-#define ALT_MON_GPIO_INTMSK_PRR_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_MON_GPIO_INTMSK_PRR register field. */
-#define ALT_MON_GPIO_INTMSK_PRR_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_PRR field value from a register. */
-#define ALT_MON_GPIO_INTMSK_PRR_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_MON_GPIO_INTMSK_PRR register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_PRR_SET(value) (((value) << 5) & 0x00000020)
-
-/*
- * Field : Interrupt Mask Field (PR_ERROR) - pre
- * 
- * Controls whether an interrupt for PR_ERROR can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                          | Value | Description     
- * :------------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_PRE_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_PRE_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_PRE
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_PRE_E_DIS   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_PRE
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_PRE_E_EN    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_PRE register field. */
-#define ALT_MON_GPIO_INTMSK_PRE_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_PRE register field. */
-#define ALT_MON_GPIO_INTMSK_PRE_MSB        6
-/* The width in bits of the ALT_MON_GPIO_INTMSK_PRE register field. */
-#define ALT_MON_GPIO_INTMSK_PRE_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_PRE register field value. */
-#define ALT_MON_GPIO_INTMSK_PRE_SET_MSK    0x00000040
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_PRE register field value. */
-#define ALT_MON_GPIO_INTMSK_PRE_CLR_MSK    0xffffffbf
-/* The reset value of the ALT_MON_GPIO_INTMSK_PRE register field. */
-#define ALT_MON_GPIO_INTMSK_PRE_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_PRE field value from a register. */
-#define ALT_MON_GPIO_INTMSK_PRE_GET(value) (((value) & 0x00000040) >> 6)
-/* Produces a ALT_MON_GPIO_INTMSK_PRE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_PRE_SET(value) (((value) << 6) & 0x00000040)
-
-/*
- * Field : Interrupt Mask Field (PR_DONE) - prd
- * 
- * Controls whether an interrupt for PR_DONE can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                          | Value | Description     
- * :------------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_PRD_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_PRD_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_PRD
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_PRD_E_DIS   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_PRD
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_PRD_E_EN    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_PRD register field. */
-#define ALT_MON_GPIO_INTMSK_PRD_LSB        7
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_PRD register field. */
-#define ALT_MON_GPIO_INTMSK_PRD_MSB        7
-/* The width in bits of the ALT_MON_GPIO_INTMSK_PRD register field. */
-#define ALT_MON_GPIO_INTMSK_PRD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_PRD register field value. */
-#define ALT_MON_GPIO_INTMSK_PRD_SET_MSK    0x00000080
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_PRD register field value. */
-#define ALT_MON_GPIO_INTMSK_PRD_CLR_MSK    0xffffff7f
-/* The reset value of the ALT_MON_GPIO_INTMSK_PRD register field. */
-#define ALT_MON_GPIO_INTMSK_PRD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_PRD field value from a register. */
-#define ALT_MON_GPIO_INTMSK_PRD_GET(value) (((value) & 0x00000080) >> 7)
-/* Produces a ALT_MON_GPIO_INTMSK_PRD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_PRD_SET(value) (((value) << 7) & 0x00000080)
-
-/*
- * Field : Interrupt Mask Field (nCONFIG Pin) - ncp
- * 
- * Controls whether an interrupt for nCONFIG Pin can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                          | Value | Description     
- * :------------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_NCP_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_NCP_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_NCP
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_NCP_E_DIS   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_NCP
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_NCP_E_EN    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_NCP register field. */
-#define ALT_MON_GPIO_INTMSK_NCP_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_NCP register field. */
-#define ALT_MON_GPIO_INTMSK_NCP_MSB        8
-/* The width in bits of the ALT_MON_GPIO_INTMSK_NCP register field. */
-#define ALT_MON_GPIO_INTMSK_NCP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_NCP register field value. */
-#define ALT_MON_GPIO_INTMSK_NCP_SET_MSK    0x00000100
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_NCP register field value. */
-#define ALT_MON_GPIO_INTMSK_NCP_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_MON_GPIO_INTMSK_NCP register field. */
-#define ALT_MON_GPIO_INTMSK_NCP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_NCP field value from a register. */
-#define ALT_MON_GPIO_INTMSK_NCP_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_MON_GPIO_INTMSK_NCP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_NCP_SET(value) (((value) << 8) & 0x00000100)
-
-/*
- * Field : Interrupt Mask Field (nSTATUS Pin) - nsp
- * 
- * Controls whether an interrupt for nSTATUS Pin can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                          | Value | Description     
- * :------------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_NSP_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_NSP_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_NSP
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_NSP_E_DIS   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_NSP
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_NSP_E_EN    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_NSP register field. */
-#define ALT_MON_GPIO_INTMSK_NSP_LSB        9
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_NSP register field. */
-#define ALT_MON_GPIO_INTMSK_NSP_MSB        9
-/* The width in bits of the ALT_MON_GPIO_INTMSK_NSP register field. */
-#define ALT_MON_GPIO_INTMSK_NSP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_NSP register field value. */
-#define ALT_MON_GPIO_INTMSK_NSP_SET_MSK    0x00000200
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_NSP register field value. */
-#define ALT_MON_GPIO_INTMSK_NSP_CLR_MSK    0xfffffdff
-/* The reset value of the ALT_MON_GPIO_INTMSK_NSP register field. */
-#define ALT_MON_GPIO_INTMSK_NSP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_NSP field value from a register. */
-#define ALT_MON_GPIO_INTMSK_NSP_GET(value) (((value) & 0x00000200) >> 9)
-/* Produces a ALT_MON_GPIO_INTMSK_NSP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_NSP_SET(value) (((value) << 9) & 0x00000200)
-
-/*
- * Field : Interrupt Mask Field (CONF_DONE Pin) - cdp
- * 
- * Controls whether an interrupt for CONF_DONE Pin can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                          | Value | Description     
- * :------------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_CDP_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_CDP_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_CDP
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_CDP_E_DIS   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_CDP
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_CDP_E_EN    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_CDP register field. */
-#define ALT_MON_GPIO_INTMSK_CDP_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_CDP register field. */
-#define ALT_MON_GPIO_INTMSK_CDP_MSB        10
-/* The width in bits of the ALT_MON_GPIO_INTMSK_CDP register field. */
-#define ALT_MON_GPIO_INTMSK_CDP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_CDP register field value. */
-#define ALT_MON_GPIO_INTMSK_CDP_SET_MSK    0x00000400
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_CDP register field value. */
-#define ALT_MON_GPIO_INTMSK_CDP_CLR_MSK    0xfffffbff
-/* The reset value of the ALT_MON_GPIO_INTMSK_CDP register field. */
-#define ALT_MON_GPIO_INTMSK_CDP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_CDP field value from a register. */
-#define ALT_MON_GPIO_INTMSK_CDP_GET(value) (((value) & 0x00000400) >> 10)
-/* Produces a ALT_MON_GPIO_INTMSK_CDP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_CDP_SET(value) (((value) << 10) & 0x00000400)
-
-/*
- * Field : Interrupt Mask Field (FPGA_POWER_ON) - fpo
- * 
- * Controls whether an interrupt for FPGA_POWER_ON can generate an interrupt to the
- * interrupt controller by not masking it. The unmasked status can be read as well
- * as the resultant status after masking.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                          | Value | Description     
- * :------------------------------|:------|:-----------------
- *  ALT_MON_GPIO_INTMSK_FPO_E_DIS | 0x0   | Unmask Interrupt
- *  ALT_MON_GPIO_INTMSK_FPO_E_EN  | 0x1   | Mask Interrupt  
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_FPO
- * 
- * Unmask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_FPO_E_DIS   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTMSK_FPO
- * 
- * Mask Interrupt
- */
-#define ALT_MON_GPIO_INTMSK_FPO_E_EN    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTMSK_FPO register field. */
-#define ALT_MON_GPIO_INTMSK_FPO_LSB        11
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTMSK_FPO register field. */
-#define ALT_MON_GPIO_INTMSK_FPO_MSB        11
-/* The width in bits of the ALT_MON_GPIO_INTMSK_FPO register field. */
-#define ALT_MON_GPIO_INTMSK_FPO_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTMSK_FPO register field value. */
-#define ALT_MON_GPIO_INTMSK_FPO_SET_MSK    0x00000800
-/* The mask used to clear the ALT_MON_GPIO_INTMSK_FPO register field value. */
-#define ALT_MON_GPIO_INTMSK_FPO_CLR_MSK    0xfffff7ff
-/* The reset value of the ALT_MON_GPIO_INTMSK_FPO register field. */
-#define ALT_MON_GPIO_INTMSK_FPO_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTMSK_FPO field value from a register. */
-#define ALT_MON_GPIO_INTMSK_FPO_GET(value) (((value) & 0x00000800) >> 11)
-/* Produces a ALT_MON_GPIO_INTMSK_FPO register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTMSK_FPO_SET(value) (((value) << 11) & 0x00000800)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_EMR_DATA1_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA1_VALUE_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_EMR_DATA1_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA1_VALUE_MSB        31
+/* The width in bits of the ALT_FPGAMGR_EMR_DATA1_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA1_VALUE_WIDTH      32
+/* The mask used to set the ALT_FPGAMGR_EMR_DATA1_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA1_VALUE_SET_MSK    0xffffffff
+/* The mask used to clear the ALT_FPGAMGR_EMR_DATA1_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA1_VALUE_CLR_MSK    0x00000000
+/* The reset value of the ALT_FPGAMGR_EMR_DATA1_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA1_VALUE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_EMR_DATA1_VALUE field value from a register. */
+#define ALT_FPGAMGR_EMR_DATA1_VALUE_GET(value) (((value) & 0xffffffff) >> 0)
+/* Produces a ALT_FPGAMGR_EMR_DATA1_VALUE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_EMR_DATA1_VALUE_SET(value) (((value) << 0) & 0xffffffff)
 
 #ifndef __ASSEMBLY__
 /*
@@ -2667,610 +562,1937 @@ typedef volatile struct ALT_MON_GPIO_INTEN_s  ALT_MON_GPIO_INTEN_t;
  * hardware drivers is to use the SoCAL access macros and alt_read_word() and
  * alt_write_word() functions.
  * 
- * The struct declaration for register ALT_MON_GPIO_INTMSK.
+ * The struct declaration for register ALT_FPGAMGR_EMR_DATA1.
  */
-struct ALT_MON_GPIO_INTMSK_s
+struct ALT_FPGAMGR_EMR_DATA1_s
 {
-    uint32_t  ns  :  1;  /* Interrupt Mask Field (nSTATUS) */
-    uint32_t  cd  :  1;  /* Interrupt Mask Field (CONF_DONE) */
-    uint32_t  id  :  1;  /* Interrupt Mask Field (INIT_DONE) */
-    uint32_t  crc :  1;  /* Interrupt Mask Field (CRC_ERROR) */
-    uint32_t  ccd :  1;  /* Interrupt Mask Field (CVP_CONF_DONE) */
-    uint32_t  prr :  1;  /* Interrupt Mask Field (PR_READY) */
-    uint32_t  pre :  1;  /* Interrupt Mask Field (PR_ERROR) */
-    uint32_t  prd :  1;  /* Interrupt Mask Field (PR_DONE) */
-    uint32_t  ncp :  1;  /* Interrupt Mask Field (nCONFIG Pin) */
-    uint32_t  nsp :  1;  /* Interrupt Mask Field (nSTATUS Pin) */
-    uint32_t  cdp :  1;  /* Interrupt Mask Field (CONF_DONE Pin) */
-    uint32_t  fpo :  1;  /* Interrupt Mask Field (FPGA_POWER_ON) */
-    uint32_t      : 20;  /* *UNDEFINED* */
+    const uint32_t  value : 32;  /* Value */
 };
 
-/* The typedef declaration for register ALT_MON_GPIO_INTMSK. */
-typedef volatile struct ALT_MON_GPIO_INTMSK_s  ALT_MON_GPIO_INTMSK_t;
+/* The typedef declaration for register ALT_FPGAMGR_EMR_DATA1. */
+typedef volatile struct ALT_FPGAMGR_EMR_DATA1_s  ALT_FPGAMGR_EMR_DATA1_t;
 #endif  /* __ASSEMBLY__ */
 
-/* The byte offset of the ALT_MON_GPIO_INTMSK register from the beginning of the component. */
-#define ALT_MON_GPIO_INTMSK_OFST        0x34
-/* The address of the ALT_MON_GPIO_INTMSK register. */
-#define ALT_MON_GPIO_INTMSK_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_INTMSK_OFST))
+/* The reset value of the ALT_FPGAMGR_EMR_DATA1 register. */
+#define ALT_FPGAMGR_EMR_DATA1_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_EMR_DATA1 register from the beginning of the component. */
+#define ALT_FPGAMGR_EMR_DATA1_OFST        0x34
 
 /*
- * Register : Interrupt Level Register - gpio_inttype_level
+ * Register : emr_data2
  * 
- * The interrupt level register defines the type of interrupt (edge or level) for
- * each GPIO input.
+ * bits [95:64] of EMR register
+ * 
+ * Register Layout
+ * 
+ *  Bits   | Access | Reset   | Description
+ * :-------|:-------|:--------|:------------
+ *  [31:0] | R      | Unknown | Value      
+ * 
+ */
+/*
+ * Field : Value - value
+ * 
+ * EMR register bits
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_EMR_DATA2_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA2_VALUE_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_EMR_DATA2_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA2_VALUE_MSB        31
+/* The width in bits of the ALT_FPGAMGR_EMR_DATA2_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA2_VALUE_WIDTH      32
+/* The mask used to set the ALT_FPGAMGR_EMR_DATA2_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA2_VALUE_SET_MSK    0xffffffff
+/* The mask used to clear the ALT_FPGAMGR_EMR_DATA2_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA2_VALUE_CLR_MSK    0x00000000
+/* The reset value of the ALT_FPGAMGR_EMR_DATA2_VALUE register field is UNKNOWN. */
+#define ALT_FPGAMGR_EMR_DATA2_VALUE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_EMR_DATA2_VALUE field value from a register. */
+#define ALT_FPGAMGR_EMR_DATA2_VALUE_GET(value) (((value) & 0xffffffff) >> 0)
+/* Produces a ALT_FPGAMGR_EMR_DATA2_VALUE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_EMR_DATA2_VALUE_SET(value) (((value) << 0) & 0xffffffff)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_EMR_DATA2.
+ */
+struct ALT_FPGAMGR_EMR_DATA2_s
+{
+    const uint32_t  value : 32;  /* Value */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_EMR_DATA2. */
+typedef volatile struct ALT_FPGAMGR_EMR_DATA2_s  ALT_FPGAMGR_EMR_DATA2_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_EMR_DATA2 register. */
+#define ALT_FPGAMGR_EMR_DATA2_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_EMR_DATA2 register from the beginning of the component. */
+#define ALT_FPGAMGR_EMR_DATA2_OFST        0x38
+
+/*
+ * Register : emr_data3
+ * 
+ * bits [119:96] of EMR register
+ * 
+ * Register Layout
+ * 
+ *  Bits   | Access | Reset   | Description
+ * :-------|:-------|:--------|:------------
+ *  [31:0] | R      | Unknown | Value      
+ * 
+ */
+/*
+ * Field : Value - value
+ * 
+ * EMR register bits
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_EMR_DATA3_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA3_VALUE_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_EMR_DATA3_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA3_VALUE_MSB        31
+/* The width in bits of the ALT_FPGAMGR_EMR_DATA3_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA3_VALUE_WIDTH      32
+/* The mask used to set the ALT_FPGAMGR_EMR_DATA3_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA3_VALUE_SET_MSK    0xffffffff
+/* The mask used to clear the ALT_FPGAMGR_EMR_DATA3_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA3_VALUE_CLR_MSK    0x00000000
+/* The reset value of the ALT_FPGAMGR_EMR_DATA3_VALUE register field is UNKNOWN. */
+#define ALT_FPGAMGR_EMR_DATA3_VALUE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_EMR_DATA3_VALUE field value from a register. */
+#define ALT_FPGAMGR_EMR_DATA3_VALUE_GET(value) (((value) & 0xffffffff) >> 0)
+/* Produces a ALT_FPGAMGR_EMR_DATA3_VALUE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_EMR_DATA3_VALUE_SET(value) (((value) << 0) & 0xffffffff)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_EMR_DATA3.
+ */
+struct ALT_FPGAMGR_EMR_DATA3_s
+{
+    const uint32_t  value : 32;  /* Value */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_EMR_DATA3. */
+typedef volatile struct ALT_FPGAMGR_EMR_DATA3_s  ALT_FPGAMGR_EMR_DATA3_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_EMR_DATA3 register. */
+#define ALT_FPGAMGR_EMR_DATA3_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_EMR_DATA3 register from the beginning of the component. */
+#define ALT_FPGAMGR_EMR_DATA3_OFST        0x3c
+
+/*
+ * Register : emr_data4
+ * 
+ * bits [159:128] of EMR register
+ * 
+ * Register Layout
+ * 
+ *  Bits   | Access | Reset   | Description
+ * :-------|:-------|:--------|:------------
+ *  [31:0] | R      | Unknown | Value      
+ * 
+ */
+/*
+ * Field : Value - value
+ * 
+ * EMR register bits
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_EMR_DATA4_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA4_VALUE_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_EMR_DATA4_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA4_VALUE_MSB        31
+/* The width in bits of the ALT_FPGAMGR_EMR_DATA4_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA4_VALUE_WIDTH      32
+/* The mask used to set the ALT_FPGAMGR_EMR_DATA4_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA4_VALUE_SET_MSK    0xffffffff
+/* The mask used to clear the ALT_FPGAMGR_EMR_DATA4_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA4_VALUE_CLR_MSK    0x00000000
+/* The reset value of the ALT_FPGAMGR_EMR_DATA4_VALUE register field is UNKNOWN. */
+#define ALT_FPGAMGR_EMR_DATA4_VALUE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_EMR_DATA4_VALUE field value from a register. */
+#define ALT_FPGAMGR_EMR_DATA4_VALUE_GET(value) (((value) & 0xffffffff) >> 0)
+/* Produces a ALT_FPGAMGR_EMR_DATA4_VALUE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_EMR_DATA4_VALUE_SET(value) (((value) << 0) & 0xffffffff)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_EMR_DATA4.
+ */
+struct ALT_FPGAMGR_EMR_DATA4_s
+{
+    const uint32_t  value : 32;  /* Value */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_EMR_DATA4. */
+typedef volatile struct ALT_FPGAMGR_EMR_DATA4_s  ALT_FPGAMGR_EMR_DATA4_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_EMR_DATA4 register. */
+#define ALT_FPGAMGR_EMR_DATA4_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_EMR_DATA4 register from the beginning of the component. */
+#define ALT_FPGAMGR_EMR_DATA4_OFST        0x40
+
+/*
+ * Register : emr_data5
+ * 
+ * bits [171:160] of EMR register
+ * 
+ * Register Layout
+ * 
+ *  Bits   | Access | Reset   | Description
+ * :-------|:-------|:--------|:------------
+ *  [31:0] | R      | Unknown | Value      
+ * 
+ */
+/*
+ * Field : Value - value
+ * 
+ * EMR register bits
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_EMR_DATA5_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA5_VALUE_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_EMR_DATA5_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA5_VALUE_MSB        31
+/* The width in bits of the ALT_FPGAMGR_EMR_DATA5_VALUE register field. */
+#define ALT_FPGAMGR_EMR_DATA5_VALUE_WIDTH      32
+/* The mask used to set the ALT_FPGAMGR_EMR_DATA5_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA5_VALUE_SET_MSK    0xffffffff
+/* The mask used to clear the ALT_FPGAMGR_EMR_DATA5_VALUE register field value. */
+#define ALT_FPGAMGR_EMR_DATA5_VALUE_CLR_MSK    0x00000000
+/* The reset value of the ALT_FPGAMGR_EMR_DATA5_VALUE register field is UNKNOWN. */
+#define ALT_FPGAMGR_EMR_DATA5_VALUE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_EMR_DATA5_VALUE field value from a register. */
+#define ALT_FPGAMGR_EMR_DATA5_VALUE_GET(value) (((value) & 0xffffffff) >> 0)
+/* Produces a ALT_FPGAMGR_EMR_DATA5_VALUE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_EMR_DATA5_VALUE_SET(value) (((value) << 0) & 0xffffffff)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_EMR_DATA5.
+ */
+struct ALT_FPGAMGR_EMR_DATA5_s
+{
+    const uint32_t  value : 32;  /* Value */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_EMR_DATA5. */
+typedef volatile struct ALT_FPGAMGR_EMR_DATA5_s  ALT_FPGAMGR_EMR_DATA5_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_EMR_DATA5 register. */
+#define ALT_FPGAMGR_EMR_DATA5_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_EMR_DATA5 register from the beginning of the component. */
+#define ALT_FPGAMGR_EMR_DATA5_OFST        0x44
+
+/*
+ * Register : emr_valid
+ * 
+ * Register Layout
+ * 
+ *  Bits   | Access | Reset | Description              
+ * :-------|:-------|:------|:--------------------------
+ *  [0]    | RW     | 0x0   | ALT_FPGAMGR_EMR_VALID_VLD
+ *  [31:1] | ???    | 0x0   | *UNDEFINED*              
+ * 
+ */
+/*
+ * Field : vld
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_EMR_VALID_VLD register field. */
+#define ALT_FPGAMGR_EMR_VALID_VLD_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_EMR_VALID_VLD register field. */
+#define ALT_FPGAMGR_EMR_VALID_VLD_MSB        0
+/* The width in bits of the ALT_FPGAMGR_EMR_VALID_VLD register field. */
+#define ALT_FPGAMGR_EMR_VALID_VLD_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_EMR_VALID_VLD register field value. */
+#define ALT_FPGAMGR_EMR_VALID_VLD_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_EMR_VALID_VLD register field value. */
+#define ALT_FPGAMGR_EMR_VALID_VLD_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_EMR_VALID_VLD register field. */
+#define ALT_FPGAMGR_EMR_VALID_VLD_RESET      0x0
+/* Extracts the ALT_FPGAMGR_EMR_VALID_VLD field value from a register. */
+#define ALT_FPGAMGR_EMR_VALID_VLD_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_EMR_VALID_VLD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_EMR_VALID_VLD_SET(value) (((value) << 0) & 0x00000001)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_EMR_VALID.
+ */
+struct ALT_FPGAMGR_EMR_VALID_s
+{
+    uint32_t  vld :  1;  /* ALT_FPGAMGR_EMR_VALID_VLD */
+    uint32_t      : 31;  /* *UNDEFINED* */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_EMR_VALID. */
+typedef volatile struct ALT_FPGAMGR_EMR_VALID_s  ALT_FPGAMGR_EMR_VALID_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_EMR_VALID register. */
+#define ALT_FPGAMGR_EMR_VALID_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_EMR_VALID register from the beginning of the component. */
+#define ALT_FPGAMGR_EMR_VALID_OFST        0x48
+
+/*
+ * Register : emr_en
+ * 
+ * Register Layout
+ * 
+ *  Bits   | Access | Reset      | Description
+ * :-------|:-------|:-----------|:------------
+ *  [0]    | RW     | 0x0        | EMR_EN     
+ *  [31:1] | ???    | 0x3b800000 | *UNDEFINED*
+ * 
+ */
+/*
+ * Field : EMR_EN - en
+ * 
+ * Enable HPS EMR extraction from CSS.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_EMR_EN_EN register field. */
+#define ALT_FPGAMGR_EMR_EN_EN_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_EMR_EN_EN register field. */
+#define ALT_FPGAMGR_EMR_EN_EN_MSB        0
+/* The width in bits of the ALT_FPGAMGR_EMR_EN_EN register field. */
+#define ALT_FPGAMGR_EMR_EN_EN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_EMR_EN_EN register field value. */
+#define ALT_FPGAMGR_EMR_EN_EN_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_EMR_EN_EN register field value. */
+#define ALT_FPGAMGR_EMR_EN_EN_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_EMR_EN_EN register field. */
+#define ALT_FPGAMGR_EMR_EN_EN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_EMR_EN_EN field value from a register. */
+#define ALT_FPGAMGR_EMR_EN_EN_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_EMR_EN_EN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_EMR_EN_EN_SET(value) (((value) << 0) & 0x00000001)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_EMR_EN.
+ */
+struct ALT_FPGAMGR_EMR_EN_s
+{
+    uint32_t  en :  1;  /* EMR_EN */
+    uint32_t     : 31;  /* *UNDEFINED* */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_EMR_EN. */
+typedef volatile struct ALT_FPGAMGR_EMR_EN_s  ALT_FPGAMGR_EMR_EN_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_EMR_EN register. */
+#define ALT_FPGAMGR_EMR_EN_RESET       0x77000000
+/* The byte offset of the ALT_FPGAMGR_EMR_EN register from the beginning of the component. */
+#define ALT_FPGAMGR_EMR_EN_OFST        0x4c
+
+/*
+ * Register : Scan-Chain Enable Register - jtag_config
+ * 
+ * This register is used to configure the JTAG master interface.
+ * 
+ * It is recommended that software write this register before initiating a
+ * transfer.
+ * 
+ * If the software writes to this register while an active session is in progress
+ * (as indicated by jtag_status.SessionStatus), the expected behavior is
+ * "undefined".
+ * 
+ * Register Layout
+ * 
+ *  Bits    | Access | Reset | Description                
+ * :--------|:-------|:------|:----------------------------
+ *  [0]     | RW     | 0x0   | Jtag Host Enable           
+ *  [1]     | RW     | 0x0   | Jtag Port Enable           
+ *  [2]     | RW     | 0x0   | Loop Back Enable           
+ *  [3]     | ???    | 0x0   | *UNDEFINED*                
+ *  [4]     | RW     | 0x0   | ALT_FPGAMGR_JTAG_CFG_TRSTEN
+ *  [7:5]   | ???    | 0x0   | *UNDEFINED*                
+ *  [15:8]  | RW     | 0x14  | TCK Divide Ratio           
+ *  [31:16] | RW     | 0x0   | Number of TX bits          
+ * 
+ */
+/*
+ * Field : Jtag Host Enable - JtagHostEn
+ * 
+ * This bit field drives the enable signal to the FPGA CSS. Please note that this
+ * enable should be driven long before you start any JTAG transactions.
+ * 
+ * Field Enumeration Values:
+ * 
+ *  Enum                                  | Value | Description       
+ * :--------------------------------------|:------|:-------------------
+ *  ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_E_DIS | 0x0   | Disable scan-chain
+ *  ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_E_EN  | 0x1   | Enable scan-chain 
+ * 
+ * Field Access Macros:
+ * 
+ */
+/*
+ * Enumerated value for register field ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN
+ * 
+ * Disable scan-chain
+ */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_E_DIS   0x0
+/*
+ * Enumerated value for register field ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN
+ * 
+ * Enable scan-chain
+ */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_E_EN    0x1
+
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_MSB        0
+/* The width in bits of the ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN field value from a register. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGHOSTEN_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : Jtag Port Enable - jtagPortEn
+ * 
+ * This bit field gates off TDI/TMS/TCK driven to the FPGA CSS interface. This
+ * allows the software to take over JTAG but keep them tied low. If this bit is 0
+ * the internal core logic will still be active and all the status will be updated
+ * as in regular operation.
+ * 
+ * Field Enumeration Values:
+ * 
+ *  Enum                                  | Value | Description       
+ * :--------------------------------------|:------|:-------------------
+ *  ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_E_DIS | 0x0   | Disable scan-chain
+ *  ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_E_EN  | 0x1   | Enable scan-chain 
+ * 
+ * Field Access Macros:
+ * 
+ */
+/*
+ * Enumerated value for register field ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN
+ * 
+ * Disable scan-chain
+ */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_E_DIS   0x0
+/*
+ * Enumerated value for register field ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN
+ * 
+ * Enable scan-chain
+ */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_E_EN    0x1
+
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_MSB        1
+/* The width in bits of the ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_SET_MSK    0x00000002
+/* The mask used to clear the ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN field value from a register. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_CFG_JTAGPORTEN_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : Loop Back Enable - loopBackEn
+ * 
+ * Enables the internal loopback mode. A typical scenario will be to set
+ * JtagHostEn=0, JtagPortEn=0, and then initiate transmits by software writes to
+ * TXFifo. All transfers should receive back on RxFifo. Also this should not affect
+ * anything external, since the Jtag ports will be gated off.
+ * 
+ * Field Enumeration Values:
+ * 
+ *  Enum                                  | Value | Description       
+ * :--------------------------------------|:------|:-------------------
+ *  ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_E_DIS | 0x0   | Disable scan-chain
+ *  ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_E_EN  | 0x1   | Enable scan-chain 
+ * 
+ * Field Access Macros:
+ * 
+ */
+/*
+ * Enumerated value for register field ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN
+ * 
+ * Disable scan-chain
+ */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_E_DIS   0x0
+/*
+ * Enumerated value for register field ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN
+ * 
+ * Enable scan-chain
+ */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_E_EN    0x1
+
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_MSB        2
+/* The width in bits of the ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_SET_MSK    0x00000004
+/* The mask used to clear the ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN field value from a register. */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_CFG_LOOPBACKEN_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : trstEn
+ * 
+ * Set this bit and then writing at least 1 data in jtag_data_w will cause a JTAG
+ * reset to happen. Please note that writing TRSTEN while a data transmission is
+ * undergoing could cause undesired effects, so it is recommended that software
+ * poll the SESSIONSTATUS bit to make sure there is no existing transfers before
+ * writing TRSTEN. Software should manually write 0 to this bit after the
+ * completion of the reset and after the SESSIONSTATUS is inactive.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_CFG_TRSTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TRSTEN_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_CFG_TRSTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TRSTEN_MSB        4
+/* The width in bits of the ALT_FPGAMGR_JTAG_CFG_TRSTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TRSTEN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_CFG_TRSTEN register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_TRSTEN_SET_MSK    0x00000010
+/* The mask used to clear the ALT_FPGAMGR_JTAG_CFG_TRSTEN register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_TRSTEN_CLR_MSK    0xffffffef
+/* The reset value of the ALT_FPGAMGR_JTAG_CFG_TRSTEN register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TRSTEN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_CFG_TRSTEN field value from a register. */
+#define ALT_FPGAMGR_JTAG_CFG_TRSTEN_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_FPGAMGR_JTAG_CFG_TRSTEN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_CFG_TRSTEN_SET(value) (((value) << 4) & 0x00000010)
+
+/*
+ * Field : TCK Divide Ratio - tckRatio
+ * 
+ * Ratio of TCK division. The FPGA manager clock is 100MHz.
+ * 
+ * value of 4 provides a 25MHz TCK
+ * 
+ * value of 20 (0x14) provides a 5MHz TCK.
+ * 
+ * Maximum supported TCK frequency is 25MHz.
+ * 
+ * So writing a value less than 4 to this field will cause unexpected behavior.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_CFG_TCKRATIO register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TCKRATIO_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_CFG_TCKRATIO register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TCKRATIO_MSB        15
+/* The width in bits of the ALT_FPGAMGR_JTAG_CFG_TCKRATIO register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TCKRATIO_WIDTH      8
+/* The mask used to set the ALT_FPGAMGR_JTAG_CFG_TCKRATIO register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_TCKRATIO_SET_MSK    0x0000ff00
+/* The mask used to clear the ALT_FPGAMGR_JTAG_CFG_TCKRATIO register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_TCKRATIO_CLR_MSK    0xffff00ff
+/* The reset value of the ALT_FPGAMGR_JTAG_CFG_TCKRATIO register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TCKRATIO_RESET      0x14
+/* Extracts the ALT_FPGAMGR_JTAG_CFG_TCKRATIO field value from a register. */
+#define ALT_FPGAMGR_JTAG_CFG_TCKRATIO_GET(value) (((value) & 0x0000ff00) >> 8)
+/* Produces a ALT_FPGAMGR_JTAG_CFG_TCKRATIO register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_CFG_TCKRATIO_SET(value) (((value) << 8) & 0x0000ff00)
+
+/*
+ * Field : Number of TX bits - txSize
+ * 
+ * Defines the number of bits to be transmitted. Once the software kicks of the
+ * transfer via Start_Transfer bits, the hardware will stop the transfer, when
+ * either of the below conditions are reached.
+ * 
+ * a)      Completed a transfer of programmed Number of TX Bits +1.
+ * 
+ * b)      TxFifo became empty (under-run of TxFifo).
+ * 
+ * c)      A Stop Transfer request received from software.
+ * 
+ * So for a successful transfer of fixed number of bits, software has to make sure
+ * continuous flow of data.
+ * 
+ * The exact number of bits to be  transferred in the current session is 1+ the
+ * value in this register field.
+ * 
+ * For example
+ * 
+ * 0 -> 1 bit to be transmitted once start session is triggered.
+ * 
+ * 1-> 2 bits to be transmitted.once start session is triggered.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_CFG_TXSIZE register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TXSIZE_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_CFG_TXSIZE register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TXSIZE_MSB        31
+/* The width in bits of the ALT_FPGAMGR_JTAG_CFG_TXSIZE register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TXSIZE_WIDTH      16
+/* The mask used to set the ALT_FPGAMGR_JTAG_CFG_TXSIZE register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_TXSIZE_SET_MSK    0xffff0000
+/* The mask used to clear the ALT_FPGAMGR_JTAG_CFG_TXSIZE register field value. */
+#define ALT_FPGAMGR_JTAG_CFG_TXSIZE_CLR_MSK    0x0000ffff
+/* The reset value of the ALT_FPGAMGR_JTAG_CFG_TXSIZE register field. */
+#define ALT_FPGAMGR_JTAG_CFG_TXSIZE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_CFG_TXSIZE field value from a register. */
+#define ALT_FPGAMGR_JTAG_CFG_TXSIZE_GET(value) (((value) & 0xffff0000) >> 16)
+/* Produces a ALT_FPGAMGR_JTAG_CFG_TXSIZE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_CFG_TXSIZE_SET(value) (((value) << 16) & 0xffff0000)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_JTAG_CFG.
+ */
+struct ALT_FPGAMGR_JTAG_CFG_s
+{
+    uint32_t  JtagHostEn :  1;  /* Jtag Host Enable */
+    uint32_t  jtagPortEn :  1;  /* Jtag Port Enable */
+    uint32_t  loopBackEn :  1;  /* Loop Back Enable */
+    uint32_t             :  1;  /* *UNDEFINED* */
+    uint32_t  trstEn     :  1;  /* ALT_FPGAMGR_JTAG_CFG_TRSTEN */
+    uint32_t             :  3;  /* *UNDEFINED* */
+    uint32_t  tckRatio   :  8;  /* TCK Divide Ratio */
+    uint32_t  txSize     : 16;  /* Number of TX bits */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_JTAG_CFG. */
+typedef volatile struct ALT_FPGAMGR_JTAG_CFG_s  ALT_FPGAMGR_JTAG_CFG_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_JTAG_CFG register. */
+#define ALT_FPGAMGR_JTAG_CFG_RESET       0x00001400
+/* The byte offset of the ALT_FPGAMGR_JTAG_CFG register from the beginning of the component. */
+#define ALT_FPGAMGR_JTAG_CFG_OFST        0x50
+
+/*
+ * Register : Control/Status Word Register - jtag_status
+ * 
+ * status of the currently ongoing JTAG transmit or receive
+ * 
+ * Register Layout
+ * 
+ *  Bits    | Access | Reset   | Description                   
+ * :--------|:-------|:--------|:-------------------------------
+ *  [3:0]   | RW     | 0x0     | Current Tx Fifo level         
+ *  [7:4]   | RW     | 0x0     | Current RX FIFO Level         
+ *  [8]     | RW     | 0x1     | Tx Fifo Empty Status          
+ *  [9]     | RW     | 0x0     | Tx Fifo Full Status           
+ *  [10]    | RW     | 0x1     | Rx Fifo Empty Status          
+ *  [11]    | RW     | 0x0     | Rx Fifo Full Status           
+ *  [14:12] | ???    | 0x0     | *UNDEFINED*                   
+ *  [15]    | RW     | 0x0     | Valid Ongoing Transfer Session
+ *  [31:16] | RW     | Unknown | Number of bits Transmitted    
+ * 
+ */
+/*
+ * Field : Current Tx Fifo level - txFifoLevel
+ * 
+ * Number of words remaining in Tx Fifo.
+ * 
+ * Maximum value is 0x8
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL_MSB        3
+/* The width in bits of the ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL_WIDTH      4
+/* The mask used to set the ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL_SET_MSK    0x0000000f
+/* The mask used to clear the ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL_CLR_MSK    0xfffffff0
+/* The reset value of the ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL field value from a register. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL_GET(value) (((value) & 0x0000000f) >> 0)
+/* Produces a ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOLEVEL_SET(value) (((value) << 0) & 0x0000000f)
+
+/*
+ * Field : Current RX FIFO Level - rxFifoLevel
+ * 
+ * Number of Words remaining in the Rx Fifo.
+ * 
+ * Maximum value is 0x8
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL_MSB        7
+/* The width in bits of the ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL_WIDTH      4
+/* The mask used to set the ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL_SET_MSK    0x000000f0
+/* The mask used to clear the ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL_CLR_MSK    0xffffff0f
+/* The reset value of the ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL field value from a register. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL_GET(value) (((value) & 0x000000f0) >> 4)
+/* Produces a ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOLEVEL_SET(value) (((value) << 4) & 0x000000f0)
+
+/*
+ * Field : Tx Fifo Empty Status - txFifoEmpty
+ * 
+ * Read
+ * 
+ * 1 -> Tx Fifo Empty
+ * 
+ * 0 -> Tx Fifo NOT Empty
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY_MSB        8
+/* The width in bits of the ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY_SET_MSK    0x00000100
+/* The mask used to clear the ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY_RESET      0x1
+/* Extracts the ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY field value from a register. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOEMPTY_SET(value) (((value) << 8) & 0x00000100)
+
+/*
+ * Field : Tx Fifo Full Status - txFifoFull
+ * 
+ * Read
+ * 
+ * 1 -> Tx Fifo Full
+ * 
+ * 0 -> Tx Fifo NOT full
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL_LSB        9
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL_MSB        9
+/* The width in bits of the ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL_SET_MSK    0x00000200
+/* The mask used to clear the ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL_CLR_MSK    0xfffffdff
+/* The reset value of the ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL field value from a register. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL_GET(value) (((value) & 0x00000200) >> 9)
+/* Produces a ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_STAT_TXFIFOFULL_SET(value) (((value) << 9) & 0x00000200)
+
+/*
+ * Field : Rx Fifo Empty Status - rxFifoEmpty
+ * 
+ * Read
+ * 
+ * 1 -> Rx Fifo Empty
+ * 
+ * 0 -> Rx Fifo NOT Empty
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY_LSB        10
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY_MSB        10
+/* The width in bits of the ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY_SET_MSK    0x00000400
+/* The mask used to clear the ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY_CLR_MSK    0xfffffbff
+/* The reset value of the ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY_RESET      0x1
+/* Extracts the ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY field value from a register. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY_GET(value) (((value) & 0x00000400) >> 10)
+/* Produces a ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOEMPTY_SET(value) (((value) << 10) & 0x00000400)
+
+/*
+ * Field : Rx Fifo Full Status - rxFifoFull
+ * 
+ * Read
+ * 
+ * 1 -> Rx Fifo Full
+ * 
+ * 0 -> Rx Fifo NOT full
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL_LSB        11
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL_MSB        11
+/* The width in bits of the ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL_SET_MSK    0x00000800
+/* The mask used to clear the ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL_CLR_MSK    0xfffff7ff
+/* The reset value of the ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL register field. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL field value from a register. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL_GET(value) (((value) & 0x00000800) >> 11)
+/* Produces a ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_STAT_RXFIFOFULL_SET(value) (((value) << 11) & 0x00000800)
+
+/*
+ * Field : Valid Ongoing Transfer Session - SessionStatus
+ * 
+ * A read of 1 indicates that there is an ongoing transfer session.
+ * 
+ * A read of 0 indicates that there is no ongoing transfer session.
+ * 
+ * Field Enumeration Values:
+ * 
+ *  Enum                                    | Value | Description       
+ * :----------------------------------------|:------|:-------------------
+ *  ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_E_DIS | 0x0   | Disable scan-chain
+ *  ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_E_EN  | 0x1   | Enable scan-chain 
+ * 
+ * Field Access Macros:
+ * 
+ */
+/*
+ * Enumerated value for register field ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT
+ * 
+ * Disable scan-chain
+ */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_E_DIS 0x0
+/*
+ * Enumerated value for register field ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT
+ * 
+ * Enable scan-chain
+ */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_E_EN  0x1
+
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT register field. */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_LSB        15
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT register field. */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_MSB        15
+/* The width in bits of the ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT register field. */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_SET_MSK    0x00008000
+/* The mask used to clear the ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_CLR_MSK    0xffff7fff
+/* The reset value of the ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT register field. */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT field value from a register. */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_GET(value) (((value) & 0x00008000) >> 15)
+/* Produces a ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_STAT_SESSIONSTAT_SET(value) (((value) << 15) & 0x00008000)
+
+/*
+ * Field : Number of bits Transmitted - txDoneSize
+ * 
+ * Total Number of Successful bits transferred in the current session.
+ * 
+ * The exact number of bits transferred in the current session is 1+ the value in
+ * this register.
+ * 
+ * For example
+ * 
+ * 0 -> 1 bit completed transmit or in the process of transmitting.
+ * 
+ * 1-> 2 bits completed transmit or in the process of transmitting.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_STAT_TXDONESIZE register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXDONESIZE_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_STAT_TXDONESIZE register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXDONESIZE_MSB        31
+/* The width in bits of the ALT_FPGAMGR_JTAG_STAT_TXDONESIZE register field. */
+#define ALT_FPGAMGR_JTAG_STAT_TXDONESIZE_WIDTH      16
+/* The mask used to set the ALT_FPGAMGR_JTAG_STAT_TXDONESIZE register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_TXDONESIZE_SET_MSK    0xffff0000
+/* The mask used to clear the ALT_FPGAMGR_JTAG_STAT_TXDONESIZE register field value. */
+#define ALT_FPGAMGR_JTAG_STAT_TXDONESIZE_CLR_MSK    0x0000ffff
+/* The reset value of the ALT_FPGAMGR_JTAG_STAT_TXDONESIZE register field is UNKNOWN. */
+#define ALT_FPGAMGR_JTAG_STAT_TXDONESIZE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_STAT_TXDONESIZE field value from a register. */
+#define ALT_FPGAMGR_JTAG_STAT_TXDONESIZE_GET(value) (((value) & 0xffff0000) >> 16)
+/* Produces a ALT_FPGAMGR_JTAG_STAT_TXDONESIZE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_STAT_TXDONESIZE_SET(value) (((value) << 16) & 0xffff0000)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_JTAG_STAT.
+ */
+struct ALT_FPGAMGR_JTAG_STAT_s
+{
+    uint32_t  txFifoLevel   :  4;  /* Current Tx Fifo level */
+    uint32_t  rxFifoLevel   :  4;  /* Current RX FIFO Level */
+    uint32_t  txFifoEmpty   :  1;  /* Tx Fifo Empty Status */
+    uint32_t  txFifoFull    :  1;  /* Tx Fifo Full Status */
+    uint32_t  rxFifoEmpty   :  1;  /* Rx Fifo Empty Status */
+    uint32_t  rxFifoFull    :  1;  /* Rx Fifo Full Status */
+    uint32_t                :  3;  /* *UNDEFINED* */
+    uint32_t  SessionStatus :  1;  /* Valid Ongoing Transfer Session */
+    uint32_t  txDoneSize    : 16;  /* Number of bits Transmitted */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_JTAG_STAT. */
+typedef volatile struct ALT_FPGAMGR_JTAG_STAT_s  ALT_FPGAMGR_JTAG_STAT_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_JTAG_STAT register. */
+#define ALT_FPGAMGR_JTAG_STAT_RESET       0x00000500
+/* The byte offset of the ALT_FPGAMGR_JTAG_STAT register from the beginning of the component. */
+#define ALT_FPGAMGR_JTAG_STAT_OFST        0x54
+
+/*
+ * Register : TCK Divide ratio - jtag_kick
+ * 
+ * Jtag Master Control Triggers. Each of this bit field triggers a specific
+ * hardware operation.
+ * 
+ * Register Layout
+ * 
+ *  Bits   | Access | Reset   | Description                   
+ * :-------|:-------|:--------|:-------------------------------
+ *  [0]    | RW     | 0x0     | Kick off a new Session        
+ *  [1]    | RW     | 0x0     | force stop an ongoing session.
+ *  [2]    | RW     | 0x0     | Clear TX FIFO                 
+ *  [3]    | RW     | 0x0     | Clear RX FIFO                 
+ *  [31:4] | ???    | Unknown | *UNDEFINED*                   
+ * 
+ */
+/*
+ * Field : Kick off a new Session - startSession
+ * 
+ * A write 1 to this bit field will kick off a session of TX and RX. Please note
+ * that there should be alteast 1 word available in the Tx Fifo for this kick off
+ * to be successful. The status of this kick off can be read from status register
+ * SessionStatus field.
+ * 
+ * stopSession has priority over startSession.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_KICK_STARTSESSION register field. */
+#define ALT_FPGAMGR_JTAG_KICK_STARTSESSION_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_KICK_STARTSESSION register field. */
+#define ALT_FPGAMGR_JTAG_KICK_STARTSESSION_MSB        0
+/* The width in bits of the ALT_FPGAMGR_JTAG_KICK_STARTSESSION register field. */
+#define ALT_FPGAMGR_JTAG_KICK_STARTSESSION_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_KICK_STARTSESSION register field value. */
+#define ALT_FPGAMGR_JTAG_KICK_STARTSESSION_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_JTAG_KICK_STARTSESSION register field value. */
+#define ALT_FPGAMGR_JTAG_KICK_STARTSESSION_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_JTAG_KICK_STARTSESSION register field. */
+#define ALT_FPGAMGR_JTAG_KICK_STARTSESSION_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_KICK_STARTSESSION field value from a register. */
+#define ALT_FPGAMGR_JTAG_KICK_STARTSESSION_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_JTAG_KICK_STARTSESSION register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_KICK_STARTSESSION_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : force stop an ongoing session. - stopSession
+ * 
+ * A write 1 to this bit field will kick off stop of an ongoing session of TX and
+ * RX. Please note that there should be alteast 1 word available in the Tx Fifo for
+ * this kick off to be successful. The status of this kick off can be read from
+ * status register SessionStatus field.
+ * 
+ * stopSession has priority over startSession.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_KICK_STOPSESSION register field. */
+#define ALT_FPGAMGR_JTAG_KICK_STOPSESSION_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_KICK_STOPSESSION register field. */
+#define ALT_FPGAMGR_JTAG_KICK_STOPSESSION_MSB        1
+/* The width in bits of the ALT_FPGAMGR_JTAG_KICK_STOPSESSION register field. */
+#define ALT_FPGAMGR_JTAG_KICK_STOPSESSION_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_KICK_STOPSESSION register field value. */
+#define ALT_FPGAMGR_JTAG_KICK_STOPSESSION_SET_MSK    0x00000002
+/* The mask used to clear the ALT_FPGAMGR_JTAG_KICK_STOPSESSION register field value. */
+#define ALT_FPGAMGR_JTAG_KICK_STOPSESSION_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_FPGAMGR_JTAG_KICK_STOPSESSION register field. */
+#define ALT_FPGAMGR_JTAG_KICK_STOPSESSION_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_KICK_STOPSESSION field value from a register. */
+#define ALT_FPGAMGR_JTAG_KICK_STOPSESSION_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_FPGAMGR_JTAG_KICK_STOPSESSION register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_KICK_STOPSESSION_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : Clear TX FIFO - clearTxFifo
+ * 
+ * A write 1 to this bit field will empty the TxFifo. A read will always return 0.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO register field. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO register field. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO_MSB        2
+/* The width in bits of the ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO register field. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO register field value. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO_SET_MSK    0x00000004
+/* The mask used to clear the ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO register field value. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO register field. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO field value from a register. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRTXFIFO_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : Clear RX FIFO - clearRxFifo
+ * 
+ * A write 1 to this bit field will empty the RxFifo. A read will always return 0.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO register field. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO register field. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO_MSB        3
+/* The width in bits of the ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO register field. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO register field value. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO_SET_MSK    0x00000008
+/* The mask used to clear the ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO register field value. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO register field. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO field value from a register. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_KICK_CLRRXFIFO_SET(value) (((value) << 3) & 0x00000008)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_JTAG_KICK.
+ */
+struct ALT_FPGAMGR_JTAG_KICK_s
+{
+    uint32_t  startSession :  1;  /* Kick off a new Session */
+    uint32_t  stopSession  :  1;  /* force stop an ongoing session. */
+    uint32_t  clearTxFifo  :  1;  /* Clear TX FIFO */
+    uint32_t  clearRxFifo  :  1;  /* Clear RX FIFO */
+    uint32_t               : 28;  /* *UNDEFINED* */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_JTAG_KICK. */
+typedef volatile struct ALT_FPGAMGR_JTAG_KICK_s  ALT_FPGAMGR_JTAG_KICK_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_JTAG_KICK register. */
+#define ALT_FPGAMGR_JTAG_KICK_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_JTAG_KICK register from the beginning of the component. */
+#define ALT_FPGAMGR_JTAG_KICK_OFST        0x58
+
+/*
+ * Register : TX FIFO Write - jtag_data_w
+ * 
+ * A write to this field initiates a write to the TxFifo with the value provided.
+ * Please note that this is always a 32bit write, and lower 16 of these bits will
+ * be transferred over TDI and upper 16 of these bits will be transferred over TMS
+ * once the transfer is initiated. A write to this fifo when full will just be
+ * ignored. Also it is allowed to keep writing this fifo without actually intiating
+ * a transfer. A typical scenario where this is applicable is if the software want
+ * to keep a fixed number of bits ready for JTAG interface before kicking it off.
+ * 
+ * Both the fifos are 8 words deep. So you can have up to 128 bits buffered in the
+ * FIFOs. If you have more than 128 bits to be transferred, and want continuous
+ * transfer software should make sure proper data flow to avoid a Tx-Fifo under-run
+ * or Rx-Fifo over-run. A Rx-Fifo over-run will cause silent data loss, and a Tx-
+ * Fifo under-run will stop the transfer, and will stop the TCK toggles, till
+ * another transfer is initiated by software.
+ * 
+ * At 5MHz jtag clock 16x100/5 = 320 cycles of FPGA manager clock to transfer 1
+ * word of data
+ * 
+ * At 25Mhz jtag clock 16x100/25 = 64 cycles of FPGA manager clock to transfer 1
+ * word of data.
+ * 
+ * Register Layout
+ * 
+ *  Bits    | Access | Reset | Description
+ * :--------|:-------|:------|:------------
+ *  [15:0]  | RW     | 0x0   | TDI  Data  
+ *  [31:16] | RW     | 0x0   | TMS Data   
+ * 
+ */
+/*
+ * Field : TDI  Data - tdiData
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_DATA_W_TDIDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TDIDATA_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_DATA_W_TDIDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TDIDATA_MSB        15
+/* The width in bits of the ALT_FPGAMGR_JTAG_DATA_W_TDIDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TDIDATA_WIDTH      16
+/* The mask used to set the ALT_FPGAMGR_JTAG_DATA_W_TDIDATA register field value. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TDIDATA_SET_MSK    0x0000ffff
+/* The mask used to clear the ALT_FPGAMGR_JTAG_DATA_W_TDIDATA register field value. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TDIDATA_CLR_MSK    0xffff0000
+/* The reset value of the ALT_FPGAMGR_JTAG_DATA_W_TDIDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TDIDATA_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_DATA_W_TDIDATA field value from a register. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TDIDATA_GET(value) (((value) & 0x0000ffff) >> 0)
+/* Produces a ALT_FPGAMGR_JTAG_DATA_W_TDIDATA register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TDIDATA_SET(value) (((value) << 0) & 0x0000ffff)
+
+/*
+ * Field : TMS Data - tmsData
+ * 
+ * Data to be transferred over TMS.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_DATA_W_TMSDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TMSDATA_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_DATA_W_TMSDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TMSDATA_MSB        31
+/* The width in bits of the ALT_FPGAMGR_JTAG_DATA_W_TMSDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TMSDATA_WIDTH      16
+/* The mask used to set the ALT_FPGAMGR_JTAG_DATA_W_TMSDATA register field value. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TMSDATA_SET_MSK    0xffff0000
+/* The mask used to clear the ALT_FPGAMGR_JTAG_DATA_W_TMSDATA register field value. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TMSDATA_CLR_MSK    0x0000ffff
+/* The reset value of the ALT_FPGAMGR_JTAG_DATA_W_TMSDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TMSDATA_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_DATA_W_TMSDATA field value from a register. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TMSDATA_GET(value) (((value) & 0xffff0000) >> 16)
+/* Produces a ALT_FPGAMGR_JTAG_DATA_W_TMSDATA register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_DATA_W_TMSDATA_SET(value) (((value) << 16) & 0xffff0000)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_JTAG_DATA_W.
+ */
+struct ALT_FPGAMGR_JTAG_DATA_W_s
+{
+    uint32_t  tdiData : 16;  /* TDI  Data */
+    uint32_t  tmsData : 16;  /* TMS Data */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_JTAG_DATA_W. */
+typedef volatile struct ALT_FPGAMGR_JTAG_DATA_W_s  ALT_FPGAMGR_JTAG_DATA_W_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_JTAG_DATA_W register. */
+#define ALT_FPGAMGR_JTAG_DATA_W_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_JTAG_DATA_W register from the beginning of the component. */
+#define ALT_FPGAMGR_JTAG_DATA_W_OFST        0x60
+
+/*
+ * Register : RX FIFO Read - jtag_data_r
+ * 
+ * A read to this field initiates a read to the RxFifo. Please note that the read
+ * always returns a 16 bit value. If the received number of bits are not aligned
+ * with 16, lower most n bits should be ignored by software. For example in the
+ * case of 6 bits received, rdata[15:10] will contain received bits and rdata[9:0]
+ * should be ignored. A read of the fifo while empty is not defined.
+ * 
+ * Both the fifos are 8 words deep. So you can have up to 128 bits buffered in the
+ * FIFOs. If you have more than 128 bits to be transferred, and want continuous
+ * transfer software should make sure proper data flow to avoid a Tx-Fifo under-run
+ * or Rx-Fifo over-run. A Rx-Fifo over-run will cause silent data loss, and a Tx-
+ * Fifo under-run will stop the transfer, and will stop the TCK toggles, till
+ * another transfer is initiated by software.
+ * 
+ * At 5MHz jtag clock 16x100/5 = 320 cycles of FPGA manager clock to transfer 1
+ * word of data
+ * 
+ * At 25Mhz jtag clock 16x100/25 = 64 cycles of FPGA manager clock to transfer 1
+ * word of data.
+ * 
+ * Register Layout
+ * 
+ *  Bits    | Access | Reset | Description                 
+ * :--------|:-------|:------|:-----------------------------
+ *  [15:0]  | RW     | 0x0   | TDI  Data                   
+ *  [31:16] | RW     | 0x0   | ALT_FPGAMGR_JTAG_DATA_R_RSVD
+ * 
+ */
+/*
+ * Field : TDI  Data - tdiData
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_DATA_R_TDIDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_R_TDIDATA_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_DATA_R_TDIDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_R_TDIDATA_MSB        15
+/* The width in bits of the ALT_FPGAMGR_JTAG_DATA_R_TDIDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_R_TDIDATA_WIDTH      16
+/* The mask used to set the ALT_FPGAMGR_JTAG_DATA_R_TDIDATA register field value. */
+#define ALT_FPGAMGR_JTAG_DATA_R_TDIDATA_SET_MSK    0x0000ffff
+/* The mask used to clear the ALT_FPGAMGR_JTAG_DATA_R_TDIDATA register field value. */
+#define ALT_FPGAMGR_JTAG_DATA_R_TDIDATA_CLR_MSK    0xffff0000
+/* The reset value of the ALT_FPGAMGR_JTAG_DATA_R_TDIDATA register field. */
+#define ALT_FPGAMGR_JTAG_DATA_R_TDIDATA_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_DATA_R_TDIDATA field value from a register. */
+#define ALT_FPGAMGR_JTAG_DATA_R_TDIDATA_GET(value) (((value) & 0x0000ffff) >> 0)
+/* Produces a ALT_FPGAMGR_JTAG_DATA_R_TDIDATA register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_DATA_R_TDIDATA_SET(value) (((value) << 0) & 0x0000ffff)
+
+/*
+ * Field : Reserved
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_JTAG_DATA_R_RSVD register field. */
+#define ALT_FPGAMGR_JTAG_DATA_R_RSVD_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_JTAG_DATA_R_RSVD register field. */
+#define ALT_FPGAMGR_JTAG_DATA_R_RSVD_MSB        31
+/* The width in bits of the ALT_FPGAMGR_JTAG_DATA_R_RSVD register field. */
+#define ALT_FPGAMGR_JTAG_DATA_R_RSVD_WIDTH      16
+/* The mask used to set the ALT_FPGAMGR_JTAG_DATA_R_RSVD register field value. */
+#define ALT_FPGAMGR_JTAG_DATA_R_RSVD_SET_MSK    0xffff0000
+/* The mask used to clear the ALT_FPGAMGR_JTAG_DATA_R_RSVD register field value. */
+#define ALT_FPGAMGR_JTAG_DATA_R_RSVD_CLR_MSK    0x0000ffff
+/* The reset value of the ALT_FPGAMGR_JTAG_DATA_R_RSVD register field. */
+#define ALT_FPGAMGR_JTAG_DATA_R_RSVD_RESET      0x0
+/* Extracts the ALT_FPGAMGR_JTAG_DATA_R_RSVD field value from a register. */
+#define ALT_FPGAMGR_JTAG_DATA_R_RSVD_GET(value) (((value) & 0xffff0000) >> 16)
+/* Produces a ALT_FPGAMGR_JTAG_DATA_R_RSVD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_JTAG_DATA_R_RSVD_SET(value) (((value) << 16) & 0xffff0000)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_JTAG_DATA_R.
+ */
+struct ALT_FPGAMGR_JTAG_DATA_R_s
+{
+    uint32_t  tdiData  : 16;  /* TDI  Data */
+    uint32_t  Reserved : 16;  /* ALT_FPGAMGR_JTAG_DATA_R_RSVD */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_JTAG_DATA_R. */
+typedef volatile struct ALT_FPGAMGR_JTAG_DATA_R_s  ALT_FPGAMGR_JTAG_DATA_R_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_JTAG_DATA_R register. */
+#define ALT_FPGAMGR_JTAG_DATA_R_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_JTAG_DATA_R register from the beginning of the component. */
+#define ALT_FPGAMGR_JTAG_DATA_R_OFST        0x64
+
+/*
+ * Register : imgcfg_ctrl_00
+ * 
+ * Register Layout
+ * 
+ *  Bits    | Access | Reset | Description                              
+ * :--------|:-------|:------|:------------------------------------------
+ *  [0]     | RW     | 0x1   | ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG   
+ *  [1]     | RW     | 0x1   | ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT  
+ *  [2]     | RW     | 0x1   | ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE
+ *  [7:3]   | ???    | 0x0   | *UNDEFINED*                              
+ *  [8]     | RW     | 0x1   | ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG       
+ *  [15:9]  | ???    | 0x0   | *UNDEFINED*                              
+ *  [16]    | RW     | 0x0   | ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE   
+ *  [23:17] | ???    | 0x0   | *UNDEFINED*                              
+ *  [24]    | RW     | 0x0   | ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE 
+ *  [31:25] | ???    | 0x0   | *UNDEFINED*                              
+ * 
+ */
+/*
+ * Field : s2f_nenable_nconfig
+ * 
+ * HPS override Enable for nCONFIG to CSS
+ * 
+ * 1: override is disabled
+ * 
+ * 0: override is enabled
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_MSB        0
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_RESET      0x1
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : s2f_nenable_nstatus
+ * 
+ * HPS override Enable for nSTATUS to PIN
+ * 
+ * 1: override is disabled
+ * 
+ * 0: override is enabled
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT_MSB        1
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT_SET_MSK    0x00000002
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT_RESET      0x1
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : s2f_nenable_condone
+ * 
+ * HPS override Enable for CONF_DONE to PIN
+ * 
+ * 1: override is disabled
+ * 
+ * 0: override is enabled
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE_MSB        2
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE_SET_MSK    0x00000004
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : s2f_nconfig
+ * 
+ * This bit has an effect on CSS only if curresponding override is enabled.
+ * 
+ * 1: Drive nCONFIG input to CSS 1.
+ * 
+ * 0: Drive nCONFIG input to CSS 0
+ * 
+ * The nCONFIG input is used to put the FPGA into its reset phase. If the FPGA was
+ * configured, its operation stops and it will have to be configured again to start
+ * operation.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_MSB        8
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK    0x00000100
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_RESET      0x1
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET(value) (((value) << 8) & 0x00000100)
+
+/*
+ * Field : s2f_nstatus_oe
+ * 
+ * This bit has an effect on CSS only if curresponding override is enabled.
+ * 
+ * 1: Drive nSTATUS pin to 0.
+ * 
+ * 0: Disable nSTATUS pin drive from HPS, and allow default pull-up to take over.
+ * 
+ * Driving this pin has no effect on CSS once the FPGA is in user mode.
+ * 
+ * HPS can drive this pin 0 to delay the initialization phase of CSS.
+ * 
+ * During configuation phase, HPS can drive this pin 0 to end the current
+ * configuration and initialize a reconfiguration.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE_MSB        16
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE_SET_MSK    0x00010000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE_CLR_MSK    0xfffeffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE_GET(value) (((value) & 0x00010000) >> 16)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE_SET(value) (((value) << 16) & 0x00010000)
+
+/*
+ * Field : s2f_condone_oe
+ * 
+ * This bit has an effect on CSS/PIN only if curresponding override is enabled.
+ * 
+ * 1: Drive CONF_DONE pin to 0.
+ * 
+ * 0: Disable CONF_DONE pin drive from HPS, and allow default pull-up to take over.
+ * 
+ * HPS can drive CONF_DONE pin 0 to delay the FPGA from entering user mode.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE_LSB        24
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE_MSB        24
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE_SET_MSK    0x01000000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE_CLR_MSK    0xfeffffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE_GET(value) (((value) & 0x01000000) >> 24)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE_SET(value) (((value) << 24) & 0x01000000)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_IMGCFG_CTL_00.
+ */
+struct ALT_FPGAMGR_IMGCFG_CTL_00_s
+{
+    uint32_t  s2f_nenable_nconfig :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG */
+    uint32_t  s2f_nenable_nstatus :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT */
+    uint32_t  s2f_nenable_condone :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE */
+    uint32_t                      :  5;  /* *UNDEFINED* */
+    uint32_t  s2f_nconfig         :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG */
+    uint32_t                      :  7;  /* *UNDEFINED* */
+    uint32_t  s2f_nstatus_oe      :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE */
+    uint32_t                      :  7;  /* *UNDEFINED* */
+    uint32_t  s2f_condone_oe      :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE */
+    uint32_t                      :  7;  /* *UNDEFINED* */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_IMGCFG_CTL_00. */
+typedef volatile struct ALT_FPGAMGR_IMGCFG_CTL_00_s  ALT_FPGAMGR_IMGCFG_CTL_00_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_00 register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_RESET       0x00000107
+/* The byte offset of the ALT_FPGAMGR_IMGCFG_CTL_00 register from the beginning of the component. */
+#define ALT_FPGAMGR_IMGCFG_CTL_00_OFST        0x70
+
+/*
+ * Register : imgcfg_ctrl_01
+ * 
+ * Register Layout
+ * 
+ *  Bits    | Access | Reset | Description                             
+ * :--------|:-------|:------|:-----------------------------------------
+ *  [0]     | RW     | 0x1   | ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG   
+ *  [15:1]  | ???    | 0x0   | *UNDEFINED*                             
+ *  [16]    | RW     | 0x0   | ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST
+ *  [23:17] | ???    | 0x0   | *UNDEFINED*                             
+ *  [24]    | RW     | 0x1   | ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE       
+ *  [31:25] | ???    | 0x0   | *UNDEFINED*                             
+ * 
+ */
+/*
+ * Field : s2f_nenable_config
+ * 
+ * HPS override Enable for DATA, DCLK, NCE and PR_REQUEST to CSS
+ * 
+ * 1: override is disabled
+ * 
+ * 0: override is enabled
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_MSB        0
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_RESET      0x1
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : s2f_pr_request
+ * 
+ * This bit carries the override value of PR_REQUEST to CSS.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST_MSB        16
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST_SET_MSK    0x00010000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST_CLR_MSK    0xfffeffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST_GET(value) (((value) & 0x00010000) >> 16)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST_SET(value) (((value) << 16) & 0x00010000)
+
+/*
+ * Field : s2f_nce
+ * 
+ * This bit carries the override value of nCE to CSS.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_LSB        24
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_MSB        24
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_SET_MSK    0x01000000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_CLR_MSK    0xfeffffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_GET(value) (((value) & 0x01000000) >> 24)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_SET(value) (((value) << 24) & 0x01000000)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_IMGCFG_CTL_01.
+ */
+struct ALT_FPGAMGR_IMGCFG_CTL_01_s
+{
+    uint32_t  s2f_nenable_config :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG */
+    uint32_t                     : 15;  /* *UNDEFINED* */
+    uint32_t  s2f_pr_request     :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST */
+    uint32_t                     :  7;  /* *UNDEFINED* */
+    uint32_t  s2f_nce            :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE */
+    uint32_t                     :  7;  /* *UNDEFINED* */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_IMGCFG_CTL_01. */
+typedef volatile struct ALT_FPGAMGR_IMGCFG_CTL_01_s  ALT_FPGAMGR_IMGCFG_CTL_01_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_01 register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_RESET       0x01000001
+/* The byte offset of the ALT_FPGAMGR_IMGCFG_CTL_01 register from the beginning of the component. */
+#define ALT_FPGAMGR_IMGCFG_CTL_01_OFST        0x74
+
+/*
+ * Register : Control Register - imgcfg_ctrl_02
+ * 
+ * Allows HPS to control FPGA configuration.
+ * 
+ * The NCONFIGPULL, NSTATUSPULL, and CONFDONEPULL fields drive signals to the FPGA
+ * Control Block that are logically ORed into their respective pins. These signals
+ * are always driven independent of the value of EN. The polarity of the
+ * NCONFIGPULL, NSTATUSPULL, and CONFDONEPULL fields is inverted relative to their
+ * associated pins.
+ * 
+ * The MSEL (external pins), CDRATIO and CFGWDTH signals determine the mode of
+ * operation for Normal Configuration. For Partial Reconfiguration, CDRATIO is used
+ * to set the appropriate clock to data ratio, and CFGWDTH should always be set to
+ * 16-bit Passive Parallel.
+ * 
+ * AXICFGEN is used to enable transfer of configuration data by enabling or
+ * disabling DCLK during data transfers.
  * 
  * Register Layout
  * 
  *  Bits    | Access | Reset | Description                          
  * :--------|:-------|:------|:--------------------------------------
- *  [0]     | RW     | 0x0   | Interrupt Level Field (nSTATUS)      
- *  [1]     | RW     | 0x0   | Interrupt Level Field (CONF_DONE)    
- *  [2]     | RW     | 0x0   | Interrupt Level Field (INIT_DONE)    
- *  [3]     | RW     | 0x0   | Interrupt Level Field (CRC_ERROR)    
- *  [4]     | RW     | 0x0   | Interrupt Level Field (CVP_CONF_DONE)
- *  [5]     | RW     | 0x0   | Interrupt Level Field (PR_READY)     
- *  [6]     | RW     | 0x0   | Interrupt Level Field (PR_ERROR)     
- *  [7]     | RW     | 0x0   | Interrupt Level Field (PR_DONE)      
- *  [8]     | RW     | 0x0   | Interrupt Level Field (nCONFIG Pin)  
- *  [9]     | RW     | 0x0   | Interrupt Level Field (nSTATUS Pin)  
- *  [10]    | RW     | 0x0   | Interrupt Level Field (CONF_DONE Pin)
- *  [11]    | RW     | 0x0   | Interrupt Level Field (FPGA_POWER_ON)
- *  [31:12] | ???    | 0x0   | *UNDEFINED*                          
+ *  [0]     | RW     | 0x0   | ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL 
+ *  [7:1]   | ???    | 0x0   | *UNDEFINED*                          
+ *  [8]     | RW     | 0x0   | ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA
+ *  [15:9]  | ???    | 0x1   | *UNDEFINED*                          
+ *  [17:16] | RW     | 0x0   | CD Ratio                             
+ *  [23:18] | ???    | 0x0   | *UNDEFINED*                          
+ *  [24]    | RW     | 0x0   | Configuration Data Width             
+ *  [31:25] | ???    | 0x0   | *UNDEFINED*                          
  * 
  */
 /*
- * Field : Interrupt Level Field (nSTATUS) - ns
+ * Field : en_cfg_ctrl
  * 
- * Controls whether the level of nSTATUS or an edge on nSTATUS generates an
- * interrupt.
+ * If this bit is not enabled, the s2f_dclk as well as s2f_data will be always
+ * driven 0.
+ * 
+ * This is to provide a mechanism by which HPS can take over the DCLK/DATA by first
+ * setting the nenable_dclk even while s2f_dclk and s2f_data from HPS is silent.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_MSB        0
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : en_cfg_data
+ * 
+ * this is an unused software bit
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_MSB        8
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_SET_MSK    0x00000100
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_SET(value) (((value) << 8) & 0x00000100)
+
+/*
+ * Field : CD Ratio - cdratio
+ * 
+ * This field controls the Clock to Data Ratio (CDRATIO) for Normal Configuration
+ * and Partial Reconfiguration data transfer from the AXI Slave to the FPGA.
+ * 
+ * For Normal Configuration, the value in this field must be set to be consistent
+ * to the implied CD ratio of the MSEL setting.
+ * 
+ * For Partial Reconfiguration, the value in this field must be set to the same
+ * clock to data ratio in the options bits in the Normal Configuration file.
  * 
  * Field Enumeration Values:
  * 
- *  Enum                                  | Value | Description    
- * :--------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_NS_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_NS_E_EDGE  | 0x1   | Edge-sensitive 
+ *  Enum                                   | Value | Description 
+ * :---------------------------------------|:------|:-------------
+ *  ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X1 | 0x0   | CDRATIO of 1
+ *  ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X2 | 0x1   | CDRATIO of 2
+ *  ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X4 | 0x2   | CDRATIO of 4
+ *  ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X8 | 0x3   | CDRATIO of 8
  * 
  * Field Access Macros:
  * 
  */
 /*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_NS
+ * Enumerated value for register field ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO
  * 
- * Level-sensitive
+ * CDRATIO of 1
  */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_E_LEVEL   0x0
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X1  0x0
 /*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_NS
+ * Enumerated value for register field ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO
  * 
- * Edge-sensitive
+ * CDRATIO of 2
  */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_E_EDGE    0x1
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X2  0x1
+/*
+ * Enumerated value for register field ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO
+ * 
+ * CDRATIO of 4
+ */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X4  0x2
+/*
+ * Enumerated value for register field ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO
+ * 
+ * CDRATIO of 8
+ */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X8  0x3
 
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_NS register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_NS register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_MSB        0
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_NS register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_NS register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_SET_MSK    0x00000001
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_NS register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_NS register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_NS field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_NS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NS_SET(value) (((value) << 0) & 0x00000001)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_MSB        17
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_WIDTH      2
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET_MSK    0x00030000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_CLR_MSK    0xfffcffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_GET(value) (((value) & 0x00030000) >> 16)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(value) (((value) << 16) & 0x00030000)
 
 /*
- * Field : Interrupt Level Field (CONF_DONE) - cd
+ * Field : Configuration Data Width - cfgwidth
  * 
- * Controls whether the level of CONF_DONE or an edge on CONF_DONE generates an
- * interrupt.
+ * This field determines the Configuration Passive Parallel data bus width when HPS
+ * configures the FPGA.   Only 32-bit Passive Parallel or 16-bit Passive Parallel
+ * are supported.
+ * 
+ * When HPS does Normal Configuration, configuration should use 32-bit Passive
+ * Parallel Mode.   The external pins MSEL must be set appropriately for the
+ * configuration selected.
+ * 
+ * For Partial Reconfiguration, 16-bit Passive Parallel must be used.
  * 
  * Field Enumeration Values:
  * 
- *  Enum                                  | Value | Description    
- * :--------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_CD_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_CD_E_EDGE  | 0x1   | Edge-sensitive 
+ *  Enum                                       | Value | Description            
+ * :-------------------------------------------|:------|:------------------------
+ *  ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX16 | 0x0   | 16-bit Passive Parallel
+ *  ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX32 | 0x1   | 32-bit Passive Parallel
  * 
  * Field Access Macros:
  * 
  */
 /*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_CD
+ * Enumerated value for register field ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH
  * 
- * Level-sensitive
+ * 16-bit Passive Parallel
  */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_E_LEVEL   0x0
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX16  0x0
 /*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_CD
+ * Enumerated value for register field ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH
  * 
- * Edge-sensitive
+ * 32-bit Passive Parallel
  */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_E_EDGE    0x1
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX32  0x1
 
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_CD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_LSB        1
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_CD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_MSB        1
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_CD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_CD register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_SET_MSK    0x00000002
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_CD register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_CLR_MSK    0xfffffffd
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_CD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_CD field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_GET(value) (((value) & 0x00000002) >> 1)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_CD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CD_SET(value) (((value) << 1) & 0x00000002)
-
-/*
- * Field : Interrupt Level Field (INIT_DONE) - id
- * 
- * Controls whether the level of INIT_DONE or an edge on INIT_DONE generates an
- * interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                  | Value | Description    
- * :--------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_ID_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_ID_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_ID
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_E_LEVEL   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_ID
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_E_EDGE    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_ID register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_ID register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_MSB        2
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_ID register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_ID register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_SET_MSK    0x00000004
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_ID register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_CLR_MSK    0xfffffffb
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_ID register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_ID field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_GET(value) (((value) & 0x00000004) >> 2)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_ID register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ID_SET(value) (((value) << 2) & 0x00000004)
-
-/*
- * Field : Interrupt Level Field (CRC_ERROR) - crc
- * 
- * Controls whether the level of CRC_ERROR or an edge on CRC_ERROR generates an
- * interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description    
- * :---------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_CRC_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_CRC_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_CRC
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_E_LEVEL  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_CRC
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_E_EDGE   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_CRC register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_CRC register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_MSB        3
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_CRC register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_CRC register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_SET_MSK    0x00000008
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_CRC register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_CLR_MSK    0xfffffff7
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_CRC register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_CRC field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_GET(value) (((value) & 0x00000008) >> 3)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_CRC register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CRC_SET(value) (((value) << 3) & 0x00000008)
-
-/*
- * Field : Interrupt Level Field (CVP_CONF_DONE) - ccd
- * 
- * Controls whether the level of CVP_CONF_DONE or an edge on CVP_CONF_DONE
- * generates an interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description    
- * :---------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_CCD_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_CCD_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_CCD
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_E_LEVEL  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_CCD
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_E_EDGE   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_CCD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_CCD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_MSB        4
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_CCD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_CCD register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_SET_MSK    0x00000010
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_CCD register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_CLR_MSK    0xffffffef
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_CCD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_CCD field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_CCD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CCD_SET(value) (((value) << 4) & 0x00000010)
-
-/*
- * Field : Interrupt Level Field (PR_READY) - prr
- * 
- * Controls whether the level of PR_READY or an edge on PR_READY generates an
- * interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description    
- * :---------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_PRR_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_PRR_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_PRR
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_E_LEVEL  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_PRR
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_E_EDGE   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_PRR register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_PRR register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_MSB        5
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_PRR register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_PRR register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_SET_MSK    0x00000020
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_PRR register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_PRR register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_PRR field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_PRR register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRR_SET(value) (((value) << 5) & 0x00000020)
-
-/*
- * Field : Interrupt Level Field (PR_ERROR) - pre
- * 
- * Controls whether the level of PR_ERROR or an edge on PR_ERROR generates an
- * interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description    
- * :---------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_PRE_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_PRE_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_PRE
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_E_LEVEL  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_PRE
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_E_EDGE   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_PRE register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_PRE register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_MSB        6
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_PRE register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_PRE register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_SET_MSK    0x00000040
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_PRE register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_CLR_MSK    0xffffffbf
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_PRE register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_PRE field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_GET(value) (((value) & 0x00000040) >> 6)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_PRE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRE_SET(value) (((value) << 6) & 0x00000040)
-
-/*
- * Field : Interrupt Level Field (PR_DONE) - prd
- * 
- * Controls whether the level of PR_DONE or an edge on PR_DONE generates an
- * interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description    
- * :---------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_PRD_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_PRD_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_PRD
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_E_LEVEL  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_PRD
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_E_EDGE   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_PRD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_LSB        7
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_PRD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_MSB        7
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_PRD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_PRD register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_SET_MSK    0x00000080
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_PRD register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_CLR_MSK    0xffffff7f
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_PRD register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_PRD field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_GET(value) (((value) & 0x00000080) >> 7)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_PRD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_PRD_SET(value) (((value) << 7) & 0x00000080)
-
-/*
- * Field : Interrupt Level Field (nCONFIG Pin) - ncp
- * 
- * Controls whether the level of nCONFIG Pin or an edge on nCONFIG Pin generates an
- * interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description    
- * :---------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_NCP_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_NCP_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_NCP
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_E_LEVEL  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_NCP
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_E_EDGE   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_NCP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_NCP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_MSB        8
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_NCP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_NCP register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_SET_MSK    0x00000100
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_NCP register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_NCP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_NCP field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_NCP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NCP_SET(value) (((value) << 8) & 0x00000100)
-
-/*
- * Field : Interrupt Level Field (nSTATUS Pin) - nsp
- * 
- * Controls whether the level of nSTATUS Pin or an edge on nSTATUS Pin generates an
- * interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description    
- * :---------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_NSP_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_NSP_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_NSP
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_E_LEVEL  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_NSP
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_E_EDGE   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_NSP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_LSB        9
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_NSP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_MSB        9
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_NSP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_NSP register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_SET_MSK    0x00000200
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_NSP register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_CLR_MSK    0xfffffdff
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_NSP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_NSP field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_GET(value) (((value) & 0x00000200) >> 9)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_NSP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_NSP_SET(value) (((value) << 9) & 0x00000200)
-
-/*
- * Field : Interrupt Level Field (CONF_DONE Pin) - cdp
- * 
- * Controls whether the level of CONF_DONE Pin or an edge on CONF_DONE Pin
- * generates an interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description    
- * :---------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_CDP_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_CDP_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_CDP
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_E_LEVEL  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_CDP
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_E_EDGE   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_CDP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_CDP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_MSB        10
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_CDP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_CDP register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_SET_MSK    0x00000400
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_CDP register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_CLR_MSK    0xfffffbff
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_CDP register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_CDP field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_GET(value) (((value) & 0x00000400) >> 10)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_CDP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_CDP_SET(value) (((value) << 10) & 0x00000400)
-
-/*
- * Field : Interrupt Level Field (FPGA_POWER_ON) - fpo
- * 
- * Controls whether the level of FPGA_POWER_ON or an edge on FPGA_POWER_ON
- * generates an interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                   | Value | Description    
- * :---------------------------------------|:------|:----------------
- *  ALT_MON_GPIO_INTTYPE_LEVEL_FPO_E_LEVEL | 0x0   | Level-sensitive
- *  ALT_MON_GPIO_INTTYPE_LEVEL_FPO_E_EDGE  | 0x1   | Edge-sensitive 
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_FPO
- * 
- * Level-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_E_LEVEL  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTTYPE_LEVEL_FPO
- * 
- * Edge-sensitive
- */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_E_EDGE   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_FPO register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_LSB        11
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTTYPE_LEVEL_FPO register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_MSB        11
-/* The width in bits of the ALT_MON_GPIO_INTTYPE_LEVEL_FPO register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTTYPE_LEVEL_FPO register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_SET_MSK    0x00000800
-/* The mask used to clear the ALT_MON_GPIO_INTTYPE_LEVEL_FPO register field value. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_CLR_MSK    0xfffff7ff
-/* The reset value of the ALT_MON_GPIO_INTTYPE_LEVEL_FPO register field. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTTYPE_LEVEL_FPO field value from a register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_GET(value) (((value) & 0x00000800) >> 11)
-/* Produces a ALT_MON_GPIO_INTTYPE_LEVEL_FPO register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_FPO_SET(value) (((value) << 11) & 0x00000800)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_LSB        24
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_MSB        24
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET_MSK    0x01000000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH register field value. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_CLR_MSK    0xfeffffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH register field. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_GET(value) (((value) & 0x01000000) >> 24)
+/* Produces a ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET(value) (((value) << 24) & 0x01000000)
 
 #ifndef __ASSEMBLY__
 /*
@@ -3281,597 +2503,1739 @@ typedef volatile struct ALT_MON_GPIO_INTMSK_s  ALT_MON_GPIO_INTMSK_t;
  * hardware drivers is to use the SoCAL access macros and alt_read_word() and
  * alt_write_word() functions.
  * 
- * The struct declaration for register ALT_MON_GPIO_INTTYPE_LEVEL.
+ * The struct declaration for register ALT_FPGAMGR_IMGCFG_CTL_02.
  */
-struct ALT_MON_GPIO_INTTYPE_LEVEL_s
+struct ALT_FPGAMGR_IMGCFG_CTL_02_s
 {
-    uint32_t  ns  :  1;  /* Interrupt Level Field (nSTATUS) */
-    uint32_t  cd  :  1;  /* Interrupt Level Field (CONF_DONE) */
-    uint32_t  id  :  1;  /* Interrupt Level Field (INIT_DONE) */
-    uint32_t  crc :  1;  /* Interrupt Level Field (CRC_ERROR) */
-    uint32_t  ccd :  1;  /* Interrupt Level Field (CVP_CONF_DONE) */
-    uint32_t  prr :  1;  /* Interrupt Level Field (PR_READY) */
-    uint32_t  pre :  1;  /* Interrupt Level Field (PR_ERROR) */
-    uint32_t  prd :  1;  /* Interrupt Level Field (PR_DONE) */
-    uint32_t  ncp :  1;  /* Interrupt Level Field (nCONFIG Pin) */
-    uint32_t  nsp :  1;  /* Interrupt Level Field (nSTATUS Pin) */
-    uint32_t  cdp :  1;  /* Interrupt Level Field (CONF_DONE Pin) */
-    uint32_t  fpo :  1;  /* Interrupt Level Field (FPGA_POWER_ON) */
-    uint32_t      : 20;  /* *UNDEFINED* */
+    uint32_t  en_cfg_ctrl :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL */
+    uint32_t              :  7;  /* *UNDEFINED* */
+    uint32_t  en_cfg_data :  1;  /* ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA */
+    uint32_t              :  7;  /* *UNDEFINED* */
+    uint32_t  cdratio     :  2;  /* CD Ratio */
+    uint32_t              :  6;  /* *UNDEFINED* */
+    uint32_t  cfgwidth    :  1;  /* Configuration Data Width */
+    uint32_t              :  7;  /* *UNDEFINED* */
 };
 
-/* The typedef declaration for register ALT_MON_GPIO_INTTYPE_LEVEL. */
-typedef volatile struct ALT_MON_GPIO_INTTYPE_LEVEL_s  ALT_MON_GPIO_INTTYPE_LEVEL_t;
+/* The typedef declaration for register ALT_FPGAMGR_IMGCFG_CTL_02. */
+typedef volatile struct ALT_FPGAMGR_IMGCFG_CTL_02_s  ALT_FPGAMGR_IMGCFG_CTL_02_t;
 #endif  /* __ASSEMBLY__ */
 
-/* The byte offset of the ALT_MON_GPIO_INTTYPE_LEVEL register from the beginning of the component. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_OFST        0x38
-/* The address of the ALT_MON_GPIO_INTTYPE_LEVEL register. */
-#define ALT_MON_GPIO_INTTYPE_LEVEL_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_INTTYPE_LEVEL_OFST))
+/* The reset value of the ALT_FPGAMGR_IMGCFG_CTL_02 register. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_RESET       0x00000200
+/* The byte offset of the ALT_FPGAMGR_IMGCFG_CTL_02 register from the beginning of the component. */
+#define ALT_FPGAMGR_IMGCFG_CTL_02_OFST        0x78
 
 /*
- * Register : Interrupt Polarity Register - gpio_int_polarity
+ * Register : imgcfg_stat
  * 
- * Controls the polarity of interrupts that can occur on each GPIO input.
+ * This is the unmasked status.
+ * 
+ * Value of corresponding inputs from CSS or PINs, without considering the
+ * intr_mask or intr_polarity.
+ * 
+ * Register Layout
+ * 
+ *  Bits    | Access | Reset | Description                              
+ * :--------|:-------|:------|:------------------------------------------
+ *  [0]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR    
+ *  [1]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD
+ *  [2]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD      
+ *  [3]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE  
+ *  [4]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN    
+ *  [5]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE     
+ *  [6]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN  
+ *  [7]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE   
+ *  [8]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE
+ *  [9]     | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY       
+ *  [10]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE      
+ *  [11]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR     
+ *  [12]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN     
+ *  [13]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE      
+ *  [15:14] | ???    | 0x0   | *UNDEFINED*                              
+ *  [16]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0        
+ *  [17]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1        
+ *  [18]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2        
+ *  [23:19] | ???    | 0x0   | *UNDEFINED*                              
+ *  [24]    | R      | 0x1   | ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY 
+ *  [25]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL  
+ *  [27:26] | ???    | 0x0   | *UNDEFINED*                              
+ *  [28]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_JTAGM            
+ *  [29]    | R      | 0x0   | ALT_FPGAMGR_IMGCFG_STAT_EMR              
+ *  [31:30] | ???    | 0x0   | *UNDEFINED*                              
+ * 
+ */
+/*
+ * Field : f2s_crc_error
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR_MSB        0
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : f2s_early_usermode
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD_MSB        1
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD_SET_MSK    0x00000002
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : f2s_usermode
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_MSB        2
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_SET_MSK    0x00000004
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : f2s_initdone_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE_MSB        3
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE_SET_MSK    0x00000008
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE_SET(value) (((value) << 3) & 0x00000008)
+
+/*
+ * Field : f2s_nstatus_pin
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_MSB        4
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_SET_MSK    0x00000010
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_CLR_MSK    0xffffffef
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_SET(value) (((value) << 4) & 0x00000010)
+
+/*
+ * Field : f2s_nstatus_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE_MSB        5
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE_SET_MSK    0x00000020
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE_CLR_MSK    0xffffffdf
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE_GET(value) (((value) & 0x00000020) >> 5)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE_SET(value) (((value) << 5) & 0x00000020)
+
+/*
+ * Field : f2s_condone_pin
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_LSB        6
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_MSB        6
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_SET_MSK    0x00000040
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_CLR_MSK    0xffffffbf
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_GET(value) (((value) & 0x00000040) >> 6)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_SET(value) (((value) << 6) & 0x00000040)
+
+/*
+ * Field : f2s_condone_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_LSB        7
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_MSB        7
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_SET_MSK    0x00000080
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_CLR_MSK    0xffffff7f
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_GET(value) (((value) & 0x00000080) >> 7)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_SET(value) (((value) << 7) & 0x00000080)
+
+/*
+ * Field : f2s_cvp_conf_done
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE_MSB        8
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE_SET_MSK    0x00000100
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE_SET(value) (((value) << 8) & 0x00000100)
+
+/*
+ * Field : f2s_pr_ready
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY_LSB        9
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY_MSB        9
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY_SET_MSK    0x00000200
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY_CLR_MSK    0xfffffdff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY_GET(value) (((value) & 0x00000200) >> 9)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY_SET(value) (((value) << 9) & 0x00000200)
+
+/*
+ * Field : f2s_pr_done
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE_LSB        10
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE_MSB        10
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE_SET_MSK    0x00000400
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE_CLR_MSK    0xfffffbff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE_GET(value) (((value) & 0x00000400) >> 10)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE_SET(value) (((value) << 10) & 0x00000400)
+
+/*
+ * Field : f2s_pr_error
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR_LSB        11
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR_MSB        11
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR_SET_MSK    0x00000800
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR_CLR_MSK    0xfffff7ff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR_GET(value) (((value) & 0x00000800) >> 11)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR_SET(value) (((value) << 11) & 0x00000800)
+
+/*
+ * Field : f2s_nconfig_pin
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_LSB        12
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_MSB        12
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_SET_MSK    0x00001000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_CLR_MSK    0xffffefff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_GET(value) (((value) & 0x00001000) >> 12)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_SET(value) (((value) << 12) & 0x00001000)
+
+/*
+ * Field : f2s_nceo_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE_LSB        13
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE_MSB        13
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE_SET_MSK    0x00002000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE_CLR_MSK    0xffffdfff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE_GET(value) (((value) & 0x00002000) >> 13)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE_SET(value) (((value) << 13) & 0x00002000)
+
+/*
+ * Field : f2s_msel0
+ * 
+ * This read-only field allows software to observe the MSEL inputs from the device
+ * pins. The MSEL pins define the FPGA configuration mode.
+ * 
+ * Please refer to CSS functional specifications for the exact definisions of MSEL
+ * encoding.
+ * 
+ * In Baum only 3 of these are used. Other bits will always read 0.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_MSB        16
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0 register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_SET_MSK    0x00010000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0 register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_CLR_MSK    0xfffeffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0 field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_GET(value) (((value) & 0x00010000) >> 16)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_SET(value) (((value) << 16) & 0x00010000)
+
+/*
+ * Field : f2s_msel1
+ * 
+ * This read-only field allows software to observe the MSEL inputs from the device
+ * pins. The MSEL pins define the FPGA configuration mode.
+ * 
+ * Please refer to CSS functional specifications for the exact definisions of MSEL
+ * encoding.
+ * 
+ * In Baum only 3 of these are used. Other bits will always read 0.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_LSB        17
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_MSB        17
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1 register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_SET_MSK    0x00020000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1 register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_CLR_MSK    0xfffdffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1 field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_GET(value) (((value) & 0x00020000) >> 17)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_SET(value) (((value) << 17) & 0x00020000)
+
+/*
+ * Field : f2s_msel2
+ * 
+ * This read-only field allows software to observe the MSEL inputs from the device
+ * pins. The MSEL pins define the FPGA configuration mode.
+ * 
+ * Please refer to CSS functional specifications for the exact definisions of MSEL
+ * encoding.
+ * 
+ * In Baum only 3 of these are used. Other bits will always read 0.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_LSB        18
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_MSB        18
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2 register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_SET_MSK    0x00040000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2 register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_CLR_MSK    0xfffbffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2 field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_GET(value) (((value) & 0x00040000) >> 18)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_SET(value) (((value) << 18) & 0x00040000)
+
+/*
+ * Field : imgcfg_FifoEmpty
+ * 
+ * FIfoEmpty Status of FPGA image configuration FIFO
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY_LSB        24
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY_MSB        24
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY_SET_MSK    0x01000000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY_CLR_MSK    0xfeffffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY_RESET      0x1
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY_GET(value) (((value) & 0x01000000) >> 24)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY_SET(value) (((value) << 24) & 0x01000000)
+
+/*
+ * Field : imgcfg_FifoFull
+ * 
+ * FIfoFull Status of FPGA image configuration FIFO
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL_LSB        25
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL_MSB        25
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL_SET_MSK    0x02000000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL_CLR_MSK    0xfdffffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL_GET(value) (((value) & 0x02000000) >> 25)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL_SET(value) (((value) << 25) & 0x02000000)
+
+/*
+ * Field : jtagm
+ * 
+ * JTAG Master Session Status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_JTAGM register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_JTAGM_LSB        28
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_JTAGM register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_JTAGM_MSB        28
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_JTAGM register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_JTAGM_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_JTAGM register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_JTAGM_SET_MSK    0x10000000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_JTAGM register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_JTAGM_CLR_MSK    0xefffffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_JTAGM register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_JTAGM_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_JTAGM field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_JTAGM_GET(value) (((value) & 0x10000000) >> 28)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_JTAGM register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_JTAGM_SET(value) (((value) << 28) & 0x10000000)
+
+/*
+ * Field : emr
+ * 
+ * EMR valid bit
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_STAT_EMR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_EMR_LSB        29
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_STAT_EMR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_EMR_MSB        29
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_STAT_EMR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_EMR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_STAT_EMR register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_EMR_SET_MSK    0x20000000
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_STAT_EMR register field value. */
+#define ALT_FPGAMGR_IMGCFG_STAT_EMR_CLR_MSK    0xdfffffff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT_EMR register field. */
+#define ALT_FPGAMGR_IMGCFG_STAT_EMR_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_STAT_EMR field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_EMR_GET(value) (((value) & 0x20000000) >> 29)
+/* Produces a ALT_FPGAMGR_IMGCFG_STAT_EMR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_EMR_SET(value) (((value) << 29) & 0x20000000)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_IMGCFG_STAT.
+ */
+struct ALT_FPGAMGR_IMGCFG_STAT_s
+{
+    const uint32_t  f2s_crc_error      :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR */
+    const uint32_t  f2s_early_usermode :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD */
+    const uint32_t  f2s_usermode       :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD */
+    const uint32_t  f2s_initdone_oe    :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_INITDONE_OE */
+    const uint32_t  f2s_nstatus_pin    :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN */
+    const uint32_t  f2s_nstatus_oe     :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_OE */
+    const uint32_t  f2s_condone_pin    :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN */
+    const uint32_t  f2s_condone_oe     :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE */
+    const uint32_t  f2s_cvp_conf_done  :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_CVP_CONF_DONE */
+    const uint32_t  f2s_pr_ready       :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_RDY */
+    const uint32_t  f2s_pr_done        :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_DONE */
+    const uint32_t  f2s_pr_error       :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_PR_ERROR */
+    const uint32_t  f2s_nconfig_pin    :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN */
+    const uint32_t  f2s_nceo_oe        :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_NCEO_OE */
+    uint32_t                           :  2;  /* *UNDEFINED* */
+    const uint32_t  f2s_msel0          :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0 */
+    const uint32_t  f2s_msel1          :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1 */
+    const uint32_t  f2s_msel2          :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2 */
+    uint32_t                           :  5;  /* *UNDEFINED* */
+    const uint32_t  imgcfg_FifoEmpty   :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOEMPTY */
+    const uint32_t  imgcfg_FifoFull    :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_IMGCFG_FIFOFULL */
+    uint32_t                           :  2;  /* *UNDEFINED* */
+    const uint32_t  jtagm              :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_JTAGM */
+    const uint32_t  emr                :  1;  /* ALT_FPGAMGR_IMGCFG_STAT_EMR */
+    uint32_t                           :  2;  /* *UNDEFINED* */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_IMGCFG_STAT. */
+typedef volatile struct ALT_FPGAMGR_IMGCFG_STAT_s  ALT_FPGAMGR_IMGCFG_STAT_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_IMGCFG_STAT register. */
+#define ALT_FPGAMGR_IMGCFG_STAT_RESET       0x01000000
+/* The byte offset of the ALT_FPGAMGR_IMGCFG_STAT register from the beginning of the component. */
+#define ALT_FPGAMGR_IMGCFG_STAT_OFST        0x80
+
+/*
+ * Register : intr_masked_status
+ * 
+ * When you read this register you read the active high pending interrupt status of
+ * corresponding bit.
+ * 
+ * This value is after the masking specified by intr_mask and after the polarity
+ * conversion as specified in intr_polarity
+ * 
+ * Register Layout
+ * 
+ *  Bits    | Access | Reset | Description                                  
+ * :--------|:-------|:------|:----------------------------------------------
+ *  [0]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR    
+ *  [1]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD
+ *  [2]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD      
+ *  [3]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE  
+ *  [4]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN    
+ *  [5]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE     
+ *  [6]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN  
+ *  [7]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE   
+ *  [8]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE
+ *  [9]     | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY       
+ *  [10]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE      
+ *  [11]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR     
+ *  [12]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN     
+ *  [13]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE      
+ *  [15:14] | ???    | 0x0   | *UNDEFINED*                                  
+ *  [16]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0        
+ *  [17]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1        
+ *  [18]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2        
+ *  [23:19] | ???    | 0x0   | *UNDEFINED*                                  
+ *  [24]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY 
+ *  [25]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL  
+ *  [27:26] | ???    | 0x0   | *UNDEFINED*                                  
+ *  [28]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM            
+ *  [29]    | RW     | 0x0   | ALT_FPGAMGR_INTR_MSKED_STAT_EMR              
+ *  [31:30] | ???    | 0x0   | *UNDEFINED*                                  
+ * 
+ */
+/*
+ * Field : f2s_crc_error
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR_MSB        0
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : f2s_early_usermode
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD_MSB        1
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD_SET_MSK    0x00000002
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : f2s_usermode
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD_MSB        2
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD_SET_MSK    0x00000004
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : f2s_initdone_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE_MSB        3
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE_SET_MSK    0x00000008
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE_SET(value) (((value) << 3) & 0x00000008)
+
+/*
+ * Field : f2s_nstatus_pin
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN_MSB        4
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN_SET_MSK    0x00000010
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN_CLR_MSK    0xffffffef
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN_SET(value) (((value) << 4) & 0x00000010)
+
+/*
+ * Field : f2s_nstatus_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE_MSB        5
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE_SET_MSK    0x00000020
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE_CLR_MSK    0xffffffdf
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE_GET(value) (((value) & 0x00000020) >> 5)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE_SET(value) (((value) << 5) & 0x00000020)
+
+/*
+ * Field : f2s_condone_pin
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN_LSB        6
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN_MSB        6
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN_SET_MSK    0x00000040
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN_CLR_MSK    0xffffffbf
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN_GET(value) (((value) & 0x00000040) >> 6)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN_SET(value) (((value) << 6) & 0x00000040)
+
+/*
+ * Field : f2s_condone_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE_LSB        7
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE_MSB        7
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE_SET_MSK    0x00000080
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE_CLR_MSK    0xffffff7f
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE_GET(value) (((value) & 0x00000080) >> 7)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE_SET(value) (((value) << 7) & 0x00000080)
+
+/*
+ * Field : f2s_cvp_conf_done
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE_MSB        8
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE_SET_MSK    0x00000100
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE_SET(value) (((value) << 8) & 0x00000100)
+
+/*
+ * Field : f2s_pr_ready
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY_LSB        9
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY_MSB        9
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY_SET_MSK    0x00000200
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY_CLR_MSK    0xfffffdff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY_GET(value) (((value) & 0x00000200) >> 9)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY_SET(value) (((value) << 9) & 0x00000200)
+
+/*
+ * Field : f2s_pr_done
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE_LSB        10
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE_MSB        10
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE_SET_MSK    0x00000400
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE_CLR_MSK    0xfffffbff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE_GET(value) (((value) & 0x00000400) >> 10)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE_SET(value) (((value) << 10) & 0x00000400)
+
+/*
+ * Field : f2s_pr_error
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR_LSB        11
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR_MSB        11
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR_SET_MSK    0x00000800
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR_CLR_MSK    0xfffff7ff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR_GET(value) (((value) & 0x00000800) >> 11)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR_SET(value) (((value) << 11) & 0x00000800)
+
+/*
+ * Field : f2s_nconfig_pin
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN_LSB        12
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN_MSB        12
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN_SET_MSK    0x00001000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN_CLR_MSK    0xffffefff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN_GET(value) (((value) & 0x00001000) >> 12)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN_SET(value) (((value) << 12) & 0x00001000)
+
+/*
+ * Field : f2s_nceo_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE_LSB        13
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE_MSB        13
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE_SET_MSK    0x00002000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE_CLR_MSK    0xffffdfff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE_GET(value) (((value) & 0x00002000) >> 13)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE_SET(value) (((value) << 13) & 0x00002000)
+
+/*
+ * Field : f2s_msel0
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0_MSB        16
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0 register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0_SET_MSK    0x00010000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0 register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0_CLR_MSK    0xfffeffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0 field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0_GET(value) (((value) & 0x00010000) >> 16)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0_SET(value) (((value) << 16) & 0x00010000)
+
+/*
+ * Field : f2s_msel1
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1_LSB        17
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1_MSB        17
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1 register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1_SET_MSK    0x00020000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1 register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1_CLR_MSK    0xfffdffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1 field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1_GET(value) (((value) & 0x00020000) >> 17)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1_SET(value) (((value) << 17) & 0x00020000)
+
+/*
+ * Field : f2s_msel2
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2_LSB        18
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2_MSB        18
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2 register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2_SET_MSK    0x00040000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2 register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2_CLR_MSK    0xfffbffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2 field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2_GET(value) (((value) & 0x00040000) >> 18)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2_SET(value) (((value) << 18) & 0x00040000)
+
+/*
+ * Field : imgcfg_FifoEmpty
+ * 
+ * FIfoEmpty Status of FPGA image configuration FIFO
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY_LSB        24
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY_MSB        24
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY_SET_MSK    0x01000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY_CLR_MSK    0xfeffffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY_GET(value) (((value) & 0x01000000) >> 24)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY_SET(value) (((value) << 24) & 0x01000000)
+
+/*
+ * Field : imgcfg_FifoFull
+ * 
+ * FIfoFull Status of FPGA image configuration FIFO
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL_LSB        25
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL_MSB        25
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL_SET_MSK    0x02000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL_CLR_MSK    0xfdffffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL_GET(value) (((value) & 0x02000000) >> 25)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL_SET(value) (((value) << 25) & 0x02000000)
+
+/*
+ * Field : jtagm
+ * 
+ * JTAG Master Session Status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM_LSB        28
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM_MSB        28
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM_SET_MSK    0x10000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM_CLR_MSK    0xefffffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM_GET(value) (((value) & 0x10000000) >> 28)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM_SET(value) (((value) << 28) & 0x10000000)
+
+/*
+ * Field : emr
+ * 
+ * EMR valid bit
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_EMR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_EMR_LSB        29
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSKED_STAT_EMR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_EMR_MSB        29
+/* The width in bits of the ALT_FPGAMGR_INTR_MSKED_STAT_EMR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_EMR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSKED_STAT_EMR register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_EMR_SET_MSK    0x20000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSKED_STAT_EMR register field value. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_EMR_CLR_MSK    0xdfffffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT_EMR register field. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_EMR_RESET      0x0
+/* Extracts the ALT_FPGAMGR_INTR_MSKED_STAT_EMR field value from a register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_EMR_GET(value) (((value) & 0x20000000) >> 29)
+/* Produces a ALT_FPGAMGR_INTR_MSKED_STAT_EMR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_EMR_SET(value) (((value) << 29) & 0x20000000)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for writing
+ * hardware drivers is to use the SoCAL access macros and alt_read_word() and
+ * alt_write_word() functions.
+ * 
+ * The struct declaration for register ALT_FPGAMGR_INTR_MSKED_STAT.
+ */
+struct ALT_FPGAMGR_INTR_MSKED_STAT_s
+{
+    uint32_t  f2s_crc_error      :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CRC_ERROR */
+    uint32_t  f2s_early_usermode :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_EARLY_USERMOD */
+    uint32_t  f2s_usermode       :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_USERMOD */
+    uint32_t  f2s_initdone_oe    :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_INITDONE_OE */
+    uint32_t  f2s_nstatus_pin    :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_PIN */
+    uint32_t  f2s_nstatus_oe     :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NSTAT_OE */
+    uint32_t  f2s_condone_pin    :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_PIN */
+    uint32_t  f2s_condone_oe     :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CONDONE_OE */
+    uint32_t  f2s_cvp_conf_done  :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_CVP_CONF_DONE */
+    uint32_t  f2s_pr_ready       :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_RDY */
+    uint32_t  f2s_pr_done        :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_DONE */
+    uint32_t  f2s_pr_error       :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_PR_ERROR */
+    uint32_t  f2s_nconfig_pin    :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCFG_PIN */
+    uint32_t  f2s_nceo_oe        :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_NCEO_OE */
+    uint32_t                     :  2;  /* *UNDEFINED* */
+    uint32_t  f2s_msel0          :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL0 */
+    uint32_t  f2s_msel1          :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL1 */
+    uint32_t  f2s_msel2          :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_F2S_MSEL2 */
+    uint32_t                     :  5;  /* *UNDEFINED* */
+    uint32_t  imgcfg_FifoEmpty   :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOEMPTY */
+    uint32_t  imgcfg_FifoFull    :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_IMGCFG_FIFOFULL */
+    uint32_t                     :  2;  /* *UNDEFINED* */
+    uint32_t  jtagm              :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_JTAGM */
+    uint32_t  emr                :  1;  /* ALT_FPGAMGR_INTR_MSKED_STAT_EMR */
+    uint32_t                     :  2;  /* *UNDEFINED* */
+};
+
+/* The typedef declaration for register ALT_FPGAMGR_INTR_MSKED_STAT. */
+typedef volatile struct ALT_FPGAMGR_INTR_MSKED_STAT_s  ALT_FPGAMGR_INTR_MSKED_STAT_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_FPGAMGR_INTR_MSKED_STAT register. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_INTR_MSKED_STAT register from the beginning of the component. */
+#define ALT_FPGAMGR_INTR_MSKED_STAT_OFST        0x84
+
+/*
+ * Register : intr_mask
+ * 
+ * Mask for interrupts. A value of 1 in a particular bit will cause the specific
+ * interrupt to be masked.
  * 
  * Register Layout
  * 
  *  Bits    | Access | Reset | Description                           
  * :--------|:-------|:------|:---------------------------------------
- *  [0]     | RW     | 0x0   | Polarity Control Field (nSTATUS)      
- *  [1]     | RW     | 0x0   | Polarity Control Field (CONF_DONE)    
- *  [2]     | RW     | 0x0   | Polarity Control Field (INIT_DONE)    
- *  [3]     | RW     | 0x0   | Polarity Control Field (CRC_ERROR)    
- *  [4]     | RW     | 0x0   | Polarity Control Field (CVP_CONF_DONE)
- *  [5]     | RW     | 0x0   | Polarity Control Field (PR_READY)     
- *  [6]     | RW     | 0x0   | Polarity Control Field (PR_ERROR)     
- *  [7]     | RW     | 0x0   | Polarity Control Field (PR_DONE)      
- *  [8]     | RW     | 0x0   | Polarity Control Field (nCONFIG Pin)  
- *  [9]     | RW     | 0x0   | Polarity Control Field (nSTATUS Pin)  
- *  [10]    | RW     | 0x0   | Polarity Control Field (CONF_DONE Pin)
- *  [11]    | RW     | 0x0   | Polarity Control Field (FPGA_POWER_ON)
- *  [31:12] | ???    | 0x0   | *UNDEFINED*                           
+ *  [0]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR    
+ *  [1]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD
+ *  [2]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_USERMOD      
+ *  [3]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE  
+ *  [4]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN    
+ *  [5]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE     
+ *  [6]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN  
+ *  [7]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE   
+ *  [8]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE
+ *  [9]     | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY       
+ *  [10]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE      
+ *  [11]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR     
+ *  [12]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN     
+ *  [13]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE      
+ *  [15:14] | ???    | 0x0   | *UNDEFINED*                           
+ *  [16]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_MSEL0        
+ *  [17]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_MSEL1        
+ *  [18]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_F2S_MSEL2        
+ *  [23:19] | ???    | 0x0   | *UNDEFINED*                           
+ *  [24]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY 
+ *  [25]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL  
+ *  [27:26] | ???    | 0x0   | *UNDEFINED*                           
+ *  [28]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_JTAGM            
+ *  [29]    | RW     | 0x1   | ALT_FPGAMGR_INTR_MSK_EMR              
+ *  [31:30] | ???    | 0x0   | *UNDEFINED*                           
  * 
  */
 /*
- * Field : Polarity Control Field (nSTATUS) - ns
- * 
- * Controls the polarity of edge or level sensitivity for nSTATUS
- * 
- * Field Enumeration Values:
- * 
- *  Enum                              | Value | Description
- * :----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_NS_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_NS_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_crc_error
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_NS
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_NS_E_ACTLOW    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_NS
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_NS_E_ACTHIGH   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_NS register field. */
-#define ALT_MON_GPIO_INT_POL_NS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_NS register field. */
-#define ALT_MON_GPIO_INT_POL_NS_MSB        0
-/* The width in bits of the ALT_MON_GPIO_INT_POL_NS register field. */
-#define ALT_MON_GPIO_INT_POL_NS_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_NS register field value. */
-#define ALT_MON_GPIO_INT_POL_NS_SET_MSK    0x00000001
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_NS register field value. */
-#define ALT_MON_GPIO_INT_POL_NS_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_MON_GPIO_INT_POL_NS register field. */
-#define ALT_MON_GPIO_INT_POL_NS_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_NS field value from a register. */
-#define ALT_MON_GPIO_INT_POL_NS_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_MON_GPIO_INT_POL_NS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_NS_SET(value) (((value) << 0) & 0x00000001)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR_MSB        0
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR_SET(value) (((value) << 0) & 0x00000001)
 
 /*
- * Field : Polarity Control Field (CONF_DONE) - cd
- * 
- * Controls the polarity of edge or level sensitivity for CONF_DONE
- * 
- * Field Enumeration Values:
- * 
- *  Enum                              | Value | Description
- * :----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_CD_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_CD_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_early_usermode
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_CD
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_CD_E_ACTLOW    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_CD
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_CD_E_ACTHIGH   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_CD register field. */
-#define ALT_MON_GPIO_INT_POL_CD_LSB        1
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_CD register field. */
-#define ALT_MON_GPIO_INT_POL_CD_MSB        1
-/* The width in bits of the ALT_MON_GPIO_INT_POL_CD register field. */
-#define ALT_MON_GPIO_INT_POL_CD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_CD register field value. */
-#define ALT_MON_GPIO_INT_POL_CD_SET_MSK    0x00000002
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_CD register field value. */
-#define ALT_MON_GPIO_INT_POL_CD_CLR_MSK    0xfffffffd
-/* The reset value of the ALT_MON_GPIO_INT_POL_CD register field. */
-#define ALT_MON_GPIO_INT_POL_CD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_CD field value from a register. */
-#define ALT_MON_GPIO_INT_POL_CD_GET(value) (((value) & 0x00000002) >> 1)
-/* Produces a ALT_MON_GPIO_INT_POL_CD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_CD_SET(value) (((value) << 1) & 0x00000002)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD_MSB        1
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD_SET_MSK    0x00000002
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD_SET(value) (((value) << 1) & 0x00000002)
 
 /*
- * Field : Polarity Control Field (INIT_DONE) - id
- * 
- * Controls the polarity of edge or level sensitivity for INIT_DONE
- * 
- * Field Enumeration Values:
- * 
- *  Enum                              | Value | Description
- * :----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_ID_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_ID_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_usermode
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_ID
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_ID_E_ACTLOW    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_ID
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_ID_E_ACTHIGH   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_ID register field. */
-#define ALT_MON_GPIO_INT_POL_ID_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_ID register field. */
-#define ALT_MON_GPIO_INT_POL_ID_MSB        2
-/* The width in bits of the ALT_MON_GPIO_INT_POL_ID register field. */
-#define ALT_MON_GPIO_INT_POL_ID_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_ID register field value. */
-#define ALT_MON_GPIO_INT_POL_ID_SET_MSK    0x00000004
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_ID register field value. */
-#define ALT_MON_GPIO_INT_POL_ID_CLR_MSK    0xfffffffb
-/* The reset value of the ALT_MON_GPIO_INT_POL_ID register field. */
-#define ALT_MON_GPIO_INT_POL_ID_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_ID field value from a register. */
-#define ALT_MON_GPIO_INT_POL_ID_GET(value) (((value) & 0x00000004) >> 2)
-/* Produces a ALT_MON_GPIO_INT_POL_ID register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_ID_SET(value) (((value) << 2) & 0x00000004)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_USERMOD_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_USERMOD_MSB        2
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_USERMOD_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_USERMOD_SET_MSK    0x00000004
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_USERMOD_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_USERMOD_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_USERMOD field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_USERMOD_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_USERMOD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_USERMOD_SET(value) (((value) << 2) & 0x00000004)
 
 /*
- * Field : Polarity Control Field (CRC_ERROR) - crc
- * 
- * Controls the polarity of edge or level sensitivity for CRC_ERROR
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description
- * :-----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_CRC_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_CRC_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_initdone_oe
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_CRC
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_CRC_E_ACTLOW   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_CRC
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_CRC_E_ACTHIGH  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_CRC register field. */
-#define ALT_MON_GPIO_INT_POL_CRC_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_CRC register field. */
-#define ALT_MON_GPIO_INT_POL_CRC_MSB        3
-/* The width in bits of the ALT_MON_GPIO_INT_POL_CRC register field. */
-#define ALT_MON_GPIO_INT_POL_CRC_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_CRC register field value. */
-#define ALT_MON_GPIO_INT_POL_CRC_SET_MSK    0x00000008
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_CRC register field value. */
-#define ALT_MON_GPIO_INT_POL_CRC_CLR_MSK    0xfffffff7
-/* The reset value of the ALT_MON_GPIO_INT_POL_CRC register field. */
-#define ALT_MON_GPIO_INT_POL_CRC_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_CRC field value from a register. */
-#define ALT_MON_GPIO_INT_POL_CRC_GET(value) (((value) & 0x00000008) >> 3)
-/* Produces a ALT_MON_GPIO_INT_POL_CRC register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_CRC_SET(value) (((value) << 3) & 0x00000008)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE_MSB        3
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE_SET_MSK    0x00000008
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE_SET(value) (((value) << 3) & 0x00000008)
 
 /*
- * Field : Polarity Control Field (CVP_CONF_DONE) - ccd
- * 
- * Controls the polarity of edge or level sensitivity for CVP_CONF_DONE
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description
- * :-----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_CCD_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_CCD_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_nstatus_pin
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_CCD
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_CCD_E_ACTLOW   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_CCD
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_CCD_E_ACTHIGH  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_CCD register field. */
-#define ALT_MON_GPIO_INT_POL_CCD_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_CCD register field. */
-#define ALT_MON_GPIO_INT_POL_CCD_MSB        4
-/* The width in bits of the ALT_MON_GPIO_INT_POL_CCD register field. */
-#define ALT_MON_GPIO_INT_POL_CCD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_CCD register field value. */
-#define ALT_MON_GPIO_INT_POL_CCD_SET_MSK    0x00000010
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_CCD register field value. */
-#define ALT_MON_GPIO_INT_POL_CCD_CLR_MSK    0xffffffef
-/* The reset value of the ALT_MON_GPIO_INT_POL_CCD register field. */
-#define ALT_MON_GPIO_INT_POL_CCD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_CCD field value from a register. */
-#define ALT_MON_GPIO_INT_POL_CCD_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_MON_GPIO_INT_POL_CCD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_CCD_SET(value) (((value) << 4) & 0x00000010)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN_MSB        4
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN_SET_MSK    0x00000010
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN_CLR_MSK    0xffffffef
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN_SET(value) (((value) << 4) & 0x00000010)
 
 /*
- * Field : Polarity Control Field (PR_READY) - prr
- * 
- * Controls the polarity of edge or level sensitivity for PR_READY
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description
- * :-----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_PRR_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_PRR_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_nstatus_oe
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_PRR
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_PRR_E_ACTLOW   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_PRR
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_PRR_E_ACTHIGH  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_PRR register field. */
-#define ALT_MON_GPIO_INT_POL_PRR_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_PRR register field. */
-#define ALT_MON_GPIO_INT_POL_PRR_MSB        5
-/* The width in bits of the ALT_MON_GPIO_INT_POL_PRR register field. */
-#define ALT_MON_GPIO_INT_POL_PRR_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_PRR register field value. */
-#define ALT_MON_GPIO_INT_POL_PRR_SET_MSK    0x00000020
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_PRR register field value. */
-#define ALT_MON_GPIO_INT_POL_PRR_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_MON_GPIO_INT_POL_PRR register field. */
-#define ALT_MON_GPIO_INT_POL_PRR_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_PRR field value from a register. */
-#define ALT_MON_GPIO_INT_POL_PRR_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_MON_GPIO_INT_POL_PRR register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_PRR_SET(value) (((value) << 5) & 0x00000020)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE_MSB        5
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE_SET_MSK    0x00000020
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE_CLR_MSK    0xffffffdf
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE_GET(value) (((value) & 0x00000020) >> 5)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE_SET(value) (((value) << 5) & 0x00000020)
 
 /*
- * Field : Polarity Control Field (PR_ERROR) - pre
- * 
- * Controls the polarity of edge or level sensitivity for PR_ERROR
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description
- * :-----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_PRE_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_PRE_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_condone_pin
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_PRE
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_PRE_E_ACTLOW   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_PRE
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_PRE_E_ACTHIGH  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_PRE register field. */
-#define ALT_MON_GPIO_INT_POL_PRE_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_PRE register field. */
-#define ALT_MON_GPIO_INT_POL_PRE_MSB        6
-/* The width in bits of the ALT_MON_GPIO_INT_POL_PRE register field. */
-#define ALT_MON_GPIO_INT_POL_PRE_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_PRE register field value. */
-#define ALT_MON_GPIO_INT_POL_PRE_SET_MSK    0x00000040
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_PRE register field value. */
-#define ALT_MON_GPIO_INT_POL_PRE_CLR_MSK    0xffffffbf
-/* The reset value of the ALT_MON_GPIO_INT_POL_PRE register field. */
-#define ALT_MON_GPIO_INT_POL_PRE_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_PRE field value from a register. */
-#define ALT_MON_GPIO_INT_POL_PRE_GET(value) (((value) & 0x00000040) >> 6)
-/* Produces a ALT_MON_GPIO_INT_POL_PRE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_PRE_SET(value) (((value) << 6) & 0x00000040)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN_LSB        6
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN_MSB        6
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN_SET_MSK    0x00000040
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN_CLR_MSK    0xffffffbf
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN_GET(value) (((value) & 0x00000040) >> 6)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN_SET(value) (((value) << 6) & 0x00000040)
 
 /*
- * Field : Polarity Control Field (PR_DONE) - prd
- * 
- * Controls the polarity of edge or level sensitivity for PR_DONE
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description
- * :-----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_PRD_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_PRD_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_condone_oe
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_PRD
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_PRD_E_ACTLOW   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_PRD
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_PRD_E_ACTHIGH  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_PRD register field. */
-#define ALT_MON_GPIO_INT_POL_PRD_LSB        7
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_PRD register field. */
-#define ALT_MON_GPIO_INT_POL_PRD_MSB        7
-/* The width in bits of the ALT_MON_GPIO_INT_POL_PRD register field. */
-#define ALT_MON_GPIO_INT_POL_PRD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_PRD register field value. */
-#define ALT_MON_GPIO_INT_POL_PRD_SET_MSK    0x00000080
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_PRD register field value. */
-#define ALT_MON_GPIO_INT_POL_PRD_CLR_MSK    0xffffff7f
-/* The reset value of the ALT_MON_GPIO_INT_POL_PRD register field. */
-#define ALT_MON_GPIO_INT_POL_PRD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_PRD field value from a register. */
-#define ALT_MON_GPIO_INT_POL_PRD_GET(value) (((value) & 0x00000080) >> 7)
-/* Produces a ALT_MON_GPIO_INT_POL_PRD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_PRD_SET(value) (((value) << 7) & 0x00000080)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE_LSB        7
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE_MSB        7
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE_SET_MSK    0x00000080
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE_CLR_MSK    0xffffff7f
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE_GET(value) (((value) & 0x00000080) >> 7)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE_SET(value) (((value) << 7) & 0x00000080)
 
 /*
- * Field : Polarity Control Field (nCONFIG Pin) - ncp
- * 
- * Controls the polarity of edge or level sensitivity for nCONFIG Pin
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description
- * :-----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_NCP_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_NCP_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_cvp_conf_done
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_NCP
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_NCP_E_ACTLOW   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_NCP
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_NCP_E_ACTHIGH  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_NCP register field. */
-#define ALT_MON_GPIO_INT_POL_NCP_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_NCP register field. */
-#define ALT_MON_GPIO_INT_POL_NCP_MSB        8
-/* The width in bits of the ALT_MON_GPIO_INT_POL_NCP register field. */
-#define ALT_MON_GPIO_INT_POL_NCP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_NCP register field value. */
-#define ALT_MON_GPIO_INT_POL_NCP_SET_MSK    0x00000100
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_NCP register field value. */
-#define ALT_MON_GPIO_INT_POL_NCP_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_MON_GPIO_INT_POL_NCP register field. */
-#define ALT_MON_GPIO_INT_POL_NCP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_NCP field value from a register. */
-#define ALT_MON_GPIO_INT_POL_NCP_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_MON_GPIO_INT_POL_NCP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_NCP_SET(value) (((value) << 8) & 0x00000100)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE_MSB        8
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE_SET_MSK    0x00000100
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE_SET(value) (((value) << 8) & 0x00000100)
 
 /*
- * Field : Polarity Control Field (nSTATUS Pin) - nsp
- * 
- * Controls the polarity of edge or level sensitivity for nSTATUS Pin
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description
- * :-----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_NSP_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_NSP_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_pr_ready
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_NSP
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_NSP_E_ACTLOW   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_NSP
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_NSP_E_ACTHIGH  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_NSP register field. */
-#define ALT_MON_GPIO_INT_POL_NSP_LSB        9
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_NSP register field. */
-#define ALT_MON_GPIO_INT_POL_NSP_MSB        9
-/* The width in bits of the ALT_MON_GPIO_INT_POL_NSP register field. */
-#define ALT_MON_GPIO_INT_POL_NSP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_NSP register field value. */
-#define ALT_MON_GPIO_INT_POL_NSP_SET_MSK    0x00000200
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_NSP register field value. */
-#define ALT_MON_GPIO_INT_POL_NSP_CLR_MSK    0xfffffdff
-/* The reset value of the ALT_MON_GPIO_INT_POL_NSP register field. */
-#define ALT_MON_GPIO_INT_POL_NSP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_NSP field value from a register. */
-#define ALT_MON_GPIO_INT_POL_NSP_GET(value) (((value) & 0x00000200) >> 9)
-/* Produces a ALT_MON_GPIO_INT_POL_NSP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_NSP_SET(value) (((value) << 9) & 0x00000200)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY_LSB        9
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY_MSB        9
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY_SET_MSK    0x00000200
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY_CLR_MSK    0xfffffdff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY_GET(value) (((value) & 0x00000200) >> 9)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY_SET(value) (((value) << 9) & 0x00000200)
 
 /*
- * Field : Polarity Control Field (CONF_DONE Pin) - cdp
- * 
- * Controls the polarity of edge or level sensitivity for CONF_DONE Pin
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description
- * :-----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_CDP_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_CDP_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_pr_done
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_CDP
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_CDP_E_ACTLOW   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_CDP
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_CDP_E_ACTHIGH  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_CDP register field. */
-#define ALT_MON_GPIO_INT_POL_CDP_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_CDP register field. */
-#define ALT_MON_GPIO_INT_POL_CDP_MSB        10
-/* The width in bits of the ALT_MON_GPIO_INT_POL_CDP register field. */
-#define ALT_MON_GPIO_INT_POL_CDP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_CDP register field value. */
-#define ALT_MON_GPIO_INT_POL_CDP_SET_MSK    0x00000400
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_CDP register field value. */
-#define ALT_MON_GPIO_INT_POL_CDP_CLR_MSK    0xfffffbff
-/* The reset value of the ALT_MON_GPIO_INT_POL_CDP register field. */
-#define ALT_MON_GPIO_INT_POL_CDP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_CDP field value from a register. */
-#define ALT_MON_GPIO_INT_POL_CDP_GET(value) (((value) & 0x00000400) >> 10)
-/* Produces a ALT_MON_GPIO_INT_POL_CDP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_CDP_SET(value) (((value) << 10) & 0x00000400)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE_LSB        10
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE_MSB        10
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE_SET_MSK    0x00000400
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE_CLR_MSK    0xfffffbff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE_GET(value) (((value) & 0x00000400) >> 10)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE_SET(value) (((value) << 10) & 0x00000400)
 
 /*
- * Field : Polarity Control Field (FPGA_POWER_ON) - fpo
- * 
- * Controls the polarity of edge or level sensitivity for FPGA_POWER_ON
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description
- * :-----------------------------------|:------|:------------
- *  ALT_MON_GPIO_INT_POL_FPO_E_ACTLOW  | 0x0   | Active low 
- *  ALT_MON_GPIO_INT_POL_FPO_E_ACTHIGH | 0x1   | Active high
+ * Field : f2s_pr_error
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_FPO
- * 
- * Active low
- */
-#define ALT_MON_GPIO_INT_POL_FPO_E_ACTLOW   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INT_POL_FPO
- * 
- * Active high
- */
-#define ALT_MON_GPIO_INT_POL_FPO_E_ACTHIGH  0x1
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR_LSB        11
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR_MSB        11
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR_SET_MSK    0x00000800
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR_CLR_MSK    0xfffff7ff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR_GET(value) (((value) & 0x00000800) >> 11)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR_SET(value) (((value) << 11) & 0x00000800)
 
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INT_POL_FPO register field. */
-#define ALT_MON_GPIO_INT_POL_FPO_LSB        11
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INT_POL_FPO register field. */
-#define ALT_MON_GPIO_INT_POL_FPO_MSB        11
-/* The width in bits of the ALT_MON_GPIO_INT_POL_FPO register field. */
-#define ALT_MON_GPIO_INT_POL_FPO_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INT_POL_FPO register field value. */
-#define ALT_MON_GPIO_INT_POL_FPO_SET_MSK    0x00000800
-/* The mask used to clear the ALT_MON_GPIO_INT_POL_FPO register field value. */
-#define ALT_MON_GPIO_INT_POL_FPO_CLR_MSK    0xfffff7ff
-/* The reset value of the ALT_MON_GPIO_INT_POL_FPO register field. */
-#define ALT_MON_GPIO_INT_POL_FPO_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INT_POL_FPO field value from a register. */
-#define ALT_MON_GPIO_INT_POL_FPO_GET(value) (((value) & 0x00000800) >> 11)
-/* Produces a ALT_MON_GPIO_INT_POL_FPO register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INT_POL_FPO_SET(value) (((value) << 11) & 0x00000800)
+/*
+ * Field : f2s_nconfig_pin
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN_LSB        12
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN_MSB        12
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN_SET_MSK    0x00001000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN_CLR_MSK    0xffffefff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN_GET(value) (((value) & 0x00001000) >> 12)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN_SET(value) (((value) << 12) & 0x00001000)
+
+/*
+ * Field : f2s_nceo_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE_LSB        13
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE_MSB        13
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE_SET_MSK    0x00002000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE_CLR_MSK    0xffffdfff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE_GET(value) (((value) & 0x00002000) >> 13)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE_SET(value) (((value) << 13) & 0x00002000)
+
+/*
+ * Field : f2s_msel0
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL0_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL0_MSB        16
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL0_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_MSEL0 register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL0_SET_MSK    0x00010000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_MSEL0 register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL0_CLR_MSK    0xfffeffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL0_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_MSEL0 field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL0_GET(value) (((value) & 0x00010000) >> 16)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_MSEL0 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL0_SET(value) (((value) << 16) & 0x00010000)
+
+/*
+ * Field : f2s_msel1
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL1_LSB        17
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL1_MSB        17
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL1_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_MSEL1 register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL1_SET_MSK    0x00020000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_MSEL1 register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL1_CLR_MSK    0xfffdffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL1_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_MSEL1 field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL1_GET(value) (((value) & 0x00020000) >> 17)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_MSEL1 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL1_SET(value) (((value) << 17) & 0x00020000)
+
+/*
+ * Field : f2s_msel2
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL2_LSB        18
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL2_MSB        18
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL2_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_F2S_MSEL2 register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL2_SET_MSK    0x00040000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_F2S_MSEL2 register field value. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL2_CLR_MSK    0xfffbffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL2_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_F2S_MSEL2 field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL2_GET(value) (((value) & 0x00040000) >> 18)
+/* Produces a ALT_FPGAMGR_INTR_MSK_F2S_MSEL2 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_F2S_MSEL2_SET(value) (((value) << 18) & 0x00040000)
+
+/*
+ * Field : imgcfg_FifoEmpty
+ * 
+ * FIfoEmpty Status of FPGA image configuration FIFO
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY_LSB        24
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY_MSB        24
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY_SET_MSK    0x01000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY_CLR_MSK    0xfeffffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY_GET(value) (((value) & 0x01000000) >> 24)
+/* Produces a ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY_SET(value) (((value) << 24) & 0x01000000)
+
+/*
+ * Field : imgcfg_FifoFull
+ * 
+ * FIfoFull Status of FPGA image configuration FIFO
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL_LSB        25
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL_MSB        25
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL register field value. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL_SET_MSK    0x02000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL register field value. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL_CLR_MSK    0xfdffffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL_GET(value) (((value) & 0x02000000) >> 25)
+/* Produces a ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL_SET(value) (((value) << 25) & 0x02000000)
+
+/*
+ * Field : jtagm
+ * 
+ * JTAG Master Session Status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_MSK_JTAGM_LSB        28
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_MSK_JTAGM_MSB        28
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_MSK_JTAGM_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_JTAGM register field value. */
+#define ALT_FPGAMGR_INTR_MSK_JTAGM_SET_MSK    0x10000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_JTAGM register field value. */
+#define ALT_FPGAMGR_INTR_MSK_JTAGM_CLR_MSK    0xefffffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_MSK_JTAGM_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_JTAGM field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_JTAGM_GET(value) (((value) & 0x10000000) >> 28)
+/* Produces a ALT_FPGAMGR_INTR_MSK_JTAGM register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_JTAGM_SET(value) (((value) << 28) & 0x10000000)
+
+/*
+ * Field : emr
+ * 
+ * EMR valid bit
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_MSK_EMR register field. */
+#define ALT_FPGAMGR_INTR_MSK_EMR_LSB        29
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_MSK_EMR register field. */
+#define ALT_FPGAMGR_INTR_MSK_EMR_MSB        29
+/* The width in bits of the ALT_FPGAMGR_INTR_MSK_EMR register field. */
+#define ALT_FPGAMGR_INTR_MSK_EMR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_MSK_EMR register field value. */
+#define ALT_FPGAMGR_INTR_MSK_EMR_SET_MSK    0x20000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_MSK_EMR register field value. */
+#define ALT_FPGAMGR_INTR_MSK_EMR_CLR_MSK    0xdfffffff
+/* The reset value of the ALT_FPGAMGR_INTR_MSK_EMR register field. */
+#define ALT_FPGAMGR_INTR_MSK_EMR_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_MSK_EMR field value from a register. */
+#define ALT_FPGAMGR_INTR_MSK_EMR_GET(value) (((value) & 0x20000000) >> 29)
+/* Produces a ALT_FPGAMGR_INTR_MSK_EMR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_MSK_EMR_SET(value) (((value) << 29) & 0x20000000)
 
 #ifndef __ASSEMBLY__
 /*
@@ -3882,598 +4246,578 @@ typedef volatile struct ALT_MON_GPIO_INTTYPE_LEVEL_s  ALT_MON_GPIO_INTTYPE_LEVEL
  * hardware drivers is to use the SoCAL access macros and alt_read_word() and
  * alt_write_word() functions.
  * 
- * The struct declaration for register ALT_MON_GPIO_INT_POL.
+ * The struct declaration for register ALT_FPGAMGR_INTR_MSK.
  */
-struct ALT_MON_GPIO_INT_POL_s
+struct ALT_FPGAMGR_INTR_MSK_s
 {
-    uint32_t  ns  :  1;  /* Polarity Control Field (nSTATUS) */
-    uint32_t  cd  :  1;  /* Polarity Control Field (CONF_DONE) */
-    uint32_t  id  :  1;  /* Polarity Control Field (INIT_DONE) */
-    uint32_t  crc :  1;  /* Polarity Control Field (CRC_ERROR) */
-    uint32_t  ccd :  1;  /* Polarity Control Field (CVP_CONF_DONE) */
-    uint32_t  prr :  1;  /* Polarity Control Field (PR_READY) */
-    uint32_t  pre :  1;  /* Polarity Control Field (PR_ERROR) */
-    uint32_t  prd :  1;  /* Polarity Control Field (PR_DONE) */
-    uint32_t  ncp :  1;  /* Polarity Control Field (nCONFIG Pin) */
-    uint32_t  nsp :  1;  /* Polarity Control Field (nSTATUS Pin) */
-    uint32_t  cdp :  1;  /* Polarity Control Field (CONF_DONE Pin) */
-    uint32_t  fpo :  1;  /* Polarity Control Field (FPGA_POWER_ON) */
-    uint32_t      : 20;  /* *UNDEFINED* */
+    uint32_t  f2s_crc_error      :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_CRC_ERROR */
+    uint32_t  f2s_early_usermode :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_EARLY_USERMOD */
+    uint32_t  f2s_usermode       :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_USERMOD */
+    uint32_t  f2s_initdone_oe    :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_INITDONE_OE */
+    uint32_t  f2s_nstatus_pin    :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_PIN */
+    uint32_t  f2s_nstatus_oe     :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_NSTAT_OE */
+    uint32_t  f2s_condone_pin    :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_PIN */
+    uint32_t  f2s_condone_oe     :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_CONDONE_OE */
+    uint32_t  f2s_cvp_conf_done  :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_CVP_CONF_DONE */
+    uint32_t  f2s_pr_ready       :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_PR_RDY */
+    uint32_t  f2s_pr_done        :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_PR_DONE */
+    uint32_t  f2s_pr_error       :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_PR_ERROR */
+    uint32_t  f2s_nconfig_pin    :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_NCFG_PIN */
+    uint32_t  f2s_nceo_oe        :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_NCEO_OE */
+    uint32_t                     :  2;  /* *UNDEFINED* */
+    uint32_t  f2s_msel0          :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_MSEL0 */
+    uint32_t  f2s_msel1          :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_MSEL1 */
+    uint32_t  f2s_msel2          :  1;  /* ALT_FPGAMGR_INTR_MSK_F2S_MSEL2 */
+    uint32_t                     :  5;  /* *UNDEFINED* */
+    uint32_t  imgcfg_FifoEmpty   :  1;  /* ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOEMPTY */
+    uint32_t  imgcfg_FifoFull    :  1;  /* ALT_FPGAMGR_INTR_MSK_IMGCFG_FIFOFULL */
+    uint32_t                     :  2;  /* *UNDEFINED* */
+    uint32_t  jtagm              :  1;  /* ALT_FPGAMGR_INTR_MSK_JTAGM */
+    uint32_t  emr                :  1;  /* ALT_FPGAMGR_INTR_MSK_EMR */
+    uint32_t                     :  2;  /* *UNDEFINED* */
 };
 
-/* The typedef declaration for register ALT_MON_GPIO_INT_POL. */
-typedef volatile struct ALT_MON_GPIO_INT_POL_s  ALT_MON_GPIO_INT_POL_t;
+/* The typedef declaration for register ALT_FPGAMGR_INTR_MSK. */
+typedef volatile struct ALT_FPGAMGR_INTR_MSK_s  ALT_FPGAMGR_INTR_MSK_t;
 #endif  /* __ASSEMBLY__ */
 
-/* The byte offset of the ALT_MON_GPIO_INT_POL register from the beginning of the component. */
-#define ALT_MON_GPIO_INT_POL_OFST        0x3c
-/* The address of the ALT_MON_GPIO_INT_POL register. */
-#define ALT_MON_GPIO_INT_POL_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_INT_POL_OFST))
+/* The reset value of the ALT_FPGAMGR_INTR_MSK register. */
+#define ALT_FPGAMGR_INTR_MSK_RESET       0x33073fff
+/* The byte offset of the ALT_FPGAMGR_INTR_MSK register from the beginning of the component. */
+#define ALT_FPGAMGR_INTR_MSK_OFST        0x88
 
 /*
- * Register : Interrupt Status Register - gpio_intstatus
+ * Register : intr_polarity
  * 
- * Reports on interrupt status for each GPIO input. The interrupt status includes
- * the effects of masking.
+ * Active Level of the signal to generate interrupt.
+ * 
+ * 0 :Active LOW. An interrupt will be generated when that particular bit/signal is
+ * LOW
+ * 
+ * 1: Active HIGH. An interrupt will be generated when that particular bit/signal
+ * is HIGH
  * 
  * Register Layout
  * 
  *  Bits    | Access | Reset | Description                           
  * :--------|:-------|:------|:---------------------------------------
- *  [0]     | R      | 0x0   | Interrupt Status Field (nSTATUS)      
- *  [1]     | R      | 0x0   | Interrupt Status Field (CONF_DONE)    
- *  [2]     | R      | 0x0   | Interrupt Status Field (INIT_DONE)    
- *  [3]     | R      | 0x0   | Interrupt Status Field (CRC_ERROR)    
- *  [4]     | R      | 0x0   | Interrupt Status Field (CVP_CONF_DONE)
- *  [5]     | R      | 0x0   | Interrupt Status Field (PR_READY)     
- *  [6]     | R      | 0x0   | Interrupt Status Field (PR_ERROR)     
- *  [7]     | R      | 0x0   | Interrupt Status Field (PR_DONE)      
- *  [8]     | R      | 0x0   | Interrupt Status Field (nCONFIG Pin)  
- *  [9]     | R      | 0x0   | Interrupt Status Field (nSTATUS Pin)  
- *  [10]    | R      | 0x0   | Interrupt Status Field (CONF_DONE Pin)
- *  [11]    | R      | 0x0   | Interrupt Status Field (FPGA_POWER_ON)
- *  [31:12] | ???    | 0x0   | *UNDEFINED*                           
+ *  [0]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR    
+ *  [1]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD
+ *  [2]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_USERMOD      
+ *  [3]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE  
+ *  [4]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN    
+ *  [5]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE     
+ *  [6]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN  
+ *  [7]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE   
+ *  [8]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE
+ *  [9]     | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_PR_RDY       
+ *  [10]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_PR_DONE      
+ *  [11]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR     
+ *  [12]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN     
+ *  [13]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE      
+ *  [15:14] | ???    | 0x0   | *UNDEFINED*                           
+ *  [16]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_MSEL0        
+ *  [17]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_MSEL1        
+ *  [18]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_F2S_MSEL2        
+ *  [23:19] | ???    | 0x0   | *UNDEFINED*                           
+ *  [24]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY 
+ *  [25]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL  
+ *  [27:26] | ???    | 0x0   | *UNDEFINED*                           
+ *  [28]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_JTAGM            
+ *  [29]    | RW     | 0x1   | ALT_FPGAMGR_INTR_POL_EMR              
+ *  [31:30] | ???    | 0x0   | *UNDEFINED*                           
  * 
  */
 /*
- * Field : Interrupt Status Field (nSTATUS) - ns
- * 
- * Indicates whether nSTATUS has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                            | Value | Description
- * :--------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_NS_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_NS_E_ACT   | 0x1   | Active     
+ * Field : f2s_crc_error
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_NS
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_NS_E_INACT 0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_NS
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_NS_E_ACT   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_NS register field. */
-#define ALT_MON_GPIO_INTSTAT_NS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_NS register field. */
-#define ALT_MON_GPIO_INTSTAT_NS_MSB        0
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_NS register field. */
-#define ALT_MON_GPIO_INTSTAT_NS_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_NS register field value. */
-#define ALT_MON_GPIO_INTSTAT_NS_SET_MSK    0x00000001
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_NS register field value. */
-#define ALT_MON_GPIO_INTSTAT_NS_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_MON_GPIO_INTSTAT_NS register field. */
-#define ALT_MON_GPIO_INTSTAT_NS_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_NS field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_NS_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_MON_GPIO_INTSTAT_NS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_NS_SET(value) (((value) << 0) & 0x00000001)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR_MSB        0
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR_SET_MSK    0x00000001
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR_SET(value) (((value) << 0) & 0x00000001)
 
 /*
- * Field : Interrupt Status Field (CONF_DONE) - cd
- * 
- * Indicates whether CONF_DONE has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                            | Value | Description
- * :--------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_CD_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_CD_E_ACT   | 0x1   | Active     
+ * Field : f2s_early_usermode
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_CD
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_CD_E_INACT 0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_CD
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_CD_E_ACT   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_CD register field. */
-#define ALT_MON_GPIO_INTSTAT_CD_LSB        1
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_CD register field. */
-#define ALT_MON_GPIO_INTSTAT_CD_MSB        1
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_CD register field. */
-#define ALT_MON_GPIO_INTSTAT_CD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_CD register field value. */
-#define ALT_MON_GPIO_INTSTAT_CD_SET_MSK    0x00000002
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_CD register field value. */
-#define ALT_MON_GPIO_INTSTAT_CD_CLR_MSK    0xfffffffd
-/* The reset value of the ALT_MON_GPIO_INTSTAT_CD register field. */
-#define ALT_MON_GPIO_INTSTAT_CD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_CD field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_CD_GET(value) (((value) & 0x00000002) >> 1)
-/* Produces a ALT_MON_GPIO_INTSTAT_CD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_CD_SET(value) (((value) << 1) & 0x00000002)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD_MSB        1
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD_SET_MSK    0x00000002
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD_SET(value) (((value) << 1) & 0x00000002)
 
 /*
- * Field : Interrupt Status Field (INIT_DONE) - id
- * 
- * Indicates whether INIT_DONE has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                            | Value | Description
- * :--------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_ID_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_ID_E_ACT   | 0x1   | Active     
+ * Field : f2s_usermode
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_ID
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_ID_E_INACT 0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_ID
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_ID_E_ACT   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_ID register field. */
-#define ALT_MON_GPIO_INTSTAT_ID_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_ID register field. */
-#define ALT_MON_GPIO_INTSTAT_ID_MSB        2
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_ID register field. */
-#define ALT_MON_GPIO_INTSTAT_ID_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_ID register field value. */
-#define ALT_MON_GPIO_INTSTAT_ID_SET_MSK    0x00000004
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_ID register field value. */
-#define ALT_MON_GPIO_INTSTAT_ID_CLR_MSK    0xfffffffb
-/* The reset value of the ALT_MON_GPIO_INTSTAT_ID register field. */
-#define ALT_MON_GPIO_INTSTAT_ID_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_ID field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_ID_GET(value) (((value) & 0x00000004) >> 2)
-/* Produces a ALT_MON_GPIO_INTSTAT_ID register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_ID_SET(value) (((value) << 2) & 0x00000004)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_USERMOD_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_USERMOD_MSB        2
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_USERMOD_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_USERMOD_SET_MSK    0x00000004
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_USERMOD register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_USERMOD_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_USERMOD register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_USERMOD_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_USERMOD field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_USERMOD_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_USERMOD register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_USERMOD_SET(value) (((value) << 2) & 0x00000004)
 
 /*
- * Field : Interrupt Status Field (CRC_ERROR) - crc
- * 
- * Indicates whether CRC_ERROR has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description
- * :---------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_CRC_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_CRC_E_ACT   | 0x1   | Active     
+ * Field : f2s_initdone_oe
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_CRC
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_CRC_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_CRC
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_CRC_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_CRC register field. */
-#define ALT_MON_GPIO_INTSTAT_CRC_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_CRC register field. */
-#define ALT_MON_GPIO_INTSTAT_CRC_MSB        3
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_CRC register field. */
-#define ALT_MON_GPIO_INTSTAT_CRC_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_CRC register field value. */
-#define ALT_MON_GPIO_INTSTAT_CRC_SET_MSK    0x00000008
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_CRC register field value. */
-#define ALT_MON_GPIO_INTSTAT_CRC_CLR_MSK    0xfffffff7
-/* The reset value of the ALT_MON_GPIO_INTSTAT_CRC register field. */
-#define ALT_MON_GPIO_INTSTAT_CRC_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_CRC field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_CRC_GET(value) (((value) & 0x00000008) >> 3)
-/* Produces a ALT_MON_GPIO_INTSTAT_CRC register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_CRC_SET(value) (((value) << 3) & 0x00000008)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE_MSB        3
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE_SET_MSK    0x00000008
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE_SET(value) (((value) << 3) & 0x00000008)
 
 /*
- * Field : Interrupt Status Field (CVP_CONF_DONE) - ccd
- * 
- * Indicates whether CVP_CONF_DONE has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description
- * :---------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_CCD_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_CCD_E_ACT   | 0x1   | Active     
+ * Field : f2s_nstatus_pin
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_CCD
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_CCD_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_CCD
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_CCD_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_CCD register field. */
-#define ALT_MON_GPIO_INTSTAT_CCD_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_CCD register field. */
-#define ALT_MON_GPIO_INTSTAT_CCD_MSB        4
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_CCD register field. */
-#define ALT_MON_GPIO_INTSTAT_CCD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_CCD register field value. */
-#define ALT_MON_GPIO_INTSTAT_CCD_SET_MSK    0x00000010
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_CCD register field value. */
-#define ALT_MON_GPIO_INTSTAT_CCD_CLR_MSK    0xffffffef
-/* The reset value of the ALT_MON_GPIO_INTSTAT_CCD register field. */
-#define ALT_MON_GPIO_INTSTAT_CCD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_CCD field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_CCD_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_MON_GPIO_INTSTAT_CCD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_CCD_SET(value) (((value) << 4) & 0x00000010)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN_MSB        4
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN_SET_MSK    0x00000010
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN_CLR_MSK    0xffffffef
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN_SET(value) (((value) << 4) & 0x00000010)
 
 /*
- * Field : Interrupt Status Field (PR_READY) - prr
- * 
- * Indicates whether PR_READY has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description
- * :---------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_PRR_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_PRR_E_ACT   | 0x1   | Active     
+ * Field : f2s_nstatus_oe
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_PRR
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_PRR_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_PRR
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_PRR_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_PRR register field. */
-#define ALT_MON_GPIO_INTSTAT_PRR_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_PRR register field. */
-#define ALT_MON_GPIO_INTSTAT_PRR_MSB        5
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_PRR register field. */
-#define ALT_MON_GPIO_INTSTAT_PRR_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_PRR register field value. */
-#define ALT_MON_GPIO_INTSTAT_PRR_SET_MSK    0x00000020
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_PRR register field value. */
-#define ALT_MON_GPIO_INTSTAT_PRR_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_MON_GPIO_INTSTAT_PRR register field. */
-#define ALT_MON_GPIO_INTSTAT_PRR_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_PRR field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_PRR_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_MON_GPIO_INTSTAT_PRR register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_PRR_SET(value) (((value) << 5) & 0x00000020)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE_MSB        5
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE_SET_MSK    0x00000020
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE_CLR_MSK    0xffffffdf
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE_GET(value) (((value) & 0x00000020) >> 5)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE_SET(value) (((value) << 5) & 0x00000020)
 
 /*
- * Field : Interrupt Status Field (PR_ERROR) - pre
- * 
- * Indicates whether PR_ERROR has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description
- * :---------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_PRE_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_PRE_E_ACT   | 0x1   | Active     
+ * Field : f2s_condone_pin
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_PRE
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_PRE_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_PRE
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_PRE_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_PRE register field. */
-#define ALT_MON_GPIO_INTSTAT_PRE_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_PRE register field. */
-#define ALT_MON_GPIO_INTSTAT_PRE_MSB        6
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_PRE register field. */
-#define ALT_MON_GPIO_INTSTAT_PRE_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_PRE register field value. */
-#define ALT_MON_GPIO_INTSTAT_PRE_SET_MSK    0x00000040
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_PRE register field value. */
-#define ALT_MON_GPIO_INTSTAT_PRE_CLR_MSK    0xffffffbf
-/* The reset value of the ALT_MON_GPIO_INTSTAT_PRE register field. */
-#define ALT_MON_GPIO_INTSTAT_PRE_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_PRE field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_PRE_GET(value) (((value) & 0x00000040) >> 6)
-/* Produces a ALT_MON_GPIO_INTSTAT_PRE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_PRE_SET(value) (((value) << 6) & 0x00000040)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN_LSB        6
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN_MSB        6
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN_SET_MSK    0x00000040
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN_CLR_MSK    0xffffffbf
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN_GET(value) (((value) & 0x00000040) >> 6)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN_SET(value) (((value) << 6) & 0x00000040)
 
 /*
- * Field : Interrupt Status Field (PR_DONE) - prd
- * 
- * Indicates whether PR_DONE has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description
- * :---------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_PRD_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_PRD_E_ACT   | 0x1   | Active     
+ * Field : f2s_condone_oe
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_PRD
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_PRD_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_PRD
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_PRD_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_PRD register field. */
-#define ALT_MON_GPIO_INTSTAT_PRD_LSB        7
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_PRD register field. */
-#define ALT_MON_GPIO_INTSTAT_PRD_MSB        7
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_PRD register field. */
-#define ALT_MON_GPIO_INTSTAT_PRD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_PRD register field value. */
-#define ALT_MON_GPIO_INTSTAT_PRD_SET_MSK    0x00000080
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_PRD register field value. */
-#define ALT_MON_GPIO_INTSTAT_PRD_CLR_MSK    0xffffff7f
-/* The reset value of the ALT_MON_GPIO_INTSTAT_PRD register field. */
-#define ALT_MON_GPIO_INTSTAT_PRD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_PRD field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_PRD_GET(value) (((value) & 0x00000080) >> 7)
-/* Produces a ALT_MON_GPIO_INTSTAT_PRD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_PRD_SET(value) (((value) << 7) & 0x00000080)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE_LSB        7
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE_MSB        7
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE_SET_MSK    0x00000080
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE_CLR_MSK    0xffffff7f
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE_GET(value) (((value) & 0x00000080) >> 7)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE_SET(value) (((value) << 7) & 0x00000080)
 
 /*
- * Field : Interrupt Status Field (nCONFIG Pin) - ncp
- * 
- * Indicates whether nCONFIG Pin has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description
- * :---------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_NCP_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_NCP_E_ACT   | 0x1   | Active     
+ * Field : f2s_cvp_conf_done
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_NCP
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_NCP_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_NCP
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_NCP_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_NCP register field. */
-#define ALT_MON_GPIO_INTSTAT_NCP_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_NCP register field. */
-#define ALT_MON_GPIO_INTSTAT_NCP_MSB        8
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_NCP register field. */
-#define ALT_MON_GPIO_INTSTAT_NCP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_NCP register field value. */
-#define ALT_MON_GPIO_INTSTAT_NCP_SET_MSK    0x00000100
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_NCP register field value. */
-#define ALT_MON_GPIO_INTSTAT_NCP_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_MON_GPIO_INTSTAT_NCP register field. */
-#define ALT_MON_GPIO_INTSTAT_NCP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_NCP field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_NCP_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_MON_GPIO_INTSTAT_NCP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_NCP_SET(value) (((value) << 8) & 0x00000100)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE_MSB        8
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE_SET_MSK    0x00000100
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE_SET(value) (((value) << 8) & 0x00000100)
 
 /*
- * Field : Interrupt Status Field (nSTATUS Pin) - nsp
- * 
- * Indicates whether nSTATUS Pin has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description
- * :---------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_NSP_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_NSP_E_ACT   | 0x1   | Active     
+ * Field : f2s_pr_ready
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_NSP
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_NSP_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_NSP
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_NSP_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_NSP register field. */
-#define ALT_MON_GPIO_INTSTAT_NSP_LSB        9
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_NSP register field. */
-#define ALT_MON_GPIO_INTSTAT_NSP_MSB        9
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_NSP register field. */
-#define ALT_MON_GPIO_INTSTAT_NSP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_NSP register field value. */
-#define ALT_MON_GPIO_INTSTAT_NSP_SET_MSK    0x00000200
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_NSP register field value. */
-#define ALT_MON_GPIO_INTSTAT_NSP_CLR_MSK    0xfffffdff
-/* The reset value of the ALT_MON_GPIO_INTSTAT_NSP register field. */
-#define ALT_MON_GPIO_INTSTAT_NSP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_NSP field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_NSP_GET(value) (((value) & 0x00000200) >> 9)
-/* Produces a ALT_MON_GPIO_INTSTAT_NSP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_NSP_SET(value) (((value) << 9) & 0x00000200)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_RDY_LSB        9
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_RDY_MSB        9
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_RDY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_PR_RDY register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_RDY_SET_MSK    0x00000200
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_PR_RDY register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_RDY_CLR_MSK    0xfffffdff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_PR_RDY register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_RDY_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_PR_RDY field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_RDY_GET(value) (((value) & 0x00000200) >> 9)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_PR_RDY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_RDY_SET(value) (((value) << 9) & 0x00000200)
 
 /*
- * Field : Interrupt Status Field (CONF_DONE Pin) - cdp
- * 
- * Indicates whether CONF_DONE Pin has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description
- * :---------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_CDP_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_CDP_E_ACT   | 0x1   | Active     
+ * Field : f2s_pr_done
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_CDP
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_CDP_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_CDP
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_CDP_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_CDP register field. */
-#define ALT_MON_GPIO_INTSTAT_CDP_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_CDP register field. */
-#define ALT_MON_GPIO_INTSTAT_CDP_MSB        10
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_CDP register field. */
-#define ALT_MON_GPIO_INTSTAT_CDP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_CDP register field value. */
-#define ALT_MON_GPIO_INTSTAT_CDP_SET_MSK    0x00000400
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_CDP register field value. */
-#define ALT_MON_GPIO_INTSTAT_CDP_CLR_MSK    0xfffffbff
-/* The reset value of the ALT_MON_GPIO_INTSTAT_CDP register field. */
-#define ALT_MON_GPIO_INTSTAT_CDP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_CDP field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_CDP_GET(value) (((value) & 0x00000400) >> 10)
-/* Produces a ALT_MON_GPIO_INTSTAT_CDP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_CDP_SET(value) (((value) << 10) & 0x00000400)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_DONE_LSB        10
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_DONE_MSB        10
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_DONE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_PR_DONE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_DONE_SET_MSK    0x00000400
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_PR_DONE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_DONE_CLR_MSK    0xfffffbff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_PR_DONE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_DONE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_PR_DONE field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_DONE_GET(value) (((value) & 0x00000400) >> 10)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_PR_DONE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_DONE_SET(value) (((value) << 10) & 0x00000400)
 
 /*
- * Field : Interrupt Status Field (FPGA_POWER_ON) - fpo
- * 
- * Indicates whether FPGA_POWER_ON has an active interrupt or not (after masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                             | Value | Description
- * :---------------------------------|:------|:------------
- *  ALT_MON_GPIO_INTSTAT_FPO_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_INTSTAT_FPO_E_ACT   | 0x1   | Active     
+ * Field : f2s_pr_error
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_FPO
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_INTSTAT_FPO_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_INTSTAT_FPO
- * 
- * Active
- */
-#define ALT_MON_GPIO_INTSTAT_FPO_E_ACT      0x1
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR_LSB        11
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR_MSB        11
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR_SET_MSK    0x00000800
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR_CLR_MSK    0xfffff7ff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR_GET(value) (((value) & 0x00000800) >> 11)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR_SET(value) (((value) << 11) & 0x00000800)
 
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_INTSTAT_FPO register field. */
-#define ALT_MON_GPIO_INTSTAT_FPO_LSB        11
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_INTSTAT_FPO register field. */
-#define ALT_MON_GPIO_INTSTAT_FPO_MSB        11
-/* The width in bits of the ALT_MON_GPIO_INTSTAT_FPO register field. */
-#define ALT_MON_GPIO_INTSTAT_FPO_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_INTSTAT_FPO register field value. */
-#define ALT_MON_GPIO_INTSTAT_FPO_SET_MSK    0x00000800
-/* The mask used to clear the ALT_MON_GPIO_INTSTAT_FPO register field value. */
-#define ALT_MON_GPIO_INTSTAT_FPO_CLR_MSK    0xfffff7ff
-/* The reset value of the ALT_MON_GPIO_INTSTAT_FPO register field. */
-#define ALT_MON_GPIO_INTSTAT_FPO_RESET      0x0
-/* Extracts the ALT_MON_GPIO_INTSTAT_FPO field value from a register. */
-#define ALT_MON_GPIO_INTSTAT_FPO_GET(value) (((value) & 0x00000800) >> 11)
-/* Produces a ALT_MON_GPIO_INTSTAT_FPO register field value suitable for setting the register. */
-#define ALT_MON_GPIO_INTSTAT_FPO_SET(value) (((value) << 11) & 0x00000800)
+/*
+ * Field : f2s_nconfig_pin
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN_LSB        12
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN_MSB        12
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN_SET_MSK    0x00001000
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN_CLR_MSK    0xffffefff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN_GET(value) (((value) & 0x00001000) >> 12)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN_SET(value) (((value) << 12) & 0x00001000)
+
+/*
+ * Field : f2s_nceo_oe
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE_LSB        13
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE_MSB        13
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE_SET_MSK    0x00002000
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE_CLR_MSK    0xffffdfff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE_GET(value) (((value) & 0x00002000) >> 13)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE_SET(value) (((value) << 13) & 0x00002000)
+
+/*
+ * Field : f2s_msel0
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL0_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL0_MSB        16
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL0_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_MSEL0 register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL0_SET_MSK    0x00010000
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_MSEL0 register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL0_CLR_MSK    0xfffeffff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_MSEL0 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL0_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_MSEL0 field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL0_GET(value) (((value) & 0x00010000) >> 16)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_MSEL0 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL0_SET(value) (((value) << 16) & 0x00010000)
+
+/*
+ * Field : f2s_msel1
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL1_LSB        17
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL1_MSB        17
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL1_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_MSEL1 register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL1_SET_MSK    0x00020000
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_MSEL1 register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL1_CLR_MSK    0xfffdffff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_MSEL1 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL1_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_MSEL1 field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL1_GET(value) (((value) & 0x00020000) >> 17)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_MSEL1 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL1_SET(value) (((value) << 17) & 0x00020000)
+
+/*
+ * Field : f2s_msel2
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL2_LSB        18
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL2_MSB        18
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL2_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_F2S_MSEL2 register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL2_SET_MSK    0x00040000
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_F2S_MSEL2 register field value. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL2_CLR_MSK    0xfffbffff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_F2S_MSEL2 register field. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL2_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_F2S_MSEL2 field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL2_GET(value) (((value) & 0x00040000) >> 18)
+/* Produces a ALT_FPGAMGR_INTR_POL_F2S_MSEL2 register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_F2S_MSEL2_SET(value) (((value) << 18) & 0x00040000)
+
+/*
+ * Field : imgcfg_FifoEmpty
+ * 
+ * FIfoEmpty Status of FPGA image configuration FIFO
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY_LSB        24
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY_MSB        24
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY_SET_MSK    0x01000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY_CLR_MSK    0xfeffffff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY_GET(value) (((value) & 0x01000000) >> 24)
+/* Produces a ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY_SET(value) (((value) << 24) & 0x01000000)
+
+/*
+ * Field : imgcfg_FifoFull
+ * 
+ * FIfoFull Status of FPGA image configuration FIFO
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL_LSB        25
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL_MSB        25
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL register field value. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL_SET_MSK    0x02000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL register field value. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL_CLR_MSK    0xfdffffff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL register field. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL_GET(value) (((value) & 0x02000000) >> 25)
+/* Produces a ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL_SET(value) (((value) << 25) & 0x02000000)
+
+/*
+ * Field : jtagm
+ * 
+ * JTAG Master Session Status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_POL_JTAGM_LSB        28
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_POL_JTAGM_MSB        28
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_POL_JTAGM_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_JTAGM register field value. */
+#define ALT_FPGAMGR_INTR_POL_JTAGM_SET_MSK    0x10000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_JTAGM register field value. */
+#define ALT_FPGAMGR_INTR_POL_JTAGM_CLR_MSK    0xefffffff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_JTAGM register field. */
+#define ALT_FPGAMGR_INTR_POL_JTAGM_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_JTAGM field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_JTAGM_GET(value) (((value) & 0x10000000) >> 28)
+/* Produces a ALT_FPGAMGR_INTR_POL_JTAGM register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_JTAGM_SET(value) (((value) << 28) & 0x10000000)
+
+/*
+ * Field : emr
+ * 
+ * EMR valid bit
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_INTR_POL_EMR register field. */
+#define ALT_FPGAMGR_INTR_POL_EMR_LSB        29
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_INTR_POL_EMR register field. */
+#define ALT_FPGAMGR_INTR_POL_EMR_MSB        29
+/* The width in bits of the ALT_FPGAMGR_INTR_POL_EMR register field. */
+#define ALT_FPGAMGR_INTR_POL_EMR_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_INTR_POL_EMR register field value. */
+#define ALT_FPGAMGR_INTR_POL_EMR_SET_MSK    0x20000000
+/* The mask used to clear the ALT_FPGAMGR_INTR_POL_EMR register field value. */
+#define ALT_FPGAMGR_INTR_POL_EMR_CLR_MSK    0xdfffffff
+/* The reset value of the ALT_FPGAMGR_INTR_POL_EMR register field. */
+#define ALT_FPGAMGR_INTR_POL_EMR_RESET      0x1
+/* Extracts the ALT_FPGAMGR_INTR_POL_EMR field value from a register. */
+#define ALT_FPGAMGR_INTR_POL_EMR_GET(value) (((value) & 0x20000000) >> 29)
+/* Produces a ALT_FPGAMGR_INTR_POL_EMR register field value suitable for setting the register. */
+#define ALT_FPGAMGR_INTR_POL_EMR_SET(value) (((value) << 29) & 0x20000000)
 
 #ifndef __ASSEMBLY__
 /*
@@ -4484,598 +4828,158 @@ typedef volatile struct ALT_MON_GPIO_INT_POL_s  ALT_MON_GPIO_INT_POL_t;
  * hardware drivers is to use the SoCAL access macros and alt_read_word() and
  * alt_write_word() functions.
  * 
- * The struct declaration for register ALT_MON_GPIO_INTSTAT.
+ * The struct declaration for register ALT_FPGAMGR_INTR_POL.
  */
-struct ALT_MON_GPIO_INTSTAT_s
+struct ALT_FPGAMGR_INTR_POL_s
 {
-    const uint32_t  ns  :  1;  /* Interrupt Status Field (nSTATUS) */
-    const uint32_t  cd  :  1;  /* Interrupt Status Field (CONF_DONE) */
-    const uint32_t  id  :  1;  /* Interrupt Status Field (INIT_DONE) */
-    const uint32_t  crc :  1;  /* Interrupt Status Field (CRC_ERROR) */
-    const uint32_t  ccd :  1;  /* Interrupt Status Field (CVP_CONF_DONE) */
-    const uint32_t  prr :  1;  /* Interrupt Status Field (PR_READY) */
-    const uint32_t  pre :  1;  /* Interrupt Status Field (PR_ERROR) */
-    const uint32_t  prd :  1;  /* Interrupt Status Field (PR_DONE) */
-    const uint32_t  ncp :  1;  /* Interrupt Status Field (nCONFIG Pin) */
-    const uint32_t  nsp :  1;  /* Interrupt Status Field (nSTATUS Pin) */
-    const uint32_t  cdp :  1;  /* Interrupt Status Field (CONF_DONE Pin) */
-    const uint32_t  fpo :  1;  /* Interrupt Status Field (FPGA_POWER_ON) */
-    uint32_t            : 20;  /* *UNDEFINED* */
+    uint32_t  f2s_crc_error      :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_CRC_ERROR */
+    uint32_t  f2s_early_usermode :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_EARLY_USERMOD */
+    uint32_t  f2s_usermode       :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_USERMOD */
+    uint32_t  f2s_initdone_oe    :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_INITDONE_OE */
+    uint32_t  f2s_nstatus_pin    :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_NSTAT_PIN */
+    uint32_t  f2s_nstatus_oe     :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_NSTAT_OE */
+    uint32_t  f2s_condone_pin    :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_CONDONE_PIN */
+    uint32_t  f2s_condone_oe     :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_CONDONE_OE */
+    uint32_t  f2s_cvp_conf_done  :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_CVP_CONF_DONE */
+    uint32_t  f2s_pr_ready       :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_PR_RDY */
+    uint32_t  f2s_pr_done        :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_PR_DONE */
+    uint32_t  f2s_pr_error       :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_PR_ERROR */
+    uint32_t  f2s_nconfig_pin    :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_NCFG_PIN */
+    uint32_t  f2s_nceo_oe        :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_NCEO_OE */
+    uint32_t                     :  2;  /* *UNDEFINED* */
+    uint32_t  f2s_msel0          :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_MSEL0 */
+    uint32_t  f2s_msel1          :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_MSEL1 */
+    uint32_t  f2s_msel2          :  1;  /* ALT_FPGAMGR_INTR_POL_F2S_MSEL2 */
+    uint32_t                     :  5;  /* *UNDEFINED* */
+    uint32_t  imgcfg_FifoEmpty   :  1;  /* ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOEMPTY */
+    uint32_t  imgcfg_FifoFull    :  1;  /* ALT_FPGAMGR_INTR_POL_IMGCFG_FIFOFULL */
+    uint32_t                     :  2;  /* *UNDEFINED* */
+    uint32_t  jtagm              :  1;  /* ALT_FPGAMGR_INTR_POL_JTAGM */
+    uint32_t  emr                :  1;  /* ALT_FPGAMGR_INTR_POL_EMR */
+    uint32_t                     :  2;  /* *UNDEFINED* */
 };
 
-/* The typedef declaration for register ALT_MON_GPIO_INTSTAT. */
-typedef volatile struct ALT_MON_GPIO_INTSTAT_s  ALT_MON_GPIO_INTSTAT_t;
+/* The typedef declaration for register ALT_FPGAMGR_INTR_POL. */
+typedef volatile struct ALT_FPGAMGR_INTR_POL_s  ALT_FPGAMGR_INTR_POL_t;
 #endif  /* __ASSEMBLY__ */
 
-/* The byte offset of the ALT_MON_GPIO_INTSTAT register from the beginning of the component. */
-#define ALT_MON_GPIO_INTSTAT_OFST        0x40
-/* The address of the ALT_MON_GPIO_INTSTAT register. */
-#define ALT_MON_GPIO_INTSTAT_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_INTSTAT_OFST))
+/* The reset value of the ALT_FPGAMGR_INTR_POL register. */
+#define ALT_FPGAMGR_INTR_POL_RESET       0x33073fff
+/* The byte offset of the ALT_FPGAMGR_INTR_POL register from the beginning of the component. */
+#define ALT_FPGAMGR_INTR_POL_OFST        0x8c
 
 /*
- * Register : Raw Interrupt Status Register - gpio_raw_intstatus
+ * Register : Control/Status Word Register - dma_config
  * 
- * Reports on raw interrupt status for each GPIO input. The raw interrupt status
- * excludes the effects of masking.
+ * Consist of control bit and status information.
  * 
  * Register Layout
  * 
- *  Bits    | Access | Reset | Description                               
- * :--------|:-------|:------|:-------------------------------------------
- *  [0]     | R      | 0x0   | Raw Interrupt Status Field (nSTATUS)      
- *  [1]     | R      | 0x0   | Raw Interrupt Status Field (CONF_DONE)    
- *  [2]     | R      | 0x0   | Raw Interrupt Status Field (INIT_DONE)    
- *  [3]     | R      | 0x0   | Raw Interrupt Status Field (CRC_ERROR)    
- *  [4]     | R      | 0x0   | Raw Interrupt Status Field (CVP_CONF_DONE)
- *  [5]     | R      | 0x0   | Raw Interrupt Status Field (PR_READY)     
- *  [6]     | R      | 0x0   | Raw Interrupt Status Field (PR_ERROR)     
- *  [7]     | R      | 0x0   | Raw Interrupt Status Field (PR_DONE)      
- *  [8]     | R      | 0x0   | Raw Interrupt Status Field (nCONFIG Pin)  
- *  [9]     | R      | 0x0   | Raw Interrupt Status Field (nSTATUS Pin)  
- *  [10]    | R      | 0x0   | Raw Interrupt Status Field (CONF_DONE Pin)
- *  [11]    | R      | 0x0   | Raw Interrupt Status Field (FPGA_POWER_ON)
- *  [31:12] | ???    | 0x0   | *UNDEFINED*                               
+ *  Bits    | Access | Reset   | Description                     
+ * :--------|:-------|:--------|:---------------------------------
+ *  [7:0]   | RW     | 0x0     | ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL
+ *  [8]     | RW     | 0x0     | ALT_FPGAMGR_DMA_CFG_DMAREQ_EN   
+ *  [15:9]  | ???    | 0x0     | *UNDEFINED*                     
+ *  [16]    | RW     | 0x0     | ALT_FPGAMGR_DMA_CFG_CLRFIFO     
+ *  [31:17] | ???    | Unknown | *UNDEFINED*                     
  * 
  */
 /*
- * Field : Raw Interrupt Status Field (nSTATUS) - ns
+ * Field : dmareq_level
  * 
- * Indicates whether nSTATUS has an active interrupt or not (before masking).
+ * DMA request threshold level
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL register field. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL register field. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL_MSB        7
+/* The width in bits of the ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL register field. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL_WIDTH      8
+/* The mask used to set the ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL register field value. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL_SET_MSK    0x000000ff
+/* The mask used to clear the ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL register field value. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL_CLR_MSK    0xffffff00
+/* The reset value of the ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL register field. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL field value from a register. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL_GET(value) (((value) & 0x000000ff) >> 0)
+/* Produces a ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL_SET(value) (((value) << 0) & 0x000000ff)
+
+/*
+ * Field : dmareq_enable
+ * 
+ * Writing 1 will enable DMA request handshake from FPGA manager.
+ * 
+ * Writing 0 will disable DMA request handshake from FPGA manager.
  * 
  * Field Enumeration Values:
  * 
  *  Enum                                | Value | Description
  * :------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_NS_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_NS_E_ACT   | 0x1   | Active     
+ *  ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_E_DIS | 0x0   |            
+ *  ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_E_EN  | 0x1   |            
  * 
  * Field Access Macros:
  * 
  */
 /*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_NS
+ * Enumerated value for register field ALT_FPGAMGR_DMA_CFG_DMAREQ_EN
  * 
- * Inactive
+ * DMA request handshake disable.
  */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_E_INACT 0x0
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_E_DIS 0x0
 /*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_NS
+ * Enumerated value for register field ALT_FPGAMGR_DMA_CFG_DMAREQ_EN
  * 
- * Active
+ * DMA request handshake enable
  */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_E_ACT   0x1
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_E_EN  0x1
 
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_NS register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_NS register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_MSB        0
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_NS register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_NS register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_SET_MSK    0x00000001
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_NS register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_NS register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_NS field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_NS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NS_SET(value) (((value) << 0) & 0x00000001)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_DMA_CFG_DMAREQ_EN register field. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_DMA_CFG_DMAREQ_EN register field. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_MSB        8
+/* The width in bits of the ALT_FPGAMGR_DMA_CFG_DMAREQ_EN register field. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_DMA_CFG_DMAREQ_EN register field value. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_SET_MSK    0x00000100
+/* The mask used to clear the ALT_FPGAMGR_DMA_CFG_DMAREQ_EN register field value. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_FPGAMGR_DMA_CFG_DMAREQ_EN register field. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_RESET      0x0
+/* Extracts the ALT_FPGAMGR_DMA_CFG_DMAREQ_EN field value from a register. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_FPGAMGR_DMA_CFG_DMAREQ_EN register field value suitable for setting the register. */
+#define ALT_FPGAMGR_DMA_CFG_DMAREQ_EN_SET(value) (((value) << 8) & 0x00000100)
 
 /*
- * Field : Raw Interrupt Status Field (CONF_DONE) - cd
+ * Field : clearFifo
  * 
- * Indicates whether CONF_DONE has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                | Value | Description
- * :------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_CD_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_CD_E_ACT   | 0x1   | Active     
+ * A write 1 to this bit field will empty the TxFifo. A read will always return 0.
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_CD
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_E_INACT 0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_CD
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_E_ACT   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_CD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_LSB        1
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_CD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_MSB        1
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_CD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_CD register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_SET_MSK    0x00000002
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_CD register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_CLR_MSK    0xfffffffd
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_CD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_CD field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_GET(value) (((value) & 0x00000002) >> 1)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_CD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CD_SET(value) (((value) << 1) & 0x00000002)
-
-/*
- * Field : Raw Interrupt Status Field (INIT_DONE) - id
- * 
- * Indicates whether INIT_DONE has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                | Value | Description
- * :------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_ID_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_ID_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_ID
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_E_INACT 0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_ID
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_E_ACT   0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_ID register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_ID register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_MSB        2
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_ID register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_ID register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_SET_MSK    0x00000004
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_ID register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_CLR_MSK    0xfffffffb
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_ID register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_ID field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_GET(value) (((value) & 0x00000004) >> 2)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_ID register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_ID_SET(value) (((value) << 2) & 0x00000004)
-
-/*
- * Field : Raw Interrupt Status Field (CRC_ERROR) - crc
- * 
- * Indicates whether CRC_ERROR has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                 | Value | Description
- * :-------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_CRC_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_CRC_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_CRC
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_CRC
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_CRC register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_CRC register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_MSB        3
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_CRC register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_CRC register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_SET_MSK    0x00000008
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_CRC register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_CLR_MSK    0xfffffff7
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_CRC register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_CRC field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_GET(value) (((value) & 0x00000008) >> 3)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_CRC register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CRC_SET(value) (((value) << 3) & 0x00000008)
-
-/*
- * Field : Raw Interrupt Status Field (CVP_CONF_DONE) - ccd
- * 
- * Indicates whether CVP_CONF_DONE has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                 | Value | Description
- * :-------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_CCD_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_CCD_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_CCD
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_CCD
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_CCD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_CCD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_MSB        4
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_CCD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_CCD register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_SET_MSK    0x00000010
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_CCD register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_CLR_MSK    0xffffffef
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_CCD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_CCD field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_CCD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CCD_SET(value) (((value) << 4) & 0x00000010)
-
-/*
- * Field : Raw Interrupt Status Field (PR_READY) - prr
- * 
- * Indicates whether PR_READY has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                 | Value | Description
- * :-------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_PRR_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_PRR_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_PRR
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_PRR
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_PRR register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_PRR register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_MSB        5
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_PRR register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_PRR register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_SET_MSK    0x00000020
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_PRR register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_PRR register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_PRR field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_PRR register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRR_SET(value) (((value) << 5) & 0x00000020)
-
-/*
- * Field : Raw Interrupt Status Field (PR_ERROR) - pre
- * 
- * Indicates whether PR_ERROR has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                 | Value | Description
- * :-------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_PRE_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_PRE_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_PRE
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_PRE
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_PRE register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_PRE register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_MSB        6
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_PRE register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_PRE register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_SET_MSK    0x00000040
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_PRE register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_CLR_MSK    0xffffffbf
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_PRE register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_PRE field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_GET(value) (((value) & 0x00000040) >> 6)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_PRE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRE_SET(value) (((value) << 6) & 0x00000040)
-
-/*
- * Field : Raw Interrupt Status Field (PR_DONE) - prd
- * 
- * Indicates whether PR_DONE has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                 | Value | Description
- * :-------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_PRD_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_PRD_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_PRD
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_PRD
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_PRD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_LSB        7
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_PRD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_MSB        7
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_PRD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_PRD register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_SET_MSK    0x00000080
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_PRD register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_CLR_MSK    0xffffff7f
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_PRD register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_PRD field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_GET(value) (((value) & 0x00000080) >> 7)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_PRD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_PRD_SET(value) (((value) << 7) & 0x00000080)
-
-/*
- * Field : Raw Interrupt Status Field (nCONFIG Pin) - ncp
- * 
- * Indicates whether nCONFIG Pin has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                 | Value | Description
- * :-------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_NCP_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_NCP_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_NCP
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_NCP
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_NCP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_NCP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_MSB        8
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_NCP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_NCP register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_SET_MSK    0x00000100
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_NCP register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_NCP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_NCP field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_NCP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NCP_SET(value) (((value) << 8) & 0x00000100)
-
-/*
- * Field : Raw Interrupt Status Field (nSTATUS Pin) - nsp
- * 
- * Indicates whether nSTATUS Pin has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                 | Value | Description
- * :-------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_NSP_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_NSP_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_NSP
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_NSP
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_NSP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_LSB        9
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_NSP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_MSB        9
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_NSP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_NSP register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_SET_MSK    0x00000200
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_NSP register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_CLR_MSK    0xfffffdff
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_NSP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_NSP field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_GET(value) (((value) & 0x00000200) >> 9)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_NSP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_NSP_SET(value) (((value) << 9) & 0x00000200)
-
-/*
- * Field : Raw Interrupt Status Field (CONF_DONE Pin) - cdp
- * 
- * Indicates whether CONF_DONE Pin has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                 | Value | Description
- * :-------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_CDP_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_CDP_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_CDP
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_CDP
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_CDP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_CDP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_MSB        10
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_CDP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_CDP register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_SET_MSK    0x00000400
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_CDP register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_CLR_MSK    0xfffffbff
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_CDP register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_CDP field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_GET(value) (((value) & 0x00000400) >> 10)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_CDP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_CDP_SET(value) (((value) << 10) & 0x00000400)
-
-/*
- * Field : Raw Interrupt Status Field (FPGA_POWER_ON) - fpo
- * 
- * Indicates whether FPGA_POWER_ON has an active interrupt or not (before masking).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                 | Value | Description
- * :-------------------------------------|:------|:------------
- *  ALT_MON_GPIO_RAW_INTSTAT_FPO_E_INACT | 0x0   | Inactive   
- *  ALT_MON_GPIO_RAW_INTSTAT_FPO_E_ACT   | 0x1   | Active     
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_FPO
- * 
- * Inactive
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_E_INACT    0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_RAW_INTSTAT_FPO
- * 
- * Active
- */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_E_ACT      0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_RAW_INTSTAT_FPO register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_LSB        11
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_RAW_INTSTAT_FPO register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_MSB        11
-/* The width in bits of the ALT_MON_GPIO_RAW_INTSTAT_FPO register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_RAW_INTSTAT_FPO register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_SET_MSK    0x00000800
-/* The mask used to clear the ALT_MON_GPIO_RAW_INTSTAT_FPO register field value. */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_CLR_MSK    0xfffff7ff
-/* The reset value of the ALT_MON_GPIO_RAW_INTSTAT_FPO register field. */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_RESET      0x0
-/* Extracts the ALT_MON_GPIO_RAW_INTSTAT_FPO field value from a register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_GET(value) (((value) & 0x00000800) >> 11)
-/* Produces a ALT_MON_GPIO_RAW_INTSTAT_FPO register field value suitable for setting the register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_FPO_SET(value) (((value) << 11) & 0x00000800)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_DMA_CFG_CLRFIFO register field. */
+#define ALT_FPGAMGR_DMA_CFG_CLRFIFO_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_DMA_CFG_CLRFIFO register field. */
+#define ALT_FPGAMGR_DMA_CFG_CLRFIFO_MSB        16
+/* The width in bits of the ALT_FPGAMGR_DMA_CFG_CLRFIFO register field. */
+#define ALT_FPGAMGR_DMA_CFG_CLRFIFO_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_DMA_CFG_CLRFIFO register field value. */
+#define ALT_FPGAMGR_DMA_CFG_CLRFIFO_SET_MSK    0x00010000
+/* The mask used to clear the ALT_FPGAMGR_DMA_CFG_CLRFIFO register field value. */
+#define ALT_FPGAMGR_DMA_CFG_CLRFIFO_CLR_MSK    0xfffeffff
+/* The reset value of the ALT_FPGAMGR_DMA_CFG_CLRFIFO register field. */
+#define ALT_FPGAMGR_DMA_CFG_CLRFIFO_RESET      0x0
+/* Extracts the ALT_FPGAMGR_DMA_CFG_CLRFIFO field value from a register. */
+#define ALT_FPGAMGR_DMA_CFG_CLRFIFO_GET(value) (((value) & 0x00010000) >> 16)
+/* Produces a ALT_FPGAMGR_DMA_CFG_CLRFIFO register field value suitable for setting the register. */
+#define ALT_FPGAMGR_DMA_CFG_CLRFIFO_SET(value) (((value) << 16) & 0x00010000)
 
 #ifndef __ASSEMBLY__
 /*
@@ -5086,598 +4990,125 @@ typedef volatile struct ALT_MON_GPIO_INTSTAT_s  ALT_MON_GPIO_INTSTAT_t;
  * hardware drivers is to use the SoCAL access macros and alt_read_word() and
  * alt_write_word() functions.
  * 
- * The struct declaration for register ALT_MON_GPIO_RAW_INTSTAT.
+ * The struct declaration for register ALT_FPGAMGR_DMA_CFG.
  */
-struct ALT_MON_GPIO_RAW_INTSTAT_s
+struct ALT_FPGAMGR_DMA_CFG_s
 {
-    const uint32_t  ns  :  1;  /* Raw Interrupt Status Field (nSTATUS) */
-    const uint32_t  cd  :  1;  /* Raw Interrupt Status Field (CONF_DONE) */
-    const uint32_t  id  :  1;  /* Raw Interrupt Status Field (INIT_DONE) */
-    const uint32_t  crc :  1;  /* Raw Interrupt Status Field (CRC_ERROR) */
-    const uint32_t  ccd :  1;  /* Raw Interrupt Status Field (CVP_CONF_DONE) */
-    const uint32_t  prr :  1;  /* Raw Interrupt Status Field (PR_READY) */
-    const uint32_t  pre :  1;  /* Raw Interrupt Status Field (PR_ERROR) */
-    const uint32_t  prd :  1;  /* Raw Interrupt Status Field (PR_DONE) */
-    const uint32_t  ncp :  1;  /* Raw Interrupt Status Field (nCONFIG Pin) */
-    const uint32_t  nsp :  1;  /* Raw Interrupt Status Field (nSTATUS Pin) */
-    const uint32_t  cdp :  1;  /* Raw Interrupt Status Field (CONF_DONE Pin) */
-    const uint32_t  fpo :  1;  /* Raw Interrupt Status Field (FPGA_POWER_ON) */
-    uint32_t            : 20;  /* *UNDEFINED* */
+    uint32_t  dmareq_level  :  8;  /* ALT_FPGAMGR_DMA_CFG_DMAREQ_LEVEL */
+    uint32_t  dmareq_enable :  1;  /* ALT_FPGAMGR_DMA_CFG_DMAREQ_EN */
+    uint32_t                :  7;  /* *UNDEFINED* */
+    uint32_t  clearFifo     :  1;  /* ALT_FPGAMGR_DMA_CFG_CLRFIFO */
+    uint32_t                : 15;  /* *UNDEFINED* */
 };
 
-/* The typedef declaration for register ALT_MON_GPIO_RAW_INTSTAT. */
-typedef volatile struct ALT_MON_GPIO_RAW_INTSTAT_s  ALT_MON_GPIO_RAW_INTSTAT_t;
+/* The typedef declaration for register ALT_FPGAMGR_DMA_CFG. */
+typedef volatile struct ALT_FPGAMGR_DMA_CFG_s  ALT_FPGAMGR_DMA_CFG_t;
 #endif  /* __ASSEMBLY__ */
 
-/* The byte offset of the ALT_MON_GPIO_RAW_INTSTAT register from the beginning of the component. */
-#define ALT_MON_GPIO_RAW_INTSTAT_OFST        0x44
-/* The address of the ALT_MON_GPIO_RAW_INTSTAT register. */
-#define ALT_MON_GPIO_RAW_INTSTAT_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_RAW_INTSTAT_OFST))
+/* The reset value of the ALT_FPGAMGR_DMA_CFG register. */
+#define ALT_FPGAMGR_DMA_CFG_RESET       0x00000000
+/* The byte offset of the ALT_FPGAMGR_DMA_CFG register from the beginning of the component. */
+#define ALT_FPGAMGR_DMA_CFG_OFST        0x90
 
 /*
- * Register : Clear Interrupt Register - gpio_porta_eoi
+ * Register : Control/Status Word Register - imgcfg_fifo_status
  * 
- * This register is written by software to clear edge interrupts generated by each
- * individual GPIO input. This register always reads back as zero.
+ * Consist of control bit and status information.
  * 
  * Register Layout
  * 
- *  Bits    | Access | Reset | Description                               
- * :--------|:-------|:------|:-------------------------------------------
- *  [0]     | W      | 0x0   | Clear Edge Interrupt Field (nSTATUS)      
- *  [1]     | W      | 0x0   | Clear Edge Interrupt Field (CONF_DONE)    
- *  [2]     | W      | 0x0   | Clear Edge Interrupt Field (INIT_DONE)    
- *  [3]     | W      | 0x0   | Clear Edge Interrupt Field (CRC_ERROR)    
- *  [4]     | W      | 0x0   | Clear Edge Interrupt Field (CVP_CONF_DONE)
- *  [5]     | W      | 0x0   | Clear Edge Interrupt Field (PR_READY)     
- *  [6]     | W      | 0x0   | Clear Edge Interrupt Field (PR_ERROR)     
- *  [7]     | W      | 0x0   | Clear Edge Interrupt Field (PR_DONE)      
- *  [8]     | W      | 0x0   | Clear Edge Interrupt Field (nCONFIG Pin)  
- *  [9]     | W      | 0x0   | Clear Edge Interrupt Field (nSTATUS Pin)  
- *  [10]    | W      | 0x0   | Clear Edge Interrupt Field (CONF_DONE Pin)
- *  [11]    | W      | 0x0   | Clear Edge Interrupt Field (FPGA_POWER_ON)
- *  [31:12] | ???    | 0x0   | *UNDEFINED*                               
+ *  Bits    | Access | Reset   | Description                           
+ * :--------|:-------|:--------|:---------------------------------------
+ *  [7:0]   | RW     | 0x0     | ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL
+ *  [8]     | RW     | 0x0     | ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL 
+ *  [9]     | RW     | 0x1     | ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY
+ *  [31:10] | ???    | Unknown | *UNDEFINED*                           
  * 
  */
 /*
- * Field : Clear Edge Interrupt Field (nSTATUS) - ns
+ * Field : FifoLevel
  * 
- * Used by software to clear an nSTATUS edge interrupt.
+ * Number of words remaining in FPGA Image Configuration Fifo.
  * 
- * Field Enumeration Values:
- * 
- *  Enum                              | Value | Description       
- * :----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_NS_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_NS_E_CLR   | 0x1   | Clear interrupt   
+ * Maximum value is 0x64
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_NS
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_NS_E_NOCLR   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_NS
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_NS_E_CLR     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_NS register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_NS register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NS_MSB        0
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_NS register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NS_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_NS register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_NS_SET_MSK    0x00000001
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_NS register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_NS_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_NS register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NS_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_NS field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_NS_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_NS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_NS_SET(value) (((value) << 0) & 0x00000001)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL_MSB        7
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL_WIDTH      8
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL register field value. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL_SET_MSK    0x000000ff
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL register field value. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL_CLR_MSK    0xffffff00
+/* The reset value of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL_GET(value) (((value) & 0x000000ff) >> 0)
+/* Produces a ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL_SET(value) (((value) << 0) & 0x000000ff)
 
 /*
- * Field : Clear Edge Interrupt Field (CONF_DONE) - cd
+ * Field : FifoFull
  * 
- * Used by software to clear an CONF_DONE edge interrupt.
+ * Read
  * 
- * Field Enumeration Values:
+ * 1 -> Fifo Full
  * 
- *  Enum                              | Value | Description       
- * :----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_CD_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_CD_E_CLR   | 0x1   | Clear interrupt   
+ * 0 -> Fifo NOT full
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_CD
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_CD_E_NOCLR   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_CD
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_CD_E_CLR     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_CD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CD_LSB        1
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_CD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CD_MSB        1
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_CD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_CD register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_CD_SET_MSK    0x00000002
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_CD register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_CD_CLR_MSK    0xfffffffd
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_CD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_CD field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_CD_GET(value) (((value) & 0x00000002) >> 1)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_CD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_CD_SET(value) (((value) << 1) & 0x00000002)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL_MSB        8
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL register field value. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL_SET_MSK    0x00000100
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL register field value. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL_RESET      0x0
+/* Extracts the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL_SET(value) (((value) << 8) & 0x00000100)
 
 /*
- * Field : Clear Edge Interrupt Field (INIT_DONE) - id
+ * Field : FifoEmpty
  * 
- * Used by software to clear an INIT_DONE edge interrupt.
+ * Read
  * 
- * Field Enumeration Values:
+ * 1 -> Fifo Empty
  * 
- *  Enum                              | Value | Description       
- * :----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_ID_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_ID_E_CLR   | 0x1   | Clear interrupt   
+ * 0 -> Fifo NOT Empty
  * 
  * Field Access Macros:
  * 
  */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_ID
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_ID_E_NOCLR   0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_ID
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_ID_E_CLR     0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_ID register field. */
-#define ALT_MON_GPIO_PORTA_EOI_ID_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_ID register field. */
-#define ALT_MON_GPIO_PORTA_EOI_ID_MSB        2
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_ID register field. */
-#define ALT_MON_GPIO_PORTA_EOI_ID_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_ID register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_ID_SET_MSK    0x00000004
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_ID register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_ID_CLR_MSK    0xfffffffb
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_ID register field. */
-#define ALT_MON_GPIO_PORTA_EOI_ID_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_ID field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_ID_GET(value) (((value) & 0x00000004) >> 2)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_ID register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_ID_SET(value) (((value) << 2) & 0x00000004)
-
-/*
- * Field : Clear Edge Interrupt Field (CRC_ERROR) - crc
- * 
- * Used by software to clear an CRC_ERROR edge interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description       
- * :-----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_CRC_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_CRC_E_CLR   | 0x1   | Clear interrupt   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_CRC
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_E_NOCLR  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_CRC
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_E_CLR    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_CRC register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_CRC register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_MSB        3
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_CRC register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_CRC register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_SET_MSK    0x00000008
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_CRC register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_CLR_MSK    0xfffffff7
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_CRC register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_CRC field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_GET(value) (((value) & 0x00000008) >> 3)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_CRC register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_CRC_SET(value) (((value) << 3) & 0x00000008)
-
-/*
- * Field : Clear Edge Interrupt Field (CVP_CONF_DONE) - ccd
- * 
- * Used by software to clear an CVP_CONF_DONE edge interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description       
- * :-----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_CCD_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_CCD_E_CLR   | 0x1   | Clear interrupt   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_CCD
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_E_NOCLR  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_CCD
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_E_CLR    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_CCD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_CCD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_MSB        4
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_CCD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_CCD register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_SET_MSK    0x00000010
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_CCD register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_CLR_MSK    0xffffffef
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_CCD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_CCD field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_CCD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_CCD_SET(value) (((value) << 4) & 0x00000010)
-
-/*
- * Field : Clear Edge Interrupt Field (PR_READY) - prr
- * 
- * Used by software to clear an PR_READY edge interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description       
- * :-----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_PRR_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_PRR_E_CLR   | 0x1   | Clear interrupt   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_PRR
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_E_NOCLR  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_PRR
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_E_CLR    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_PRR register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_PRR register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_MSB        5
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_PRR register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_PRR register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_SET_MSK    0x00000020
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_PRR register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_PRR register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_PRR field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_PRR register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_PRR_SET(value) (((value) << 5) & 0x00000020)
-
-/*
- * Field : Clear Edge Interrupt Field (PR_ERROR) - pre
- * 
- * Used by software to clear an PR_ERROR edge interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description       
- * :-----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_PRE_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_PRE_E_CLR   | 0x1   | Clear interrupt   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_PRE
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_E_NOCLR  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_PRE
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_E_CLR    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_PRE register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_PRE register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_MSB        6
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_PRE register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_PRE register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_SET_MSK    0x00000040
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_PRE register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_CLR_MSK    0xffffffbf
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_PRE register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_PRE field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_GET(value) (((value) & 0x00000040) >> 6)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_PRE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_PRE_SET(value) (((value) << 6) & 0x00000040)
-
-/*
- * Field : Clear Edge Interrupt Field (PR_DONE) - prd
- * 
- * Used by software to clear an PR_DONE edge interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description       
- * :-----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_PRD_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_PRD_E_CLR   | 0x1   | Clear interrupt   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_PRD
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_E_NOCLR  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_PRD
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_E_CLR    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_PRD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_LSB        7
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_PRD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_MSB        7
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_PRD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_PRD register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_SET_MSK    0x00000080
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_PRD register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_CLR_MSK    0xffffff7f
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_PRD register field. */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_PRD field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_GET(value) (((value) & 0x00000080) >> 7)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_PRD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_PRD_SET(value) (((value) << 7) & 0x00000080)
-
-/*
- * Field : Clear Edge Interrupt Field (nCONFIG Pin) - ncp
- * 
- * Used by software to clear an nCONFIG Pin edge interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description       
- * :-----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_NCP_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_NCP_E_CLR   | 0x1   | Clear interrupt   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_NCP
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_E_NOCLR  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_NCP
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_E_CLR    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_NCP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_NCP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_MSB        8
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_NCP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_NCP register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_SET_MSK    0x00000100
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_NCP register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_NCP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_NCP field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_NCP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_NCP_SET(value) (((value) << 8) & 0x00000100)
-
-/*
- * Field : Clear Edge Interrupt Field (nSTATUS Pin) - nsp
- * 
- * Used by software to clear an nSTATUS Pin edge interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description       
- * :-----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_NSP_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_NSP_E_CLR   | 0x1   | Clear interrupt   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_NSP
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_E_NOCLR  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_NSP
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_E_CLR    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_NSP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_LSB        9
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_NSP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_MSB        9
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_NSP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_NSP register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_SET_MSK    0x00000200
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_NSP register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_CLR_MSK    0xfffffdff
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_NSP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_NSP field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_GET(value) (((value) & 0x00000200) >> 9)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_NSP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_NSP_SET(value) (((value) << 9) & 0x00000200)
-
-/*
- * Field : Clear Edge Interrupt Field (CONF_DONE Pin) - cdp
- * 
- * Used by software to clear an CONF_DONE Pin edge interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description       
- * :-----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_CDP_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_CDP_E_CLR   | 0x1   | Clear interrupt   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_CDP
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_E_NOCLR  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_CDP
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_E_CLR    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_CDP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_CDP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_MSB        10
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_CDP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_CDP register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_SET_MSK    0x00000400
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_CDP register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_CLR_MSK    0xfffffbff
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_CDP register field. */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_CDP field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_GET(value) (((value) & 0x00000400) >> 10)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_CDP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_CDP_SET(value) (((value) << 10) & 0x00000400)
-
-/*
- * Field : Clear Edge Interrupt Field (FPGA_POWER_ON) - fpo
- * 
- * Used by software to clear an FPGA_POWER_ON edge interrupt.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                               | Value | Description       
- * :-----------------------------------|:------|:-------------------
- *  ALT_MON_GPIO_PORTA_EOI_FPO_E_NOCLR | 0x0   | No interrupt clear
- *  ALT_MON_GPIO_PORTA_EOI_FPO_E_CLR   | 0x1   | Clear interrupt   
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_FPO
- * 
- * No interrupt clear
- */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_E_NOCLR  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_PORTA_EOI_FPO
- * 
- * Clear interrupt
- */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_E_CLR    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_PORTA_EOI_FPO register field. */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_LSB        11
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_PORTA_EOI_FPO register field. */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_MSB        11
-/* The width in bits of the ALT_MON_GPIO_PORTA_EOI_FPO register field. */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_PORTA_EOI_FPO register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_SET_MSK    0x00000800
-/* The mask used to clear the ALT_MON_GPIO_PORTA_EOI_FPO register field value. */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_CLR_MSK    0xfffff7ff
-/* The reset value of the ALT_MON_GPIO_PORTA_EOI_FPO register field. */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_RESET      0x0
-/* Extracts the ALT_MON_GPIO_PORTA_EOI_FPO field value from a register. */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_GET(value) (((value) & 0x00000800) >> 11)
-/* Produces a ALT_MON_GPIO_PORTA_EOI_FPO register field value suitable for setting the register. */
-#define ALT_MON_GPIO_PORTA_EOI_FPO_SET(value) (((value) << 11) & 0x00000800)
+/* The Least Significant Bit (LSB) position of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY_LSB        9
+/* The Most Significant Bit (MSB) position of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY_MSB        9
+/* The width in bits of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY_WIDTH      1
+/* The mask used to set the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY_SET_MSK    0x00000200
+/* The mask used to clear the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY register field value. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY_CLR_MSK    0xfffffdff
+/* The reset value of the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY register field. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY_RESET      0x1
+/* Extracts the ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY field value from a register. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY_GET(value) (((value) & 0x00000200) >> 9)
+/* Produces a ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY register field value suitable for setting the register. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY_SET(value) (((value) << 9) & 0x00000200)
 
 #ifndef __ASSEMBLY__
 /*
@@ -5688,1356 +5119,24 @@ typedef volatile struct ALT_MON_GPIO_RAW_INTSTAT_s  ALT_MON_GPIO_RAW_INTSTAT_t;
  * hardware drivers is to use the SoCAL access macros and alt_read_word() and
  * alt_write_word() functions.
  * 
- * The struct declaration for register ALT_MON_GPIO_PORTA_EOI.
+ * The struct declaration for register ALT_FPGAMGR_IMGCFG_FIFO_STAT.
  */
-struct ALT_MON_GPIO_PORTA_EOI_s
+struct ALT_FPGAMGR_IMGCFG_FIFO_STAT_s
 {
-    uint32_t  ns  :  1;  /* Clear Edge Interrupt Field (nSTATUS) */
-    uint32_t  cd  :  1;  /* Clear Edge Interrupt Field (CONF_DONE) */
-    uint32_t  id  :  1;  /* Clear Edge Interrupt Field (INIT_DONE) */
-    uint32_t  crc :  1;  /* Clear Edge Interrupt Field (CRC_ERROR) */
-    uint32_t  ccd :  1;  /* Clear Edge Interrupt Field (CVP_CONF_DONE) */
-    uint32_t  prr :  1;  /* Clear Edge Interrupt Field (PR_READY) */
-    uint32_t  pre :  1;  /* Clear Edge Interrupt Field (PR_ERROR) */
-    uint32_t  prd :  1;  /* Clear Edge Interrupt Field (PR_DONE) */
-    uint32_t  ncp :  1;  /* Clear Edge Interrupt Field (nCONFIG Pin) */
-    uint32_t  nsp :  1;  /* Clear Edge Interrupt Field (nSTATUS Pin) */
-    uint32_t  cdp :  1;  /* Clear Edge Interrupt Field (CONF_DONE Pin) */
-    uint32_t  fpo :  1;  /* Clear Edge Interrupt Field (FPGA_POWER_ON) */
-    uint32_t      : 20;  /* *UNDEFINED* */
+    uint32_t  FifoLevel :  8;  /* ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOLEVEL */
+    uint32_t  FifoFull  :  1;  /* ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOFULL */
+    uint32_t  FifoEmpty :  1;  /* ALT_FPGAMGR_IMGCFG_FIFO_STAT_FIFOEMPTY */
+    uint32_t            : 22;  /* *UNDEFINED* */
 };
 
-/* The typedef declaration for register ALT_MON_GPIO_PORTA_EOI. */
-typedef volatile struct ALT_MON_GPIO_PORTA_EOI_s  ALT_MON_GPIO_PORTA_EOI_t;
+/* The typedef declaration for register ALT_FPGAMGR_IMGCFG_FIFO_STAT. */
+typedef volatile struct ALT_FPGAMGR_IMGCFG_FIFO_STAT_s  ALT_FPGAMGR_IMGCFG_FIFO_STAT_t;
 #endif  /* __ASSEMBLY__ */
 
-/* The byte offset of the ALT_MON_GPIO_PORTA_EOI register from the beginning of the component. */
-#define ALT_MON_GPIO_PORTA_EOI_OFST        0x4c
-/* The address of the ALT_MON_GPIO_PORTA_EOI register. */
-#define ALT_MON_GPIO_PORTA_EOI_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_PORTA_EOI_OFST))
-
-/*
- * Register : External Port A Register - gpio_ext_porta
- * 
- * Reading this register reads the values of the GPIO inputs.
- * 
- * Register Layout
- * 
- *  Bits    | Access | Reset | Description                        
- * :--------|:-------|:------|:------------------------------------
- *  [0]     | R      | 0x0   | External Port Field (nSTATUS)      
- *  [1]     | R      | 0x0   | External Port Field (CONF_DONE)    
- *  [2]     | R      | 0x0   | External Port Field (INIT_DONE)    
- *  [3]     | R      | 0x0   | External Port Field (CRC_ERROR)    
- *  [4]     | R      | 0x0   | External Port Field (CVP_CONF_DONE)
- *  [5]     | R      | 0x0   | External Port Field (PR_READY)     
- *  [6]     | R      | 0x0   | External Port Field (PR_ERROR)     
- *  [7]     | R      | 0x0   | External Port Field (PR_DONE)      
- *  [8]     | R      | 0x0   | External Port Field (nCONFIG Pin)  
- *  [9]     | R      | 0x0   | External Port Field (nSTATUS Pin)  
- *  [10]    | R      | 0x0   | External Port Field (CONF_DONE Pin)
- *  [11]    | R      | 0x0   | External Port Field (FPGA_POWER_ON)
- *  [31:12] | ???    | 0x0   | *UNDEFINED*                        
- * 
- */
-/*
- * Field : External Port Field (nSTATUS) - ns
- * 
- * Reading this provides the value of nSTATUS
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_NS register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_NS register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NS_MSB        0
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_NS register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NS_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_NS register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_NS_SET_MSK    0x00000001
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_NS register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_NS_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_NS register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NS_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_NS field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_NS_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_NS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_NS_SET(value) (((value) << 0) & 0x00000001)
-
-/*
- * Field : External Port Field (CONF_DONE) - cd
- * 
- * Reading this provides the value of CONF_DONE
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_CD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CD_LSB        1
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_CD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CD_MSB        1
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_CD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_CD register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_CD_SET_MSK    0x00000002
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_CD register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_CD_CLR_MSK    0xfffffffd
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_CD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_CD field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_CD_GET(value) (((value) & 0x00000002) >> 1)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_CD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_CD_SET(value) (((value) << 1) & 0x00000002)
-
-/*
- * Field : External Port Field (INIT_DONE) - id
- * 
- * Reading this provides the value of INIT_DONE
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_ID register field. */
-#define ALT_MON_GPIO_EXT_PORTA_ID_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_ID register field. */
-#define ALT_MON_GPIO_EXT_PORTA_ID_MSB        2
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_ID register field. */
-#define ALT_MON_GPIO_EXT_PORTA_ID_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_ID register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_ID_SET_MSK    0x00000004
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_ID register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_ID_CLR_MSK    0xfffffffb
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_ID register field. */
-#define ALT_MON_GPIO_EXT_PORTA_ID_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_ID field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_ID_GET(value) (((value) & 0x00000004) >> 2)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_ID register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_ID_SET(value) (((value) << 2) & 0x00000004)
-
-/*
- * Field : External Port Field (CRC_ERROR) - crc
- * 
- * Reading this provides the value of CRC_ERROR
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_CRC register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CRC_LSB        3
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_CRC register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CRC_MSB        3
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_CRC register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CRC_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_CRC register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_CRC_SET_MSK    0x00000008
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_CRC register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_CRC_CLR_MSK    0xfffffff7
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_CRC register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CRC_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_CRC field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_CRC_GET(value) (((value) & 0x00000008) >> 3)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_CRC register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_CRC_SET(value) (((value) << 3) & 0x00000008)
-
-/*
- * Field : External Port Field (CVP_CONF_DONE) - ccd
- * 
- * Reading this provides the value of CVP_CONF_DONE
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_CCD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CCD_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_CCD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CCD_MSB        4
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_CCD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CCD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_CCD register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_CCD_SET_MSK    0x00000010
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_CCD register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_CCD_CLR_MSK    0xffffffef
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_CCD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CCD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_CCD field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_CCD_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_CCD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_CCD_SET(value) (((value) << 4) & 0x00000010)
-
-/*
- * Field : External Port Field (PR_READY) - prr
- * 
- * Reading this provides the value of PR_READY
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_PRR register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRR_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_PRR register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRR_MSB        5
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_PRR register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRR_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_PRR register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_PRR_SET_MSK    0x00000020
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_PRR register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_PRR_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_PRR register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRR_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_PRR field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_PRR_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_PRR register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_PRR_SET(value) (((value) << 5) & 0x00000020)
-
-/*
- * Field : External Port Field (PR_ERROR) - pre
- * 
- * Reading this provides the value of PR_ERROR
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_PRE register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRE_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_PRE register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRE_MSB        6
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_PRE register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRE_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_PRE register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_PRE_SET_MSK    0x00000040
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_PRE register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_PRE_CLR_MSK    0xffffffbf
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_PRE register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRE_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_PRE field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_PRE_GET(value) (((value) & 0x00000040) >> 6)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_PRE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_PRE_SET(value) (((value) << 6) & 0x00000040)
-
-/*
- * Field : External Port Field (PR_DONE) - prd
- * 
- * Reading this provides the value of PR_DONE
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_PRD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRD_LSB        7
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_PRD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRD_MSB        7
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_PRD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRD_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_PRD register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_PRD_SET_MSK    0x00000080
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_PRD register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_PRD_CLR_MSK    0xffffff7f
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_PRD register field. */
-#define ALT_MON_GPIO_EXT_PORTA_PRD_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_PRD field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_PRD_GET(value) (((value) & 0x00000080) >> 7)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_PRD register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_PRD_SET(value) (((value) << 7) & 0x00000080)
-
-/*
- * Field : External Port Field (nCONFIG Pin) - ncp
- * 
- * Reading this provides the value of nCONFIG Pin
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_NCP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NCP_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_NCP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NCP_MSB        8
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_NCP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NCP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_NCP register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_NCP_SET_MSK    0x00000100
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_NCP register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_NCP_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_NCP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NCP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_NCP field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_NCP_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_NCP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_NCP_SET(value) (((value) << 8) & 0x00000100)
-
-/*
- * Field : External Port Field (nSTATUS Pin) - nsp
- * 
- * Reading this provides the value of nSTATUS Pin
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_NSP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NSP_LSB        9
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_NSP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NSP_MSB        9
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_NSP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NSP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_NSP register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_NSP_SET_MSK    0x00000200
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_NSP register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_NSP_CLR_MSK    0xfffffdff
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_NSP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_NSP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_NSP field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_NSP_GET(value) (((value) & 0x00000200) >> 9)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_NSP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_NSP_SET(value) (((value) << 9) & 0x00000200)
-
-/*
- * Field : External Port Field (CONF_DONE Pin) - cdp
- * 
- * Reading this provides the value of CONF_DONE Pin
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_CDP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CDP_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_CDP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CDP_MSB        10
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_CDP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CDP_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_CDP register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_CDP_SET_MSK    0x00000400
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_CDP register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_CDP_CLR_MSK    0xfffffbff
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_CDP register field. */
-#define ALT_MON_GPIO_EXT_PORTA_CDP_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_CDP field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_CDP_GET(value) (((value) & 0x00000400) >> 10)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_CDP register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_CDP_SET(value) (((value) << 10) & 0x00000400)
-
-/*
- * Field : External Port Field (FPGA_POWER_ON) - fpo
- * 
- * Reading this provides the value of FPGA_POWER_ON
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_EXT_PORTA_FPO register field. */
-#define ALT_MON_GPIO_EXT_PORTA_FPO_LSB        11
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_EXT_PORTA_FPO register field. */
-#define ALT_MON_GPIO_EXT_PORTA_FPO_MSB        11
-/* The width in bits of the ALT_MON_GPIO_EXT_PORTA_FPO register field. */
-#define ALT_MON_GPIO_EXT_PORTA_FPO_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_EXT_PORTA_FPO register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_FPO_SET_MSK    0x00000800
-/* The mask used to clear the ALT_MON_GPIO_EXT_PORTA_FPO register field value. */
-#define ALT_MON_GPIO_EXT_PORTA_FPO_CLR_MSK    0xfffff7ff
-/* The reset value of the ALT_MON_GPIO_EXT_PORTA_FPO register field. */
-#define ALT_MON_GPIO_EXT_PORTA_FPO_RESET      0x0
-/* Extracts the ALT_MON_GPIO_EXT_PORTA_FPO field value from a register. */
-#define ALT_MON_GPIO_EXT_PORTA_FPO_GET(value) (((value) & 0x00000800) >> 11)
-/* Produces a ALT_MON_GPIO_EXT_PORTA_FPO register field value suitable for setting the register. */
-#define ALT_MON_GPIO_EXT_PORTA_FPO_SET(value) (((value) << 11) & 0x00000800)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for writing
- * hardware drivers is to use the SoCAL access macros and alt_read_word() and
- * alt_write_word() functions.
- * 
- * The struct declaration for register ALT_MON_GPIO_EXT_PORTA.
- */
-struct ALT_MON_GPIO_EXT_PORTA_s
-{
-    const uint32_t  ns  :  1;  /* External Port Field (nSTATUS) */
-    const uint32_t  cd  :  1;  /* External Port Field (CONF_DONE) */
-    const uint32_t  id  :  1;  /* External Port Field (INIT_DONE) */
-    const uint32_t  crc :  1;  /* External Port Field (CRC_ERROR) */
-    const uint32_t  ccd :  1;  /* External Port Field (CVP_CONF_DONE) */
-    const uint32_t  prr :  1;  /* External Port Field (PR_READY) */
-    const uint32_t  pre :  1;  /* External Port Field (PR_ERROR) */
-    const uint32_t  prd :  1;  /* External Port Field (PR_DONE) */
-    const uint32_t  ncp :  1;  /* External Port Field (nCONFIG Pin) */
-    const uint32_t  nsp :  1;  /* External Port Field (nSTATUS Pin) */
-    const uint32_t  cdp :  1;  /* External Port Field (CONF_DONE Pin) */
-    const uint32_t  fpo :  1;  /* External Port Field (FPGA_POWER_ON) */
-    uint32_t            : 20;  /* *UNDEFINED* */
-};
-
-/* The typedef declaration for register ALT_MON_GPIO_EXT_PORTA. */
-typedef volatile struct ALT_MON_GPIO_EXT_PORTA_s  ALT_MON_GPIO_EXT_PORTA_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The byte offset of the ALT_MON_GPIO_EXT_PORTA register from the beginning of the component. */
-#define ALT_MON_GPIO_EXT_PORTA_OFST        0x50
-/* The address of the ALT_MON_GPIO_EXT_PORTA register. */
-#define ALT_MON_GPIO_EXT_PORTA_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_EXT_PORTA_OFST))
-
-/*
- * Register : Synchronization Level Register - gpio_ls_sync
- * 
- * The Synchronization level register is used to synchronize inputs to the
- * l4_mp_clk. All MON interrupts are already synchronized before the GPIO instance
- * so it is not necessary to setup this register to enable synchronization.
- * 
- * Register Layout
- * 
- *  Bits   | Access | Reset | Description                
- * :-------|:-------|:------|:----------------------------
- *  [0]    | RW     | 0x0   | Synchronization Level Field
- *  [31:1] | ???    | 0x0   | *UNDEFINED*                
- * 
- */
-/*
- * Field : Synchronization Level Field - gpio_ls_sync
- * 
- * The level-sensitive interrupts is synchronized to l4_mp_clk.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                       | Value | Description                    
- * :-------------------------------------------|:------|:--------------------------------
- *  ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_E_NOSYNC | 0x0   | No synchronization to l4_mp_clk
- *  ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_E_SYNC   | 0x1   | Synchronize to l4_mp_clk       
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC
- * 
- * No synchronization to l4_mp_clk
- */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_E_NOSYNC  0x0
-/*
- * Enumerated value for register field ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC
- * 
- * Synchronize to l4_mp_clk
- */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_E_SYNC    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC register field. */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC register field. */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_MSB        0
-/* The width in bits of the ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC register field. */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC register field value. */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_SET_MSK    0x00000001
-/* The mask used to clear the ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC register field value. */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_CLR_MSK    0xfffffffe
-/* The reset value of the ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC register field. */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_RESET      0x0
-/* Extracts the ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC field value from a register. */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_GET(value) (((value) & 0x00000001) >> 0)
-/* Produces a ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC register field value suitable for setting the register. */
-#define ALT_MON_GPIO_LS_SYNC_GPIO_LS_SYNC_SET(value) (((value) << 0) & 0x00000001)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for writing
- * hardware drivers is to use the SoCAL access macros and alt_read_word() and
- * alt_write_word() functions.
- * 
- * The struct declaration for register ALT_MON_GPIO_LS_SYNC.
- */
-struct ALT_MON_GPIO_LS_SYNC_s
-{
-    uint32_t  gpio_ls_sync :  1;  /* Synchronization Level Field */
-    uint32_t               : 31;  /* *UNDEFINED* */
-};
-
-/* The typedef declaration for register ALT_MON_GPIO_LS_SYNC. */
-typedef volatile struct ALT_MON_GPIO_LS_SYNC_s  ALT_MON_GPIO_LS_SYNC_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The byte offset of the ALT_MON_GPIO_LS_SYNC register from the beginning of the component. */
-#define ALT_MON_GPIO_LS_SYNC_OFST        0x60
-/* The address of the ALT_MON_GPIO_LS_SYNC register. */
-#define ALT_MON_GPIO_LS_SYNC_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_LS_SYNC_OFST))
-
-/*
- * Register : GPIO Version Register - gpio_ver_id_code
- * 
- * GPIO Component Version
- * 
- * Register Layout
- * 
- *  Bits   | Access | Reset      | Description                  
- * :-------|:-------|:-----------|:------------------------------
- *  [31:0] | R      | 0x3230382a | ASCII Component Version Field
- * 
- */
-/*
- * Field : ASCII Component Version Field - gpio_ver_id_code
- * 
- * ASCII value for each number in the version, followed by *. For example.
- * 32_30_31_2A represents the version 2.01
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE register field. */
-#define ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE register field. */
-#define ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE_MSB        31
-/* The width in bits of the ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE register field. */
-#define ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE_WIDTH      32
-/* The mask used to set the ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE register field value. */
-#define ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE_SET_MSK    0xffffffff
-/* The mask used to clear the ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE register field value. */
-#define ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE_CLR_MSK    0x00000000
-/* The reset value of the ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE register field. */
-#define ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE_RESET      0x3230382a
-/* Extracts the ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE field value from a register. */
-#define ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE_GET(value) (((value) & 0xffffffff) >> 0)
-/* Produces a ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_VER_ID_CODE_GPIO_VER_ID_CODE_SET(value) (((value) << 0) & 0xffffffff)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for writing
- * hardware drivers is to use the SoCAL access macros and alt_read_word() and
- * alt_write_word() functions.
- * 
- * The struct declaration for register ALT_MON_GPIO_VER_ID_CODE.
- */
-struct ALT_MON_GPIO_VER_ID_CODE_s
-{
-    const uint32_t  gpio_ver_id_code : 32;  /* ASCII Component Version Field */
-};
-
-/* The typedef declaration for register ALT_MON_GPIO_VER_ID_CODE. */
-typedef volatile struct ALT_MON_GPIO_VER_ID_CODE_s  ALT_MON_GPIO_VER_ID_CODE_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The byte offset of the ALT_MON_GPIO_VER_ID_CODE register from the beginning of the component. */
-#define ALT_MON_GPIO_VER_ID_CODE_OFST        0x6c
-/* The address of the ALT_MON_GPIO_VER_ID_CODE register. */
-#define ALT_MON_GPIO_VER_ID_CODE_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_VER_ID_CODE_OFST))
-
-/*
- * Register : Configuration Register 2 - gpio_config_reg2
- * 
- * Specifies the bit width of port A.
- * 
- * Register Layout
- * 
- *  Bits    | Access | Reset | Description          
- * :--------|:-------|:------|:----------------------
- *  [4:0]   | R      | 0xb   | Port A Width (less 1)
- *  [9:5]   | R      | 0x7   | Port B Width (less 1)
- *  [14:10] | R      | 0x7   | Port C Width (less 1)
- *  [19:15] | R      | 0x7   | Port D Width (less 1)
- *  [31:20] | ???    | 0x0   | *UNDEFINED*          
- * 
- */
-/*
- * Field : Port A Width (less 1) - encoded_id_pwidth_a
- * 
- * Specifies the width of GPIO Port A. The value 11 represents the 12-bit width
- * less one.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                                       | Value | Description              
- * :-----------------------------------------------------------|:------|:--------------------------
- *  ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_E_WIDTHLESSONE8BITS  | 0x7   | Width (less 1) of 8 bits 
- *  ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_E_WIDTHLESSONE12BITS | 0xb   | Width (less 1) of 12 bits
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A
- * 
- * Width (less 1) of 8 bits
- */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_E_WIDTHLESSONE8BITS   0x7
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A
- * 
- * Width (less 1) of 12 bits
- */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_E_WIDTHLESSONE12BITS  0xb
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_MSB        4
-/* The width in bits of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_WIDTH      5
-/* The mask used to set the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A register field value. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_SET_MSK    0x0000001f
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A register field value. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_CLR_MSK    0xffffffe0
-/* The reset value of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_RESET      0xb
-/* Extracts the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A field value from a register. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_GET(value) (((value) & 0x0000001f) >> 0)
-/* Produces a ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_A_SET(value) (((value) << 0) & 0x0000001f)
-
-/*
- * Field : Port B Width (less 1) - encoded_id_pwidth_b
- * 
- * Specifies the width of GPIO Port B. Ignored because there is no Port B in the
- * GPIO.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                                       | Value | Description              
- * :-----------------------------------------------------------|:------|:--------------------------
- *  ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_E_WIDTHLESSONE8BITS  | 0x7   | Width (less 1) of 8 bits 
- *  ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_E_WIDTHLESSONE12BITS | 0xb   | Width (less 1) of 12 bits
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B
- * 
- * Width (less 1) of 8 bits
- */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_E_WIDTHLESSONE8BITS   0x7
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B
- * 
- * Width (less 1) of 12 bits
- */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_E_WIDTHLESSONE12BITS  0xb
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_MSB        9
-/* The width in bits of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_WIDTH      5
-/* The mask used to set the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B register field value. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_SET_MSK    0x000003e0
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B register field value. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_CLR_MSK    0xfffffc1f
-/* The reset value of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_RESET      0x7
-/* Extracts the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B field value from a register. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_GET(value) (((value) & 0x000003e0) >> 5)
-/* Produces a ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_B_SET(value) (((value) << 5) & 0x000003e0)
-
-/*
- * Field : Port C Width (less 1) - encoded_id_pwidth_c
- * 
- * Specifies the width of GPIO Port C. Ignored because there is no Port C in the
- * GPIO.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                                       | Value | Description              
- * :-----------------------------------------------------------|:------|:--------------------------
- *  ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_E_WIDTHLESSONE8BITS  | 0x7   | Width (less 1) of 8 bits 
- *  ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_E_WIDTHLESSONE12BITS | 0xb   | Width (less 1) of 12 bits
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C
- * 
- * Width (less 1) of 8 bits
- */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_E_WIDTHLESSONE8BITS   0x7
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C
- * 
- * Width (less 1) of 12 bits
- */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_E_WIDTHLESSONE12BITS  0xb
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_MSB        14
-/* The width in bits of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_WIDTH      5
-/* The mask used to set the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C register field value. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_SET_MSK    0x00007c00
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C register field value. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_CLR_MSK    0xffff83ff
-/* The reset value of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_RESET      0x7
-/* Extracts the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C field value from a register. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_GET(value) (((value) & 0x00007c00) >> 10)
-/* Produces a ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_C_SET(value) (((value) << 10) & 0x00007c00)
-
-/*
- * Field : Port D Width (less 1) - encoded_id_pwidth_d
- * 
- * Specifies the width of GPIO Port D. Ignored because there is no Port D in the
- * GPIO.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                                       | Value | Description              
- * :-----------------------------------------------------------|:------|:--------------------------
- *  ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_E_WIDTHLESSONE8BITS  | 0x7   | Width (less 1) of 8 bits 
- *  ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_E_WIDTHLESSONE12BITS | 0xb   | Width (less 1) of 12 bits
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D
- * 
- * Width (less 1) of 8 bits
- */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_E_WIDTHLESSONE8BITS   0x7
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D
- * 
- * Width (less 1) of 12 bits
- */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_E_WIDTHLESSONE12BITS  0xb
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_LSB        15
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_MSB        19
-/* The width in bits of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_WIDTH      5
-/* The mask used to set the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D register field value. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_SET_MSK    0x000f8000
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D register field value. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_CLR_MSK    0xfff07fff
-/* The reset value of the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D register field. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_RESET      0x7
-/* Extracts the ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D field value from a register. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_GET(value) (((value) & 0x000f8000) >> 15)
-/* Produces a ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG2_ENC_ID_PWIDTH_D_SET(value) (((value) << 15) & 0x000f8000)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for writing
- * hardware drivers is to use the SoCAL access macros and alt_read_word() and
- * alt_write_word() functions.
- * 
- * The struct declaration for register ALT_MON_GPIO_CFG_REG2.
- */
-struct ALT_MON_GPIO_CFG_REG2_s
-{
-    const uint32_t  encoded_id_pwidth_a :  5;  /* Port A Width (less 1) */
-    const uint32_t  encoded_id_pwidth_b :  5;  /* Port B Width (less 1) */
-    const uint32_t  encoded_id_pwidth_c :  5;  /* Port C Width (less 1) */
-    const uint32_t  encoded_id_pwidth_d :  5;  /* Port D Width (less 1) */
-    uint32_t                            : 12;  /* *UNDEFINED* */
-};
-
-/* The typedef declaration for register ALT_MON_GPIO_CFG_REG2. */
-typedef volatile struct ALT_MON_GPIO_CFG_REG2_s  ALT_MON_GPIO_CFG_REG2_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The byte offset of the ALT_MON_GPIO_CFG_REG2 register from the beginning of the component. */
-#define ALT_MON_GPIO_CFG_REG2_OFST        0x70
-/* The address of the ALT_MON_GPIO_CFG_REG2 register. */
-#define ALT_MON_GPIO_CFG_REG2_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_CFG_REG2_OFST))
-
-/*
- * Register : Configuration Register 1 - gpio_config_reg1
- * 
- * Reports settings of various GPIO configuration parameters
- * 
- * Register Layout
- * 
- *  Bits    | Access | Reset | Description                      
- * :--------|:-------|:------|:----------------------------------
- *  [1:0]   | R      | 0x2   | APB DATA WIDTH                   
- *  [3:2]   | R      | 0x0   | NUM PORTS                        
- *  [4]     | R      | 0x1   | PORT A SINGLE CTL                
- *  [5]     | R      | 0x1   | PORT B SINGLE CTL                
- *  [6]     | R      | 0x1   | PORT C SINGLE CTL                
- *  [7]     | R      | 0x1   | PORT D SINGLE CTL                
- *  [8]     | R      | 0x0   | HW PORTA                         
- *  [11:9]  | ???    | 0x0   | *UNDEFINED*                      
- *  [12]    | R      | 0x1   | Port A Interrupt Field           
- *  [13]    | R      | 0x0   | Debounce Field                   
- *  [14]    | R      | 0x1   | Encoded GPIO Parameters Available
- *  [15]    | R      | 0x0   | ID Field                         
- *  [20:16] | R      | 0x1f  | Encoded ID Width Field           
- *  [31:21] | ???    | 0x0   | *UNDEFINED*                      
- * 
- */
-/*
- * Field : APB DATA WIDTH - apb_data_width
- * 
- * Fixed to support an APB data bus width of 32-bits.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                               | Value | Description             
- * :---------------------------------------------------|:------|:-------------------------
- *  ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_E_WIDTH32BITS | 0x2   | APB Data Width = 32-bits
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH
- * 
- * APB Data Width = 32-bits
- */
-#define ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_E_WIDTH32BITS  0x2
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH register field. */
-#define ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH register field. */
-#define ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_MSB        1
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH register field. */
-#define ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_WIDTH      2
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH register field value. */
-#define ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_SET_MSK    0x00000003
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH register field value. */
-#define ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_CLR_MSK    0xfffffffc
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH register field. */
-#define ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_RESET      0x2
-/* Extracts the ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_GET(value) (((value) & 0x00000003) >> 0)
-/* Produces a ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_APB_DATA_WIDTH_SET(value) (((value) << 0) & 0x00000003)
-
-/*
- * Field : NUM PORTS - num_ports
- * 
- * The value of this register is fixed at one port (Port A).
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                       | Value | Description             
- * :-------------------------------------------|:------|:-------------------------
- *  ALT_MON_GPIO_CFG_REG1_NUM_PORTS_E_ONEPORTA | 0x0   | Number of GPIO Ports = 1
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_NUM_PORTS
- * 
- * Number of GPIO Ports = 1
- */
-#define ALT_MON_GPIO_CFG_REG1_NUM_PORTS_E_ONEPORTA  0x0
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_NUM_PORTS register field. */
-#define ALT_MON_GPIO_CFG_REG1_NUM_PORTS_LSB        2
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_NUM_PORTS register field. */
-#define ALT_MON_GPIO_CFG_REG1_NUM_PORTS_MSB        3
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_NUM_PORTS register field. */
-#define ALT_MON_GPIO_CFG_REG1_NUM_PORTS_WIDTH      2
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_NUM_PORTS register field value. */
-#define ALT_MON_GPIO_CFG_REG1_NUM_PORTS_SET_MSK    0x0000000c
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_NUM_PORTS register field value. */
-#define ALT_MON_GPIO_CFG_REG1_NUM_PORTS_CLR_MSK    0xfffffff3
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_NUM_PORTS register field. */
-#define ALT_MON_GPIO_CFG_REG1_NUM_PORTS_RESET      0x0
-/* Extracts the ALT_MON_GPIO_CFG_REG1_NUM_PORTS field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_NUM_PORTS_GET(value) (((value) & 0x0000000c) >> 2)
-/* Produces a ALT_MON_GPIO_CFG_REG1_NUM_PORTS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_NUM_PORTS_SET(value) (((value) << 2) & 0x0000000c)
-
-/*
- * Field : PORT A SINGLE CTL - porta_single_ctl
- * 
- * Indicates the mode of operation of Port A to be software controlled only.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                                 | Value | Description                             
- * :-----------------------------------------------------|:------|:-----------------------------------------
- *  ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_E_SOFTCTLONLY | 0x1   | Software Enabled Individual Port Control
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL
- * 
- * Software Enabled Individual Port Control
- */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_E_SOFTCTLONLY    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_LSB        4
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_MSB        4
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_SET_MSK    0x00000010
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_CLR_MSK    0xffffffef
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_RESET      0x1
-/* Extracts the ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_GET(value) (((value) & 0x00000010) >> 4)
-/* Produces a ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_SINGLE_CTL_SET(value) (((value) << 4) & 0x00000010)
-
-/*
- * Field : PORT B SINGLE CTL - portb_single_ctl
- * 
- * Indicates the mode of operation of Port B to be software controlled only.
- * Ignored because there is no Port B in the GPIO.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                                 | Value | Description                             
- * :-----------------------------------------------------|:------|:-----------------------------------------
- *  ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_E_SOFTCTLONLY | 0x1   | Software Enabled Individual Port Control
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL
- * 
- * Software Enabled Individual Port Control
- */
-#define ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_E_SOFTCTLONLY    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_MSB        5
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_SET_MSK    0x00000020
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_CLR_MSK    0xffffffdf
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_RESET      0x1
-/* Extracts the ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_GET(value) (((value) & 0x00000020) >> 5)
-/* Produces a ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTB_SINGLE_CTL_SET(value) (((value) << 5) & 0x00000020)
-
-/*
- * Field : PORT C SINGLE CTL - portc_single_ctl
- * 
- * Indicates the mode of operation of Port C to be software controlled only.
- * Ignored because there is no Port C in the GPIO.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                                 | Value | Description                             
- * :-----------------------------------------------------|:------|:-----------------------------------------
- *  ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_E_SOFTCTLONLY | 0x1   | Software Enabled Individual Port Control
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL
- * 
- * Software Enabled Individual Port Control
- */
-#define ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_E_SOFTCTLONLY    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_LSB        6
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_MSB        6
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_SET_MSK    0x00000040
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_CLR_MSK    0xffffffbf
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_RESET      0x1
-/* Extracts the ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_GET(value) (((value) & 0x00000040) >> 6)
-/* Produces a ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTC_SINGLE_CTL_SET(value) (((value) << 6) & 0x00000040)
-
-/*
- * Field : PORT D SINGLE CTL - portd_single_ctl
- * 
- * Indicates the mode of operation of Port D to be software controlled only.
- * Ignored because there is no Port D in the GPIO.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                                 | Value | Description                             
- * :-----------------------------------------------------|:------|:-----------------------------------------
- *  ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_E_SOFTCTLONLY | 0x1   | Software Enabled Individual Port Control
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL
- * 
- * Software Enabled Individual Port Control
- */
-#define ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_E_SOFTCTLONLY    0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_LSB        7
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_MSB        7
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_SET_MSK    0x00000080
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_CLR_MSK    0xffffff7f
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_RESET      0x1
-/* Extracts the ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_GET(value) (((value) & 0x00000080) >> 7)
-/* Produces a ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTD_SINGLE_CTL_SET(value) (((value) << 7) & 0x00000080)
-
-/*
- * Field : HW PORTA - hw_porta
- * 
- * The value is fixed to enable Port A configuration to be controlled by software
- * only.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                         | Value | Description                           
- * :---------------------------------------------|:------|:---------------------------------------
- *  ALT_MON_GPIO_CFG_REG1_HW_PORTA_E_PORTANOHARD | 0x0   | Software Configuration Control Enabled
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_HW_PORTA
- * 
- * Software Configuration Control Enabled
- */
-#define ALT_MON_GPIO_CFG_REG1_HW_PORTA_E_PORTANOHARD    0x0
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_HW_PORTA register field. */
-#define ALT_MON_GPIO_CFG_REG1_HW_PORTA_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_HW_PORTA register field. */
-#define ALT_MON_GPIO_CFG_REG1_HW_PORTA_MSB        8
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_HW_PORTA register field. */
-#define ALT_MON_GPIO_CFG_REG1_HW_PORTA_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_HW_PORTA register field value. */
-#define ALT_MON_GPIO_CFG_REG1_HW_PORTA_SET_MSK    0x00000100
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_HW_PORTA register field value. */
-#define ALT_MON_GPIO_CFG_REG1_HW_PORTA_CLR_MSK    0xfffffeff
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_HW_PORTA register field. */
-#define ALT_MON_GPIO_CFG_REG1_HW_PORTA_RESET      0x0
-/* Extracts the ALT_MON_GPIO_CFG_REG1_HW_PORTA field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_HW_PORTA_GET(value) (((value) & 0x00000100) >> 8)
-/* Produces a ALT_MON_GPIO_CFG_REG1_HW_PORTA register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_HW_PORTA_SET(value) (((value) << 8) & 0x00000100)
-
-/*
- * Field : Port A Interrupt Field - porta_intr
- * 
- * The value of this field is fixed to allow interrupts on Port A.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                           | Value | Description              
- * :-----------------------------------------------|:------|:--------------------------
- *  ALT_MON_GPIO_CFG_REG1_PORTA_INTR_E_PORTAINTERR | 0x1   | Port A Interrupts Enabled
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_PORTA_INTR
- * 
- * Port A Interrupts Enabled
- */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_INTR_E_PORTAINTERR  0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_PORTA_INTR register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_INTR_LSB        12
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_PORTA_INTR register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_INTR_MSB        12
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_PORTA_INTR register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_INTR_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_PORTA_INTR register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_INTR_SET_MSK    0x00001000
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_PORTA_INTR register field value. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_INTR_CLR_MSK    0xffffefff
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_PORTA_INTR register field. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_INTR_RESET      0x1
-/* Extracts the ALT_MON_GPIO_CFG_REG1_PORTA_INTR field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_INTR_GET(value) (((value) & 0x00001000) >> 12)
-/* Produces a ALT_MON_GPIO_CFG_REG1_PORTA_INTR register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_PORTA_INTR_SET(value) (((value) << 12) & 0x00001000)
-
-/*
- * Field : Debounce Field - debounce
- * 
- * The value of this field is fixed to not allow debouncing of the Port A signals.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                            | Value | Description         
- * :------------------------------------------------|:------|:---------------------
- *  ALT_MON_GPIO_CFG_REG1_DEBOUNCE_E_DEBOUNCEA_DISD | 0x0   | Debounce is Disabled
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_DEBOUNCE
- * 
- * Debounce is Disabled
- */
-#define ALT_MON_GPIO_CFG_REG1_DEBOUNCE_E_DEBOUNCEA_DISD 0x0
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_DEBOUNCE register field. */
-#define ALT_MON_GPIO_CFG_REG1_DEBOUNCE_LSB        13
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_DEBOUNCE register field. */
-#define ALT_MON_GPIO_CFG_REG1_DEBOUNCE_MSB        13
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_DEBOUNCE register field. */
-#define ALT_MON_GPIO_CFG_REG1_DEBOUNCE_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_DEBOUNCE register field value. */
-#define ALT_MON_GPIO_CFG_REG1_DEBOUNCE_SET_MSK    0x00002000
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_DEBOUNCE register field value. */
-#define ALT_MON_GPIO_CFG_REG1_DEBOUNCE_CLR_MSK    0xffffdfff
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_DEBOUNCE register field. */
-#define ALT_MON_GPIO_CFG_REG1_DEBOUNCE_RESET      0x0
-/* Extracts the ALT_MON_GPIO_CFG_REG1_DEBOUNCE field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_DEBOUNCE_GET(value) (((value) & 0x00002000) >> 13)
-/* Produces a ALT_MON_GPIO_CFG_REG1_DEBOUNCE register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_DEBOUNCE_SET(value) (((value) << 13) & 0x00002000)
-
-/*
- * Field : Encoded GPIO Parameters Available - add_encoded_params
- * 
- * Fixed to allow the indentification of the Designware IP component.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                                | Value | Description              
- * :----------------------------------------------------|:------|:--------------------------
- *  ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_E_ADDENCPARAMS | 0x1   | Enable IP indentification
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS
- * 
- * Enable IP indentification
- */
-#define ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_E_ADDENCPARAMS 0x1
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS register field. */
-#define ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_LSB        14
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS register field. */
-#define ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_MSB        14
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS register field. */
-#define ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS register field value. */
-#define ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_SET_MSK    0x00004000
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS register field value. */
-#define ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_CLR_MSK    0xffffbfff
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS register field. */
-#define ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_RESET      0x1
-/* Extracts the ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_GET(value) (((value) & 0x00004000) >> 14)
-/* Produces a ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_ADD_ENC_PARAMS_SET(value) (((value) << 14) & 0x00004000)
-
-/*
- * Field : ID Field - gpio_id
- * 
- * Provides an ID code value
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                            | Value | Description                   
- * :------------------------------------------------|:------|:-------------------------------
- *  ALT_MON_GPIO_CFG_REG1_GPIO_ID_E_IDCODE_EXCLUDED | 0x0   | GPIO ID Code Register Excluded
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_GPIO_ID
- * 
- * GPIO ID Code Register Excluded
- */
-#define ALT_MON_GPIO_CFG_REG1_GPIO_ID_E_IDCODE_EXCLUDED 0x0
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_GPIO_ID register field. */
-#define ALT_MON_GPIO_CFG_REG1_GPIO_ID_LSB        15
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_GPIO_ID register field. */
-#define ALT_MON_GPIO_CFG_REG1_GPIO_ID_MSB        15
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_GPIO_ID register field. */
-#define ALT_MON_GPIO_CFG_REG1_GPIO_ID_WIDTH      1
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_GPIO_ID register field value. */
-#define ALT_MON_GPIO_CFG_REG1_GPIO_ID_SET_MSK    0x00008000
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_GPIO_ID register field value. */
-#define ALT_MON_GPIO_CFG_REG1_GPIO_ID_CLR_MSK    0xffff7fff
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_GPIO_ID register field. */
-#define ALT_MON_GPIO_CFG_REG1_GPIO_ID_RESET      0x0
-/* Extracts the ALT_MON_GPIO_CFG_REG1_GPIO_ID field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_GPIO_ID_GET(value) (((value) & 0x00008000) >> 15)
-/* Produces a ALT_MON_GPIO_CFG_REG1_GPIO_ID register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_GPIO_ID_SET(value) (((value) << 15) & 0x00008000)
-
-/*
- * Field : Encoded ID Width Field - encoded_id_width
- * 
- * This value is fixed at 32 bits.
- * 
- * Field Enumeration Values:
- * 
- *  Enum                                            | Value | Description      
- * :------------------------------------------------|:------|:------------------
- *  ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_E_ENCIDWIDTH | 0x1f  | Width of ID Field
- * 
- * Field Access Macros:
- * 
- */
-/*
- * Enumerated value for register field ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH
- * 
- * Width of ID Field
- */
-#define ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_E_ENCIDWIDTH 0x1f
-
-/* The Least Significant Bit (LSB) position of the ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH register field. */
-#define ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_LSB        16
-/* The Most Significant Bit (MSB) position of the ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH register field. */
-#define ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_MSB        20
-/* The width in bits of the ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH register field. */
-#define ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_WIDTH      5
-/* The mask used to set the ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH register field value. */
-#define ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_SET_MSK    0x001f0000
-/* The mask used to clear the ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH register field value. */
-#define ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_CLR_MSK    0xffe0ffff
-/* The reset value of the ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH register field. */
-#define ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_RESET      0x1f
-/* Extracts the ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH field value from a register. */
-#define ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_GET(value) (((value) & 0x001f0000) >> 16)
-/* Produces a ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH register field value suitable for setting the register. */
-#define ALT_MON_GPIO_CFG_REG1_ENC_ID_WIDTH_SET(value) (((value) << 16) & 0x001f0000)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for writing
- * hardware drivers is to use the SoCAL access macros and alt_read_word() and
- * alt_write_word() functions.
- * 
- * The struct declaration for register ALT_MON_GPIO_CFG_REG1.
- */
-struct ALT_MON_GPIO_CFG_REG1_s
-{
-    const uint32_t  apb_data_width     :  2;  /* APB DATA WIDTH */
-    const uint32_t  num_ports          :  2;  /* NUM PORTS */
-    const uint32_t  porta_single_ctl   :  1;  /* PORT A SINGLE CTL */
-    const uint32_t  portb_single_ctl   :  1;  /* PORT B SINGLE CTL */
-    const uint32_t  portc_single_ctl   :  1;  /* PORT C SINGLE CTL */
-    const uint32_t  portd_single_ctl   :  1;  /* PORT D SINGLE CTL */
-    const uint32_t  hw_porta           :  1;  /* HW PORTA */
-    uint32_t                           :  3;  /* *UNDEFINED* */
-    const uint32_t  porta_intr         :  1;  /* Port A Interrupt Field */
-    const uint32_t  debounce           :  1;  /* Debounce Field */
-    const uint32_t  add_encoded_params :  1;  /* Encoded GPIO Parameters Available */
-    const uint32_t  gpio_id            :  1;  /* ID Field */
-    const uint32_t  encoded_id_width   :  5;  /* Encoded ID Width Field */
-    uint32_t                           : 11;  /* *UNDEFINED* */
-};
-
-/* The typedef declaration for register ALT_MON_GPIO_CFG_REG1. */
-typedef volatile struct ALT_MON_GPIO_CFG_REG1_s  ALT_MON_GPIO_CFG_REG1_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The byte offset of the ALT_MON_GPIO_CFG_REG1 register from the beginning of the component. */
-#define ALT_MON_GPIO_CFG_REG1_OFST        0x74
-/* The address of the ALT_MON_GPIO_CFG_REG1 register. */
-#define ALT_MON_GPIO_CFG_REG1_ADDR(base)  ALT_CAST(void *, (ALT_CAST(char *, (base)) + ALT_MON_GPIO_CFG_REG1_OFST))
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for writing
- * hardware drivers is to use the SoCAL access macros and alt_read_word() and
- * alt_write_word() functions.
- * 
- * The struct declaration for register group ALT_MON.
- */
-struct ALT_MON_s
-{
-    volatile uint32_t             _pad_0x0_0x2f[12];   /* *UNDEFINED* */
-    ALT_MON_GPIO_INTEN_t          gpio_inten;          /* ALT_MON_GPIO_INTEN */
-    ALT_MON_GPIO_INTMSK_t         gpio_intmask;        /* ALT_MON_GPIO_INTMSK */
-    ALT_MON_GPIO_INTTYPE_LEVEL_t  gpio_inttype_level;  /* ALT_MON_GPIO_INTTYPE_LEVEL */
-    ALT_MON_GPIO_INT_POL_t        gpio_int_polarity;   /* ALT_MON_GPIO_INT_POL */
-    ALT_MON_GPIO_INTSTAT_t        gpio_intstatus;      /* ALT_MON_GPIO_INTSTAT */
-    ALT_MON_GPIO_RAW_INTSTAT_t    gpio_raw_intstatus;  /* ALT_MON_GPIO_RAW_INTSTAT */
-    volatile uint32_t             _pad_0x48_0x4b;      /* *UNDEFINED* */
-    ALT_MON_GPIO_PORTA_EOI_t      gpio_porta_eoi;      /* ALT_MON_GPIO_PORTA_EOI */
-    ALT_MON_GPIO_EXT_PORTA_t      gpio_ext_porta;      /* ALT_MON_GPIO_EXT_PORTA */
-    volatile uint32_t             _pad_0x54_0x5f[3];   /* *UNDEFINED* */
-    ALT_MON_GPIO_LS_SYNC_t        gpio_ls_sync;        /* ALT_MON_GPIO_LS_SYNC */
-    volatile uint32_t             _pad_0x64_0x6b[2];   /* *UNDEFINED* */
-    ALT_MON_GPIO_VER_ID_CODE_t    gpio_ver_id_code;    /* ALT_MON_GPIO_VER_ID_CODE */
-    ALT_MON_GPIO_CFG_REG2_t       gpio_config_reg2;    /* ALT_MON_GPIO_CFG_REG2 */
-    ALT_MON_GPIO_CFG_REG1_t       gpio_config_reg1;    /* ALT_MON_GPIO_CFG_REG1 */
-    volatile uint32_t             _pad_0x78_0x80[2];   /* *UNDEFINED* */
-};
-
-/* The typedef declaration for register group ALT_MON. */
-typedef volatile struct ALT_MON_s  ALT_MON_t;
-/* The struct declaration for the raw register contents of register group ALT_MON. */
-struct ALT_MON_raw_s
-{
-    uint32_t           _pad_0x0_0x2f[12];   /* *UNDEFINED* */
-    volatile uint32_t  gpio_inten;          /* ALT_MON_GPIO_INTEN */
-    volatile uint32_t  gpio_intmask;        /* ALT_MON_GPIO_INTMSK */
-    volatile uint32_t  gpio_inttype_level;  /* ALT_MON_GPIO_INTTYPE_LEVEL */
-    volatile uint32_t  gpio_int_polarity;   /* ALT_MON_GPIO_INT_POL */
-    volatile uint32_t  gpio_intstatus;      /* ALT_MON_GPIO_INTSTAT */
-    volatile uint32_t  gpio_raw_intstatus;  /* ALT_MON_GPIO_RAW_INTSTAT */
-    uint32_t           _pad_0x48_0x4b;      /* *UNDEFINED* */
-    volatile uint32_t  gpio_porta_eoi;      /* ALT_MON_GPIO_PORTA_EOI */
-    volatile uint32_t  gpio_ext_porta;      /* ALT_MON_GPIO_EXT_PORTA */
-    uint32_t           _pad_0x54_0x5f[3];   /* *UNDEFINED* */
-    volatile uint32_t  gpio_ls_sync;        /* ALT_MON_GPIO_LS_SYNC */
-    uint32_t           _pad_0x64_0x6b[2];   /* *UNDEFINED* */
-    volatile uint32_t  gpio_ver_id_code;    /* ALT_MON_GPIO_VER_ID_CODE */
-    volatile uint32_t  gpio_config_reg2;    /* ALT_MON_GPIO_CFG_REG2 */
-    volatile uint32_t  gpio_config_reg1;    /* ALT_MON_GPIO_CFG_REG1 */
-    uint32_t           _pad_0x78_0x80[2];   /* *UNDEFINED* */
-};
-
-/* The typedef declaration for the raw register contents of register group ALT_MON. */
-typedef volatile struct ALT_MON_raw_s  ALT_MON_raw_t;
-#endif  /* __ASSEMBLY__ */
-
+/* The reset value of the ALT_FPGAMGR_IMGCFG_FIFO_STAT register. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_RESET       0x00000200
+/* The byte offset of the ALT_FPGAMGR_IMGCFG_FIFO_STAT register from the beginning of the component. */
+#define ALT_FPGAMGR_IMGCFG_FIFO_STAT_OFST        0x94
 
 #ifndef __ASSEMBLY__
 /*
@@ -7052,16 +5151,39 @@ typedef volatile struct ALT_MON_raw_s  ALT_MON_raw_t;
  */
 struct ALT_FPGAMGR_s
 {
-    ALT_FPGAMGR_STAT_t      stat;                    /* ALT_FPGAMGR_STAT */
-    ALT_FPGAMGR_CTL_t       ctrl;                    /* ALT_FPGAMGR_CTL */
-    ALT_FPGAMGR_DCLKCNT_t   dclkcnt;                 /* ALT_FPGAMGR_DCLKCNT */
-    ALT_FPGAMGR_DCLKSTAT_t  dclkstat;                /* ALT_FPGAMGR_DCLKSTAT */
-    ALT_FPGAMGR_GPO_t       gpo;                     /* ALT_FPGAMGR_GPO */
-    ALT_FPGAMGR_GPI_t       gpi;                     /* ALT_FPGAMGR_GPI */
-    ALT_FPGAMGR_MISCI_t     misci;                   /* ALT_FPGAMGR_MISCI */
-    volatile uint32_t       _pad_0x1c_0x7ff[505];    /* *UNDEFINED* */
-    ALT_MON_t               mon;                     /* ALT_MON */
-    volatile uint32_t       _pad_0x880_0x1000[480];  /* *UNDEFINED* */
+    volatile uint32_t               _pad_0x0_0x7[2];        /* *UNDEFINED* */
+    ALT_FPGAMGR_DCLKCNT_t           dclkcnt;                /* ALT_FPGAMGR_DCLKCNT */
+    ALT_FPGAMGR_DCLKSTAT_t          dclkstat;               /* ALT_FPGAMGR_DCLKSTAT */
+    ALT_FPGAMGR_GPO_t               gpo;                    /* ALT_FPGAMGR_GPO */
+    ALT_FPGAMGR_GPI_t               gpi;                    /* ALT_FPGAMGR_GPI */
+    ALT_FPGAMGR_MISCI_t             misci;                  /* ALT_FPGAMGR_MISCI */
+    volatile uint32_t               _pad_0x1c_0x2f[5];      /* *UNDEFINED* */
+    ALT_FPGAMGR_EMR_DATA0_t         emr_data0;              /* ALT_FPGAMGR_EMR_DATA0 */
+    ALT_FPGAMGR_EMR_DATA1_t         emr_data1;              /* ALT_FPGAMGR_EMR_DATA1 */
+    ALT_FPGAMGR_EMR_DATA2_t         emr_data2;              /* ALT_FPGAMGR_EMR_DATA2 */
+    ALT_FPGAMGR_EMR_DATA3_t         emr_data3;              /* ALT_FPGAMGR_EMR_DATA3 */
+    ALT_FPGAMGR_EMR_DATA4_t         emr_data4;              /* ALT_FPGAMGR_EMR_DATA4 */
+    ALT_FPGAMGR_EMR_DATA5_t         emr_data5;              /* ALT_FPGAMGR_EMR_DATA5 */
+    ALT_FPGAMGR_EMR_VALID_t         emr_valid;              /* ALT_FPGAMGR_EMR_VALID */
+    ALT_FPGAMGR_EMR_EN_t            emr_en;                 /* ALT_FPGAMGR_EMR_EN */
+    ALT_FPGAMGR_JTAG_CFG_t          jtag_config;            /* ALT_FPGAMGR_JTAG_CFG */
+    ALT_FPGAMGR_JTAG_STAT_t         jtag_status;            /* ALT_FPGAMGR_JTAG_STAT */
+    ALT_FPGAMGR_JTAG_KICK_t         jtag_kick;              /* ALT_FPGAMGR_JTAG_KICK */
+    volatile uint32_t               _pad_0x5c_0x5f;         /* *UNDEFINED* */
+    ALT_FPGAMGR_JTAG_DATA_W_t       jtag_data_w;            /* ALT_FPGAMGR_JTAG_DATA_W */
+    ALT_FPGAMGR_JTAG_DATA_R_t       jtag_data_r;            /* ALT_FPGAMGR_JTAG_DATA_R */
+    volatile uint32_t               _pad_0x68_0x6f[2];      /* *UNDEFINED* */
+    ALT_FPGAMGR_IMGCFG_CTL_00_t     imgcfg_ctrl_00;         /* ALT_FPGAMGR_IMGCFG_CTL_00 */
+    ALT_FPGAMGR_IMGCFG_CTL_01_t     imgcfg_ctrl_01;         /* ALT_FPGAMGR_IMGCFG_CTL_01 */
+    ALT_FPGAMGR_IMGCFG_CTL_02_t     imgcfg_ctrl_02;         /* ALT_FPGAMGR_IMGCFG_CTL_02 */
+    volatile uint32_t               _pad_0x7c_0x7f;         /* *UNDEFINED* */
+    ALT_FPGAMGR_IMGCFG_STAT_t       imgcfg_stat;            /* ALT_FPGAMGR_IMGCFG_STAT */
+    ALT_FPGAMGR_INTR_MSKED_STAT_t   intr_masked_status;     /* ALT_FPGAMGR_INTR_MSKED_STAT */
+    ALT_FPGAMGR_INTR_MSK_t          intr_mask;              /* ALT_FPGAMGR_INTR_MSK */
+    ALT_FPGAMGR_INTR_POL_t          intr_polarity;          /* ALT_FPGAMGR_INTR_POL */
+    ALT_FPGAMGR_DMA_CFG_t           dma_config;             /* ALT_FPGAMGR_DMA_CFG */
+    ALT_FPGAMGR_IMGCFG_FIFO_STAT_t  imgcfg_fifo_status;     /* ALT_FPGAMGR_IMGCFG_FIFO_STAT */
+    volatile uint32_t               _pad_0x98_0x1000[986];  /* *UNDEFINED* */
 };
 
 /* The typedef declaration for register group ALT_FPGAMGR. */
@@ -7069,16 +5191,39 @@ typedef volatile struct ALT_FPGAMGR_s  ALT_FPGAMGR_t;
 /* The struct declaration for the raw register contents of register group ALT_FPGAMGR. */
 struct ALT_FPGAMGR_raw_s
 {
-    volatile uint32_t  stat;                    /* ALT_FPGAMGR_STAT */
-    volatile uint32_t  ctrl;                    /* ALT_FPGAMGR_CTL */
-    volatile uint32_t  dclkcnt;                 /* ALT_FPGAMGR_DCLKCNT */
-    volatile uint32_t  dclkstat;                /* ALT_FPGAMGR_DCLKSTAT */
-    volatile uint32_t  gpo;                     /* ALT_FPGAMGR_GPO */
-    volatile uint32_t  gpi;                     /* ALT_FPGAMGR_GPI */
-    volatile uint32_t  misci;                   /* ALT_FPGAMGR_MISCI */
-    uint32_t           _pad_0x1c_0x7ff[505];    /* *UNDEFINED* */
-    ALT_MON_raw_t      mon;                     /* ALT_MON */
-    uint32_t           _pad_0x880_0x1000[480];  /* *UNDEFINED* */
+    uint32_t           _pad_0x0_0x7[2];        /* *UNDEFINED* */
+    volatile uint32_t  dclkcnt;                /* ALT_FPGAMGR_DCLKCNT */
+    volatile uint32_t  dclkstat;               /* ALT_FPGAMGR_DCLKSTAT */
+    volatile uint32_t  gpo;                    /* ALT_FPGAMGR_GPO */
+    volatile uint32_t  gpi;                    /* ALT_FPGAMGR_GPI */
+    volatile uint32_t  misci;                  /* ALT_FPGAMGR_MISCI */
+    uint32_t           _pad_0x1c_0x2f[5];      /* *UNDEFINED* */
+    volatile uint32_t  emr_data0;              /* ALT_FPGAMGR_EMR_DATA0 */
+    volatile uint32_t  emr_data1;              /* ALT_FPGAMGR_EMR_DATA1 */
+    volatile uint32_t  emr_data2;              /* ALT_FPGAMGR_EMR_DATA2 */
+    volatile uint32_t  emr_data3;              /* ALT_FPGAMGR_EMR_DATA3 */
+    volatile uint32_t  emr_data4;              /* ALT_FPGAMGR_EMR_DATA4 */
+    volatile uint32_t  emr_data5;              /* ALT_FPGAMGR_EMR_DATA5 */
+    volatile uint32_t  emr_valid;              /* ALT_FPGAMGR_EMR_VALID */
+    volatile uint32_t  emr_en;                 /* ALT_FPGAMGR_EMR_EN */
+    volatile uint32_t  jtag_config;            /* ALT_FPGAMGR_JTAG_CFG */
+    volatile uint32_t  jtag_status;            /* ALT_FPGAMGR_JTAG_STAT */
+    volatile uint32_t  jtag_kick;              /* ALT_FPGAMGR_JTAG_KICK */
+    uint32_t           _pad_0x5c_0x5f;         /* *UNDEFINED* */
+    volatile uint32_t  jtag_data_w;            /* ALT_FPGAMGR_JTAG_DATA_W */
+    volatile uint32_t  jtag_data_r;            /* ALT_FPGAMGR_JTAG_DATA_R */
+    uint32_t           _pad_0x68_0x6f[2];      /* *UNDEFINED* */
+    volatile uint32_t  imgcfg_ctrl_00;         /* ALT_FPGAMGR_IMGCFG_CTL_00 */
+    volatile uint32_t  imgcfg_ctrl_01;         /* ALT_FPGAMGR_IMGCFG_CTL_01 */
+    volatile uint32_t  imgcfg_ctrl_02;         /* ALT_FPGAMGR_IMGCFG_CTL_02 */
+    uint32_t           _pad_0x7c_0x7f;         /* *UNDEFINED* */
+    volatile uint32_t  imgcfg_stat;            /* ALT_FPGAMGR_IMGCFG_STAT */
+    volatile uint32_t  intr_masked_status;     /* ALT_FPGAMGR_INTR_MSKED_STAT */
+    volatile uint32_t  intr_mask;              /* ALT_FPGAMGR_INTR_MSK */
+    volatile uint32_t  intr_polarity;          /* ALT_FPGAMGR_INTR_POL */
+    volatile uint32_t  dma_config;             /* ALT_FPGAMGR_DMA_CFG */
+    volatile uint32_t  imgcfg_fifo_status;     /* ALT_FPGAMGR_IMGCFG_FIFO_STAT */
+    uint32_t           _pad_0x98_0x1000[986];  /* *UNDEFINED* */
 };
 
 /* The typedef declaration for the raw register contents of register group ALT_FPGAMGR. */
@@ -7089,5 +5234,5 @@ typedef volatile struct ALT_FPGAMGR_raw_s  ALT_FPGAMGR_raw_t;
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */
-#endif  /* __ALTERA_ALT_FPGAMGR_H__ */
+#endif  /* __ALT_SOCAL_FPGAMGR_H__ */
 
