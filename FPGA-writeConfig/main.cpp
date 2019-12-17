@@ -14,7 +14,6 @@
 #include <fstream>
 #include <iostream>
 using namespace std;
-s
 
 #pragma region File Accsess 
 bool is_file_exist(const char* fileName)
