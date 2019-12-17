@@ -4,7 +4,7 @@
  * @author  Robin Sebastian (https://github.com/robseb)
  * @mainpage
  * rstools application to read the general purpose input line 
- * from the FPGA 
+ * from the FPGA for Intel Arria 10 SX
  */
 
 #include <cstdio>
@@ -17,7 +17,7 @@
 using namespace std;
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
-
+ 
 
 int main(int argc, const char* argv[])
 {
@@ -27,14 +27,15 @@ int main(int argc, const char* argv[])
 	/////////	 init the FPGA Manager	 /////////
 	alt_fpga_init();
 
-	// Take the right to controll the FPGA
-	alt_fpga_control_enable();
+	// Check if the FPGA is in the USER Mode ///
+	
+	bool isFPGAuserMode = alt_fpga_status_get() & (ALT_FPGA_STATUS_F2S_USERMODE);
 
 	/////////  read the GPI register /////////
 	uint32_t gpi = 0;
-
-	if (alt_fpga_state_get() == ALT_FPGA_STATE_USER_MODE)
+	if(isFPGAuserMode)
 		gpi = alt_fpga_gpi_read(0xFFFFFFFF);
+
 
 	if ((argc > 1) && (std::string(argv[1]) == "-h"))
 	{
@@ -55,7 +56,7 @@ int main(int argc, const char* argv[])
 		// Print the MSEL Value as detailed string 
 		cout << "-- Reading of the general purpose FPGA Input Registers (gpi) --" << endl;
 
-		if (alt_fpga_state_get() != ALT_FPGA_STATE_USER_MODE)
+		if (!isFPGAuserMode)
 			cout << "	ERROR: failed to read! FPGA is not in the USER State!" << endl;
 		else
 		{
@@ -70,8 +71,7 @@ int main(int argc, const char* argv[])
 		}
 	}
 
-	// Give the right to controll the FPGA
-	alt_fpga_control_disable();
+	__VIRTUALMEM_SPACE_DEINIT();
 
 	return 0;
 }

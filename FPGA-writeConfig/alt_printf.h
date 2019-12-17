@@ -63,7 +63,6 @@ int alt_sprintf(char *to, const char *format, ...);
 int alt_fprintf(FILE *stream, const char *format, ...);
 int alt_vfprintf(FILE *stream, const char *format, va_list args);
 
-
 #if defined (PRINTF_HOST) 
   #define ALT_PRINTF printf
   #define alt_printf printf
