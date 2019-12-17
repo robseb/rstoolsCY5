@@ -4,7 +4,7 @@
  * @author  Robin Sebastian (https://github.com/robseb)
  * @mainpage
  * rstools application to read the Status of the FPGA Fabric
- * with FPGA Manager for Intel Arria 10 SX
+ * with FPGA Manager
  */
 
 #include <cstdio>
@@ -15,95 +15,66 @@
 #include <iostream>
 using namespace std;
 
-string std2str(ALT_FPGA_STATUS_e std)
+#pragma region convert to string 
+
+string std2str(ALT_FPGA_STATE_t std)
 {
-	string tmp = "";
-	if (std & ALT_FPGA_STATUS_F2S_CRC_ERROR)
-		tmp+= "			FPGA POWER CRC  ERROR STATE\n"\
-			  " 		CRC Error detected while in User mode \n";
+	switch (std)
+	{
+	case ALT_FPGA_STATE_POWER_UP:
+		return "FPGA POWER UP STATE\n"\
+			"	FPGA is in Power Up Phase. This is the state of the FPGA just after\n"\
+			"	powering up";
 
-	if (std & ALT_FPGA_STATUS_F2S_EARLY_USERMODE)
-		tmp += "	FPGA EARLY USERMODE\n"\
-			"		Early usermode signal from CSS. This can be used by software to\n"\
-			"		determine status when HPS is configured the shared IOs via sending the\n"\
-			"		POF to the CSS.\n";
+	case ALT_FPGA_STATE_RESET:
+		return "FPGA RESET STATE\n"\
+			"	FPGA is in Reset Phase. In this phase, the FPGA resets, clears the FPGA\n"\
+			"	configuration RAM bits, tri-states all FPGA user I/O pins, pulls the\n"\
+			"	nSTATUS and CONF_DONE pins low, and determines the configuration mode\n"\
+			"	by reading the value of the MSEL pins.";
 
-	if (std & ALT_FPGA_STATUS_F2S_USERMODE)
-		tmp += "	FPGA USER MODE STATE\n"\
-			"		Usermode status. Asserted only when the FPGA has finally entered usermode.";
+	case ALT_FPGA_STATE_CFG:
+		return "FPGA CONFIGURATION STATE\n"\
+			"	FPGA is in Configuration Phase. This state represents the phase when the\n"\
+			"	configuration bitstream is loaded into the FPGA fabric. The\n"\
+			"	configuration phase is complete after the FPGA has received all the\n"\
+			"	configuration data.";
 
-	if (std & ALT_FPGA_STATUS_F2S_INITDONE_OE)
-		tmp += "	FPGA INITIALIZATION DONE STATE\n"\
-			"		Driven enable of \b initdone signal.\n";
+	case ALT_FPGA_STATE_INIT:
+		return "FPGA INITIALIZATION STATE\n"\
+			"	FPGA is in Initialization Phase. In this state the FPGA prepares to enter\n"\
+			"	User Mode. In Configuration via PCI Express (CVP), this state indicates\n"\
+			"	I/O configuration has completed";
 
-	if(std &  ALT_FPGA_STATUS_F2S_NSTATUS_PIN)
-		tmp += "	FPGA NETSTATUS PIN\n"\
-			"		Sampled pin value of \b nstatus signal. This can be overridden by an \n" \
-			"		external device.\n";
+	case ALT_FPGA_STATE_USER_MODE:
+		return "FPGA USER MODE STATE\n"\
+			"	FPGA is in the User Mode State. In this state, the FPGA performs the\n"\
+			"	function loaded during the configuration phase. The FPGA user \n"\
+			"	I/O are functional as determined at design time.";
 
-	if (std & ALT_FPGA_STATUS_F2S_NSTATUS_OE)
-		tmp += "	FPGA NETSTATUS SIGNAL\n"\
-			"		Driven enable of \b nstatus signal.\n"; 
+	case ALT_FPGA_STATE_UNKNOWN:
+		return "ERROR: FPGA State unknown";
 
-	if (std & ALT_FPGA_STATUS_F2S_CONDONE_PIN)
-		tmp += "	FPGA CONDONE PIN\n"\
-			"		Sampled pin value of \b condone signal. This can be overridden by an \n" \
-			"		external devices.\n";
-
-	if (std & ALT_FPGA_STATUS_F2S_CONDONE_OE)
-		tmp += "FPGA CONDONE SIGNAL\n"\
-			"	Driven enable of \b condone signal from CSS. \n";
-
-	if (std & ALT_FPGA_STATUS_F2S_CVP_CONF_DONE)
-		tmp += "	FPGA PCIe CONFIG DONE\n"\
-			"		Configuration via PCIe (CVP) done indicator. \n";
-
-	if(std & ALT_FPGA_STATUS_F2S_PR_READY)
-		tmp += "	FPGA PARTIAL RECONF READY\n"\
-			"		Partial Reconfiguration (PR) ready. \n";
-
-	if (std & ALT_FPGA_STATUS_F2S_PR_DONE) 
-		tmp += "	FPGA PARTIAL RECONF DONE\n"\
-			"		Partial Reconfiguration (PR) done. \n";
-
-	if (std & ALT_FPGA_STATUS_F2S_PR_ERROR)
-		tmp += "	FPGA PARTIAL RECONF ERROR\n"\
-			"		Partial Reconfiguration (PR) error. \n";
-	
-	if (std & ALT_FPGA_STATUS_F2S_NCONFIG_PIN)
-		tmp += "	FPGA NCONFIG SIGNAL\n"\
-			"		Sampled pin value of \b nconfig signal.\n";
-	
-	if (std & ALT_FPGA_STATUS_F2S_NCEO_OE)
-		tmp += "	FPGA CSS BLOCK\n"\
-			"		Chip select output driven from CSS block.\n";
-
-	if (std & ALT_FPGA_STATUS_IMGCFG_FIFOEMPTY)
-		tmp += "	FPGA FIFO EMPTY\n"\
-			"		FIFO Empty status of the FPGA image configuration FIFO..\n";
-
-	if (std & ALT_FPGA_STATUS_IMGCFG_FIFOFULL)
-		tmp += "	FPGA FIFO FULL\n"\
-			"		FIFO Empty full of the FPGA image configuration FIFO..\n";
-
-	if (std & ALT_FPGA_STATUS_JTAGM)
-		tmp += "	JTAG STATUS\n" \
-			"		JTAG Master Session Status..\n";
-
-	if (std & ALT_FPGA_STATUS_EMR)
-		tmp += "	EMR STATUS\n" \
-		    "		EMR valid bit.\n";
-
-	return tmp;
+	default:
+		return "ERROR: FPGA State unknown";
+	}
 }
+#pragma endregion
 
 int main(int argc, const char* argv[])
 {
+
 	///////// init the Virtual Memory for I/O access /////////
 	__VIRTUALMEM_SPACE_INIT();
 
+	/////////	 init the FPGA Manager	 /////////
+	alt_fpga_init();
+
+	///////// Take the right to controll the FPGA /////////
+	alt_fpga_control_enable();
+
 	///////// read the status of the FPGA		/////////
-	ALT_FPGA_STATUS_e stat =(ALT_FPGA_STATUS_e) alt_fpga_status_get();
+	ALT_FPGA_STATE_t stat = alt_fpga_state_get();
 
 	if ((argc > 1) && (std::string(argv[1]) == "-h"))
 	{
@@ -111,7 +82,12 @@ int main(int argc, const char* argv[])
 		cout << "	FPGA-status" << endl;
 		cout << "		read the status with detailed output" << endl;
 		cout << "	FPGA-status -d" << endl;
-		cout << "    Output as 32-Bit Register value" << endl;
+		cout << "		POWER UP:	 0" << endl;
+		cout << "		RESET:		 1" << endl;
+		cout << "		CONFIG:		 2" << endl;
+		cout << "		INIT:		 3" << endl;
+		cout << "		USER:		 4" << endl;
+		cout << "		UNKNOWN:	 5" << endl;
 	}
 	else if ((argc > 1) && (std::string(argv[1]) == "-d"))
 		// Print only the Status Code 
@@ -123,6 +99,7 @@ int main(int argc, const char* argv[])
 		cout << "   Status of the FPGA: "  << std2str(stat) << endl;
 	}
 
-	__VIRTUALMEM_SPACE_DEINIT();
-	return 0;
+
+	// Give the right to controll the FPGA
+	alt_fpga_control_disable();
 }

@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alt_fpgamgr.h" />
-    <ClInclude Include="alt_fpgamgrdata.h" />
     <ClInclude Include="alt_fpga_manager.h" />
     <ClInclude Include="alt_printf.h" />
     <ClInclude Include="hps.h" />

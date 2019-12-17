@@ -1,93 +1,95 @@
 /******************************************************************************
- *
- * Copyright 2015 Altera Corporation. All Rights Reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- * may be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- ******************************************************************************/
+*
+* Copyright 2013 Altera Corporation. All Rights Reserved.
+* 
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+* 
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 
+* 2. Redistributions in binary form must reproduce the above copyright notice,
+* this list of conditions and the following disclaimer in the documentation
+* and/or other materials provided with the distribution.
+* 
+* 3. Neither the name of the copyright holder nor the names of its contributors
+* may be used to endorse or promote products derived from this software without
+* specific prior written permission.
+* 
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+* 
+******************************************************************************/
 
 /*
- * $Id: //acds/rel/19.1std/embedded/ip/hps/altera_hps/hwlib/src/hwmgr/soc_a10/alt_fpga_manager.c#1 $
+ * $Id: //acds/rel/18.1std/embedded/ip/hps/altera_hps/hwlib/src/hwmgr/soc_cv_av/alt_fpga_manager.c#1 $
  */
 
-#include <stdio.h>
-#include <inttypes.h>
 #include "alt_fpga_manager.h"
-#include "alt_printf.h"
-#include "alt_fpgamgr.h"
-#include "alt_fpgamgrdata.h"
-#include "hps.h"
 #include "socal.h"
+#include "hps.h"
+#include "alt_fpgamgr.h"
+#include <string.h>
+#include <stdbool.h>
+#include "hwlib.h"
+#include "alt_printf.h"
 
-#if DEBUG_ALT_FPGA_MANAGER
+//#define DEBUG_ALT_FPGA_MANAGER
+
+
+#ifdef DEBUG_ALT_FPGA_MANAGER
   #define dprintf printf
 #else
-  #define dprintf null_printf
+  #define dprintf  null_printf
 #endif
 
-/*
- * This is used in the FPGA reconfiguration streaming interface. Because FPGA
+/* This is the timeout used when waiting for a state change in the FPGA monitor. */
+#define _ALT_FPGA_TMO_STATE     2048
+
+/* This is the timeout used when waiting for the DCLK countdown to complete.
+ * The time to wait a constant + DCLK * multiplier. */
+#define _ALT_FPGA_TMO_DCLK_CONST 2048
+#define _ALT_FPGA_TMO_DCLK_MUL   2
+
+#define _ALT_FPGA_TMO_CONFIG     8192
+
+/* This define is used to control whether to use the Configuration with DCLK steps */
+#ifndef _ALT_FPGA_USE_DCLK
+#define _ALT_FPGA_USE_DCLK 0
+#endif
+
+/* This is used in the FPGA reconfiguration streaming interface. Because FPGA
  * images are commonly stored on disk, the chunk size is that of the disk size.
  * We cannot choose too large a chunk size because the stack size is fairly
- * small.
- */
-#define DISK_SECTOR_SIZE    8192
+ * small. */
+#define DISK_SECTOR_SIZE    512
 #define ISTREAM_CHUNK_SIZE  DISK_SECTOR_SIZE
 
 /*
- * Structure that holds the internal global state.
- */
-static struct
-{
-    /* HPS CPU is in control of FPGA block. */
-    bool cpu_in_control;
-
-    /* Reset assert active. */
-    bool reset_asserted;
-
-} g_fpgaState;
-
-/*
  * FPGA Data Type identifier enum
- */
+*/
 typedef enum FPGA_DATA_TYPE_e
 {
-    FPGA_DATA_FULL   = 1,
-    FPGA_DATA_LIST   = 2,
-    FPGA_DATA_STREAM = 3
+    FPGA_DATA_FULL    = 1,
+    FPGA_DATA_ISTREAM = 2
 } FPGA_DATA_TYPE_t;
 
 /*
- * FPGA Data, for Full Buffer, Buffer List, or IStream configuration
- */
+ * FPGA Data, for Full Stream or IStream configuration
+*/
 typedef struct FPGA_DATA_s
 {
     FPGA_DATA_TYPE_t type;
-
+    
     union
     {
         /* For FPGA_DATA_FULL */
@@ -96,22 +98,13 @@ typedef struct FPGA_DATA_s
             const void * buffer;
             size_t       length;
         } full;
-
-        /* For FPGA_DATA_LIST */
+        
+        /* FPGA_DATA_ISTREAM */
         struct
         {
-            const void **  buffer;
-            const size_t * length;
-            size_t         count;
-        } list;
-
-        /* For FPGA_DATA_STREAM */
-        struct
-        {
-            alt_fpga_istream_t callback;
-            void *             context;
-        } stream;
-
+            alt_fpga_istream_t stream;
+            void *             data;
+        } istream;
     } mode;
 
 #if ALT_FPGA_ENABLE_DMA_SUPPORT
@@ -121,385 +114,116 @@ typedef struct FPGA_DATA_s
 
 } FPGA_DATA_t;
 
-/*****/
-
-/*
- * Helper function that polls for a certain FPGA state to become active.
- */
-static ALT_STATUS_CODE wait_for_fpga_status(ALT_FPGA_STATUS_t state, bool to_be_set, size_t tmo)
+#if ALT_FPGA_ENABLE_DMA_SUPPORT
+static ALT_STATUS_CODE alt_dma_channel_wait_for_state(ALT_DMA_CHANNEL_t channel,
+                                                      ALT_DMA_CHANNEL_STATE_t state,
+                                                      uint32_t count)
 {
-    if (to_be_set)
+    ALT_STATUS_CODE status = ALT_E_SUCCESS;
+
+    ALT_DMA_CHANNEL_STATE_t current;
+
+    uint32_t i = count;
+    while (--i)
     {
-        while ((alt_read_word(ALT_FPGAMGR_IMGCFG_STAT_ADDR) & state) == 0)
+        status = alt_dma_channel_state_get(channel, &current);
+        if (status != ALT_E_SUCCESS)
         {
-            --tmo;
-            if (tmo == 0)
-            {
-                return ALT_E_TMO;
-            }
-        }
-    }
-    else
-    {
-        while ((alt_read_word(ALT_FPGAMGR_IMGCFG_STAT_ADDR) & state) != 0)
-        {
-            --tmo;
-            if (tmo == 0)
-            {
-                return ALT_E_TMO;
-            }
-        }
-    }
-            
-    return ALT_E_SUCCESS;
-}
-
-/*****/
-
-ALT_STATUS_CODE alt_fpga_init(void)
-{
-    g_fpgaState.cpu_in_control = false;
-    g_fpgaState.reset_asserted = false;
-
-    return ALT_E_SUCCESS;
-}
-
-ALT_STATUS_CODE alt_fpga_uninit(void)
-{
-    if (g_fpgaState.cpu_in_control)
-    {
-        alt_fpga_control_disable();
-    }
-
-    return ALT_E_SUCCESS;
-}
-
-ALT_STATUS_CODE alt_fpga_control_enable(ALT_FPGA_CFG_MODE_t mode)
-{
-    if (!g_fpgaState.cpu_in_control)
-    {
-        uint32_t mask = 0;
-        
-        /*
-         * Step 1:
-         * Verify MSEL is 000 or 001.
-         */
-
-        dprintf("FPGA[ctrl:en]: === Step 1 ===\n");
-
-        switch (alt_read_word(ALT_FPGAMGR_IMGCFG_STAT_ADDR)
-                & (ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_SET_MSK | ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_SET_MSK | ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_SET_MSK))
-        {
-        case 0:
-        case ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_SET_MSK:
-            break;
-
-        default:
-            dprintf("FPGA[1]: MSEL not set to 000 or 001.\n");
-            return ALT_E_ERROR;
-        }
-
-        dprintf("FPGA[ctrl:en]: === Step 2 ===\n");
-
-        switch (mode)
-        {
-        case ALT_FPGA_CFG_MODE_PP16_FAST_NOAES_NODC:
-            mask = ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX16)
-                | ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X1);
-            break;
-        case ALT_FPGA_CFG_MODE_PP16_FAST_AES_NODC:
-            mask = ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX16)
-                | ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X2);
-            break;
-        case ALT_FPGA_CFG_MODE_PP16_FAST_NOAES_DC:
-            mask = ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX16)
-                | ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X4);
-            break;
-        case ALT_FPGA_CFG_MODE_PP16_FAST_AES_DC:
-            mask = ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX16)
-                | ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X4);
-            break;
-        case ALT_FPGA_CFG_MODE_PP32_FAST_NOAES_NODC:
-            mask = ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX32)
-                | ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X1);
-            break;
-        case ALT_FPGA_CFG_MODE_PP32_FAST_AES_NODC:
-            mask = ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX32)
-                | ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X4);
-            break;
-        case ALT_FPGA_CFG_MODE_PP32_FAST_NOAES_DC:
-            mask = ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX32)
-                | ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X8);
-            break;
-        case ALT_FPGA_CFG_MODE_PP32_FAST_AES_DC:
-            mask = ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_E_PPX32)
-                | ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_E_X8);
             break;
         }
-
-        alt_replbits_word(ALT_FPGAMGR_IMGCFG_CTL_02_ADDR,
-                          ALT_FPGAMGR_IMGCFG_CTL_02_CFGWIDTH_SET_MSK | ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET_MSK,
-                          mask);
-        /*
-         * Step 3:
-         * Verify no other devices are interfering with programming.
-         // Verify: F2S_NCONFIG_PIN = 1
-         // Verify: F2S_NSTATUS_PIN = 1
-         */
-
-        dprintf("FPGA[ctrl:en]: === Step 3 ===\n");
-
-        if ((alt_read_word(ALT_FPGAMGR_IMGCFG_STAT_ADDR) & (ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_SET_MSK | ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_SET_MSK))
-            != (ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_SET_MSK | ALT_FPGAMGR_IMGCFG_STAT_F2S_NCFG_PIN_SET_MSK))
+        if (current == state)
         {
-            dprintf("FPGA[3]: Error: F2S_NCONFIG_PIN != 1 or F2S_NSTATUS_PIN != 1.\n");
-            return ALT_E_ERROR;
+            break;
         }
-
-        /*
-         * Step 4:
-         * Deassert signal drives before taking over those overrides.
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE = 1
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST = 0
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA = 0
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL = 0
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG = 1
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE = 0
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE = 0
-         */
-
-        dprintf("FPGA[ctrl:en]: === Step 4 ===\n");
-
-        alt_replbits_word(ALT_FPGAMGR_IMGCFG_CTL_01_ADDR,
-                          ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_SET_MSK | ALT_FPGAMGR_IMGCFG_CTL_01_S2F_PR_REQUEST_SET_MSK,
-                          ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_SET_MSK);
-        
-        alt_replbits_word(ALT_FPGAMGR_IMGCFG_CTL_02_ADDR,
-                          ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_SET_MSK | ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_SET_MSK,
-                          0);
-
-        alt_replbits_word(ALT_FPGAMGR_IMGCFG_CTL_00_ADDR,
-                          ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK | ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NSTAT_OE_SET_MSK | ALT_FPGAMGR_IMGCFG_CTL_00_S2F_CONDONE_OE_SET_MSK,
-                          ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK);
-
-        /*
-         * Step 5:
-         * Enable overrides for DATA / DCLK / NCONFIG.
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG = 0
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG = 0
-         *
-         * Disable overrides for NSTATUS / CONF_DONE.
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT = 1
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE = 1
-         */
-
-        dprintf("FPGA[ctrl:en]: === Step 5 ===\n");
-        
-        alt_clrbits_word(ALT_FPGAMGR_IMGCFG_CTL_01_ADDR, ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_SET_MSK);
-        alt_clrbits_word(ALT_FPGAMGR_IMGCFG_CTL_00_ADDR, ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_SET_MSK);
-        
-        alt_setbits_word(ALT_FPGAMGR_IMGCFG_CTL_00_ADDR,
-                         ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NSTAT_SET_MSK | ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_CONDONE_SET_MSK);
-
-        /*
-         * Step 6:
-         * Drive chip select.
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE = 0
-         */
-        
-        dprintf("FPGA[ctrl:en]: === Step 6 ===\n");
-
-        alt_clrbits_word(ALT_FPGAMGR_IMGCFG_CTL_01_ADDR, ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_SET_MSK);
-
-        /*
-         * Step 7:
-         * Repeat step 3, just in case.
-         */
-
-        dprintf("FPGA[ctrl:en]: === Step 7 ===\n");
-        
-        if ((alt_read_word(ALT_FPGAMGR_IMGCFG_STAT_ADDR) & (ALT_FPGA_STATUS_F2S_NSTATUS_PIN | ALT_FPGA_STATUS_F2S_NCONFIG_PIN))
-            != (ALT_FPGA_STATUS_F2S_NSTATUS_PIN | ALT_FPGA_STATUS_F2S_NCONFIG_PIN))
-        {
-            dprintf("FPGA[7]: Error: F2S_NCONFIG_PIN != 1 or F2S_NSTATUS_PIN != 1.\n");
-            return ALT_E_ERROR;
-        }
-        
-        /*
-         * Mark state as in control.
-         */
-        g_fpgaState.cpu_in_control = true;
     }
 
-    return ALT_E_SUCCESS;
+    if (i == 0)
+    {
+        dprintf("FPGA[AXI]: Timeout [count=%u] waiting for DMA state [%d]. Last state was [%d]",
+                (unsigned)count,
+                (int)state, (int)current);
+        status = ALT_E_TMO;
+    }
+
+    return status;
 }
-
-ALT_STATUS_CODE alt_fpga_control_disable(void)
-{
-    if (g_fpgaState.cpu_in_control)
-    {
-        if (g_fpgaState.reset_asserted)
-        {
-            /*
-             * Borrowed from Step 8b. Disable reset of FPGA.
-             */
-            
-            dprintf("FPGA[ctrl:dis]: === Step 8b ===\n");
-            
-            alt_setbits_word(ALT_FPGAMGR_IMGCFG_CTL_00_ADDR, ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK);
-
-            g_fpgaState.reset_asserted = false;
-        }
-        
-        /*
-         * Step 15:
-         * Disable chip select.
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE = 1
-         */
-
-        dprintf("FPGA[ctrl:dis]: === Step 15 ===\n");
-
-        alt_setbits_word(ALT_FPGAMGR_IMGCFG_CTL_01_ADDR, ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE_SET_MSK);
-
-        /*
-         * Step 16:
-         * Disable overrides for DATA / DCLK / NCONFIG
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG = 1
-         // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG = 1
-         */
-
-        dprintf("FPGA[ctrl:dis]: === Step 16 ===\n");
-
-        alt_setbits_word(ALT_FPGAMGR_IMGCFG_CTL_01_ADDR, ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG_SET_MSK);
-        alt_setbits_word(ALT_FPGAMGR_IMGCFG_CTL_00_ADDR, ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG_SET_MSK);
-        
-        /*
-         * Mark state as not in control.
-         */
-        
-        g_fpgaState.cpu_in_control = false;
-    }
-
-    return ALT_E_SUCCESS;
-}
-
-bool alt_fpga_control_is_enabled(void)
-{
-    return g_fpgaState.cpu_in_control;
-}
-
-ALT_STATUS_CODE alt_fpga_reset_assert(void)
-{
-    if (!alt_fpga_control_is_enabled())
-    {
-        /* HPS not in control. */
-        return ALT_E_FPGA_NO_SOC_CTRL;
-    }
-    else if (g_fpgaState.reset_asserted)
-    {
-        /* Reset already asserted. */
-        return ALT_E_SUCCESS;
-    }
-    else
-    {
-        g_fpgaState.reset_asserted = true;
-        
-        /*
-         * Borrowed from FPGA configuration, step 8a.
-         */
-
-        dprintf("FPGA[rst:en]: === Step 8a ===\n");
-        
-        alt_clrbits_word(ALT_FPGAMGR_IMGCFG_CTL_00_ADDR, ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK);
-
-        return wait_for_fpga_status(ALT_FPGA_STATUS_F2S_NSTATUS_PIN, false, 1000);
-    }
-}
-
-ALT_STATUS_CODE alt_fpga_reset_deassert(void)
-{
-    if (!alt_fpga_control_is_enabled())
-    {
-        /* HPS not in control. */
-        return ALT_E_FPGA_NO_SOC_CTRL;
-    }
-    else if (!g_fpgaState.reset_asserted)
-    {
-        /* Reset already unasserted. */
-        return ALT_E_SUCCESS;
-    }
-    else
-    {
-        g_fpgaState.reset_asserted = false;
-        
-        /*
-         * Borrowed from FPGA configuration, step 8b.
-         */
-
-        dprintf("FPGA[rst:dis]: === Step 8b ===\n");
-        
-        alt_setbits_word(ALT_FPGAMGR_IMGCFG_CTL_00_ADDR, ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK);
-
-        return wait_for_fpga_status(ALT_FPGA_STATUS_F2S_NSTATUS_PIN, true, 1000);
-    }
-}
-
-uint32_t alt_fpga_status_get(void)
-{
-    return alt_read_word(ALT_FPGAMGR_IMGCFG_STAT_ADDR);
-}
+#endif
 
 /*
  * Helper function which handles writing data to the AXI bus.
- */
-static ALT_STATUS_CODE alt_fpga_internal_writeaxi(const void * bufferv, uint32_t length
+*/
+static ALT_STATUS_CODE alt_fpga_internal_writeaxi(const void * bufferv, uint32_t cfg_buf_len
 #if ALT_FPGA_ENABLE_DMA_SUPPORT
                                                   ,
                                                   bool use_dma, ALT_DMA_CHANNEL_t dma_channel
 #endif
     )
 {
-    const char * buffer = bufferv;
-    
+    const char * cfg_buf = bufferv;
     ALT_STATUS_CODE status = ALT_E_SUCCESS;
-    const uint32_t * buffer_end_32 = (const uint32_t *) (buffer + (length & ~0x3));
 
 #if ALT_FPGA_ENABLE_DMA_SUPPORT
+    /* Use DMA if requested. */
     if (use_dma)
     {
-        /* A10 DMA support for FPGA as a peripheral is not implemented. */
-        dprintf("FPGA[AXI]: DMA support not implemented.\n");
-        status = ALT_E_ERROR;
+        ALT_DMA_PROGRAM_t program;
+
+        if (status == ALT_E_SUCCESS)
+        {
+            /* The FPGA buffer size must be called with count, but the size is
+             * given in bytes. So add 3 and divide by 4 so the last unaligned
+             * 1 to 3 byte(s) will be written out if they exist. */
+
+            dprintf("FPGA[AXI]: DMA mem-to-reg ...\n");
+            status = alt_dma_memory_to_register(dma_channel, &program,
+                                                ALT_FPGAMGRDATA_ADDR,
+                                                cfg_buf,
+                                                (cfg_buf_len + 3) >> 2, /* we need the number uint32_t's */
+                                                32,
+                                                false, ALT_DMA_EVENT_0);
+        }
+        if (status == ALT_E_SUCCESS)
+        {
+            dprintf("FPGA[AXI]: Wait for channel to stop\n");
+
+            /* NOTE: Polling this register is much better than polling the
+             *   FPGA status register. Thus ensure the DMA is complete here. */
+            status = alt_dma_channel_wait_for_state(dma_channel, ALT_DMA_CHANNEL_STATE_STOPPED, cfg_buf_len);
+        }
     }
     else
 #endif
     {
-        const uint32_t * buffer_32 = (const uint32_t *) buffer;
+		uint32_t i = 0;
+        const uint32_t * buffer_32 = (const uint32_t *) cfg_buf;
+
+        dprintf("FPGA[AXI]: PIO memcpy() ...\n");
 
         /* Write out as many complete 32-bit chunks. */
-        while (length >= sizeof(uint32_t))
+        while (cfg_buf_len >= sizeof(uint32_t))
         {
-            alt_write_word(ALT_FPGAMGRDATA_ADDR, *buffer_32);
-            ++buffer_32;
-            length -= sizeof(uint32_t);
+            alt_write_word(ALT_FPGAMGRDATA_ADDR, buffer_32[i++]);
+            cfg_buf_len -= sizeof(uint32_t);
         }
     }
 
-    /* Write out remaining non 32-bit aligned chunk. */
-    if ((status == ALT_E_SUCCESS) && (length & 0x3))
+    /* Write out remaining non 32-bit chunks. */
+    if ((status == ALT_E_SUCCESS) && (cfg_buf_len & 0x3))
     {
-        dprintf("FPGA[AXI]: PIO unaligned data ...\n");
+        const uint32_t * buffer_32 = (const uint32_t *) (cfg_buf + (cfg_buf_len & ~0x3));
 
-        switch (length & 0x3)
+        dprintf("FPGA[AXI]: Copy non-aligned data ...\n");
+
+        switch (cfg_buf_len & 0x3)
         {
         case 3:
-            alt_write_word(ALT_FPGAMGRDATA_ADDR, *buffer_end_32 & 0x00ffffff);
+            alt_write_word(ALT_FPGAMGRDATA_ADDR, *buffer_32 & 0x00ffffff);
             break;
         case 2:
-            alt_write_word(ALT_FPGAMGRDATA_ADDR, *buffer_end_32 & 0x0000ffff);
+            alt_write_word(ALT_FPGAMGRDATA_ADDR, *buffer_32 & 0x0000ffff);
             break;
         case 1:
-            alt_write_word(ALT_FPGAMGRDATA_ADDR, *buffer_end_32 & 0x000000ff);
+            alt_write_word(ALT_FPGAMGRDATA_ADDR, *buffer_32 & 0x000000ff);
             break;
         default:
             /* This will never happen. */
@@ -510,473 +234,699 @@ static ALT_STATUS_CODE alt_fpga_internal_writeaxi(const void * bufferv, uint32_t
     return status;
 }
 
-static ALT_STATUS_CODE alt_fpga_internal_configure_idata(FPGA_DATA_t * fpga_data)
+/*
+ * Helper function which sets the DCLKCNT, waits for DCLKSTAT to report the
+ * count completed, and clear the complete status.
+ * Returns:
+ *  - ALT_E_SUCCESS if the FPGA DCLKSTAT reports that the DCLK count is done.
+ *  - ALT_E_TMO     if the number of polling cycles exceeds the timeout value.
+ * */
+static ALT_STATUS_CODE dclk_set_and_wait_clear(uint32_t count, uint32_t timeout)
 {
-    ALT_STATUS_CODE status = ALT_E_SUCCESS;
+    ALT_STATUS_CODE status = ALT_E_TMO;
 
-    /*
-     * Step 10:
-     * Send POF / SOF data
-     * Program in ALT_FPGAMGRDATA_ADDR
-     * Optionally read and confirm LT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN = 1, else restart from step 1.
-     */
-
-    if (status == ALT_E_SUCCESS)
+    /* Clear any existing DONE status. This can happen if a previous call to
+     * this function returned timeout. The counter would complete later on but
+     * never be cleared. */
+    if (alt_read_word(ALT_FPGAMGR_DCLKSTAT_ADDR))
     {
-        /*
-         * This is the largest configuration image possible for the largest Arria 10
-         * SoC device with some generous padding added.
-         * Experimental values:
-         *  - Compressed   : 15 MiB.
-         *  - Uncompressed : 31 MiB.
-         */
-        uint32_t data_limit = 36 * 1024 * 1024;
+        alt_write_word(ALT_FPGAMGR_DCLKSTAT_ADDR, ALT_FPGAMGR_DCLKSTAT_DCNTDONE_E_DONE);
+    }
 
-        dprintf("FPGA[cfg]: === Step 10 ===\n");
-        /* Print this here or else istream will cause this to be printed many times. */
-        dprintf("FPGA[AXI]: PIO aligned data ...\n");
+    /* Issue the DCLK count. */
+    alt_write_word(ALT_FPGAMGR_DCLKCNT_ADDR, count);
 
-        if (fpga_data->type == FPGA_DATA_FULL)
+    /* Poll DCLKSTAT to see if it completed in the timeout period specified. */
+    do
+    {
+        uint32_t done = alt_read_word(ALT_FPGAMGR_DCLKSTAT_ADDR);
+
+        dprintf(".");
+
+        if (done == ALT_FPGAMGR_DCLKSTAT_DCNTDONE_E_DONE)
         {
-            if (fpga_data->mode.full.length > data_limit)
+            /* Now that it is done, clear the DONE status. */
+            alt_write_word(ALT_FPGAMGR_DCLKSTAT_ADDR, ALT_FPGAMGR_DCLKSTAT_DCNTDONE_E_DONE);
+
+            status = ALT_E_SUCCESS;
+            break;
+        }
+    }
+    while (timeout--);
+
+    dprintf("\n");
+
+    return status;
+}
+
+/*
+ * Helper function which waits for the FPGA to enter the specified state.
+ * Returns:
+ *  - ALT_E_SUCCESS if successful
+ *  - ALT_E_TMO     if the number of polling cycles exceeds the timeout value.
+ * */
+static ALT_STATUS_CODE wait_for_fpga_state(ALT_FPGA_STATE_t state, uint32_t timeout)
+{
+    ALT_STATUS_CODE status = ALT_E_TMO;
+
+    /* Poll on the state to see if it matches the requested state within the
+     * timeout period specified. */
+    do
+    {
+        ALT_FPGA_STATE_t current = alt_fpga_state_get();
+
+        dprintf(".");
+
+        if (current == state)
+        {
+            status = ALT_E_SUCCESS;
+            break;
+        }
+    }
+    while (timeout--);
+
+    dprintf("\n");
+
+    return status;
+}
+
+/*
+ * Waits for the FPGA CB monitor to report the FPGA configuration status by
+ * polling that both CONF_DONE and nSTATUS or neither flags are set.
+ *
+ * Returns:
+ *  - ALT_E_SUCCESS  if CB monitor reports configuration successful.
+ *  - ALT_E_FPGA_CFG if CB monitor reports configuration failure.
+ *  - ALT_E_FPGA_CRC if CB monitor reports a CRC error.
+ *  - ALT_E_TMO      if CONF_DONE and nSTATUS fails to "settle" in the number
+ *                   of polling cycles specified by the timeout value.
+ * */
+static ALT_STATUS_CODE wait_for_config_done(uint32_t timeout)
+{
+    ALT_STATUS_CODE retval = ALT_E_TMO;
+
+    /* Poll on the CONF_DONE and nSTATUS both being set within the timeout
+     * period specified. */
+    do
+    {
+        uint32_t status = alt_fpga_mon_status_get();
+        bool conf_done = (status & ALT_FPGA_MON_CONF_DONE) != 0;
+        bool nstatus   = (status & ALT_FPGA_MON_nSTATUS)   != 0;
+
+        dprintf(".");
+
+        /* Detect CRC problems with the FPGA configuration */
+        if (status & ALT_FPGA_MON_CRC_ERROR)
+        {
+            retval = ALT_E_FPGA_CRC;
+            break;
+        }
+
+        if (conf_done == nstatus)
+        {
+            if (conf_done)
             {
-                status = ALT_E_FPGA_CFG;
+                retval = ALT_E_SUCCESS;
             }
             else
             {
-                status = alt_fpga_internal_writeaxi(fpga_data->mode.full.buffer, fpga_data->mode.full.length
+                retval = ALT_E_FPGA_CFG;
+            }
+            break;
+        }
+    }
+    while (timeout--);
+
+    dprintf("\n");
+
+    return retval;
+}
+
+ALT_STATUS_CODE alt_fpga_init(void)
+{
+    return ALT_E_SUCCESS;
+}
+
+ALT_STATUS_CODE alt_fpga_uninit(void)
+{
+	printf("Hallo from Intel HPS HAL running on Linux developed and debuged by VS");
+    return ALT_E_SUCCESS;
+}
+
+ALT_STATUS_CODE alt_fpga_control_enable(void)
+{
+    /* Simply set CTRL.EN to allow HPS to control the FPGA control block. */
+    alt_setbits_word(ALT_FPGAMGR_CTL_ADDR, ALT_FPGAMGR_CTL_EN_SET_MSK);
+
+    return ALT_E_SUCCESS;
+}
+
+ALT_STATUS_CODE alt_fpga_control_disable(void)
+{
+    /* Simply clear CTRL.EN to allow HPS to control the FPGA control block. */
+    alt_clrbits_word(ALT_FPGAMGR_CTL_ADDR, ALT_FPGAMGR_CTL_EN_SET_MSK);
+
+    return ALT_E_SUCCESS;
+}
+
+bool alt_fpga_control_is_enabled(void)
+{
+    /* Check if CTRL.EN is set or not. */
+    if ((alt_read_word(ALT_FPGAMGR_CTL_ADDR) & ALT_FPGAMGR_CTL_EN_SET_MSK) != 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+ALT_FPGA_STATE_t alt_fpga_state_get(void)
+{
+    /* Detect FPGA power status.
+     * NOTE: Do not use alt_fpga_state_get() to look for ALT_FPGA_STATE_PWR_OFF.
+     *   This is a bit of a misnomer in that the ALT_FPGA_STATE_PWR_OFF really means
+     *   FPGA is powered off or idle (which happens just out of being reset by the
+     *   reset manager). */
+    if ((alt_fpga_mon_status_get() & ALT_FPGA_MON_FPGA_POWER_ON) == 0)
+    {
+        return ALT_FPGA_STATE_POWER_OFF;
+    }
+
+    /* The fpgamgrreg::stat::mode bits maps to the FPGA state enum. */
+    return (ALT_FPGA_STATE_t) ALT_FPGAMGR_STAT_MOD_GET(alt_read_word(ALT_FPGAMGR_STAT_ADDR));
+}
+
+uint32_t alt_fpga_mon_status_get(void)
+{
+    return alt_read_word(ALT_FPGAMGR_MON_GPIO_EXT_PORTA_ADDR) & ((1 << 12) - 1);
+}
+
+ALT_STATUS_CODE alt_fpga_reset_assert(void)
+{
+    /* Verify that HPS has control of the FPGA control block. */
+    if (alt_fpga_control_is_enabled() != true)
+    {
+        return ALT_E_FPGA_NO_SOC_CTRL;
+    }
+
+    /* Detect FPGA power status. */
+    if (alt_fpga_state_get() == ALT_FPGA_STATE_POWER_OFF)
+    {
+        return ALT_E_FPGA_PWR_OFF;
+    }
+
+    /* Set the nCONFIGPULL to put the FPGA into reset. */
+    alt_setbits_word(ALT_FPGAMGR_CTL_ADDR, ALT_FPGAMGR_CTL_NCFGPULL_SET_MSK);
+
+    return ALT_E_SUCCESS;
+}
+
+ALT_STATUS_CODE alt_fpga_reset_deassert(void)
+{
+    /* Verify that HPS has control of the FPGA control block. */
+    if (alt_fpga_control_is_enabled() != true)
+    {
+        return ALT_E_FPGA_NO_SOC_CTRL;
+    }
+
+    /* Detect FPGA power status. */
+    if (alt_fpga_state_get() == ALT_FPGA_STATE_POWER_OFF)
+    {
+        return ALT_E_FPGA_PWR_OFF;
+    }
+
+    /* Clear the nCONFIGPULL to release the FPGA from reset. */
+    alt_clrbits_word(ALT_FPGAMGR_CTL_ADDR, ALT_FPGAMGR_CTL_NCFGPULL_SET_MSK);
+
+    return ALT_E_SUCCESS;
+}
+
+ALT_FPGA_CFG_MODE_t alt_fpga_cfg_mode_get(void)
+{
+    uint32_t msel = ALT_FPGAMGR_STAT_MSEL_GET(alt_read_word(ALT_FPGAMGR_STAT_ADDR));
+
+    switch (msel)
+    {
+    case ALT_FPGAMGR_STAT_MSEL_E_PP16_FAST_NOAES_NODC: /* SoCAL: 0x0 */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP16_FAST_AES_NODC:   /* SoCAL: 0x1 */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP16_FAST_AESOPT_DC:  /* SoCAL: 0x2 */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP16_SLOW_NOAES_NODC: /* SoCAL: 0x4 */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP16_SLOW_AES_NODC:   /* SoCAL: 0x5 */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP16_SLOW_AESOPT_DC:  /* SoCAL: 0x6 */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP32_FAST_NOAES_NODC: /* SoCAL: 0x8 */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP32_FAST_AES_NODC:   /* SoCAL: 0x9 */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP32_FAST_AESOPT_DC:  /* SoCAL: 0xa */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP32_SLOW_NOAES_NODC: /* SoCAL: 0xc */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP32_SLOW_AES_NODC:   /* SoCAL: 0xd */
+    case ALT_FPGAMGR_STAT_MSEL_E_PP32_SLOW_AESOPT_DC:  /* SoCAL: 0xe */
+        /* The definitions for the various msel's match up with the hardware
+         * definitions, so just cast it to the enum type. */
+        return (ALT_FPGA_CFG_MODE_t) msel;
+    default:
+        return ALT_FPGA_CFG_MODE_UNKNOWN;
+    }
+}
+
+ALT_STATUS_CODE alt_fpga_cfg_mode_set(ALT_FPGA_CFG_MODE_t cfg_mode)
+{
+    /* This function will always return ERROR. See header for reasons. */
+    return ALT_E_ERROR;
+}
+
+/*
+ * This function handles writing data to the FPGA data register and ensuring
+ * the image was programmed correctly.
+ * */
+static ALT_STATUS_CODE alt_fpga_internal_configure_idata(FPGA_DATA_t * fpga_data)
+{
+    ALT_STATUS_CODE status = ALT_E_SUCCESS;
+    /* From the A5 datasheet, it is 186 Mb => ~ 23 MiB. Thus cap the max
+     * configuration data size to 32 MiB. Anything larger will cause an error
+     * to be reported to the user. This will also terminate the IStream
+     * interface should the stream never end. */
+
+    uint32_t data_limit = 32 * 1024 * 1024;
+
+    /* Step 9:
+     *  - Write configuration image to AXI DATA register in 4 byte chunks. */
+
+    dprintf("FPGA: === Step 9 ===\n");
+
+    /* This is the largest configuration image possible for the largest Arria 5
+     * SoC device with some generous padding added. Given that the Arria 5 SoC
+     * is larger than the Cyclone 5 SoC, this value will also be sufficient for
+     * the Cyclone 5 SoC device. */
+
+    if (fpga_data->type == FPGA_DATA_FULL)
+    {
+        if (fpga_data->mode.full.length > data_limit)
+        {
+            status = ALT_E_FPGA_CFG;
+        }
+        else
+        {
+            status = alt_fpga_internal_writeaxi(fpga_data->mode.full.buffer, fpga_data->mode.full.length
+#if ALT_FPGA_ENABLE_DMA_SUPPORT
+                                                ,
+                                                fpga_data->use_dma, fpga_data->dma_channel
+#endif
+            );
+        }
+    }
+    else
+    {
+        uint32_t buffer[ISTREAM_CHUNK_SIZE / sizeof(uint32_t)];
+        int32_t cb_status = 0; /* Callback status */
+
+        do
+        {
+            cb_status = fpga_data->mode.istream.stream(buffer, sizeof(buffer), fpga_data->mode.istream.data);
+
+            if (cb_status > sizeof(buffer))
+            {
+                /* Callback data overflows buffer space. */
+                status = ALT_E_FPGA_CFG_STM;
+            }
+            else if (cb_status < 0)
+            {
+                /* A problem occurred when streaming data from the source. */
+                status = ALT_E_FPGA_CFG_STM;
+            }
+            else if (cb_status == 0)
+            {
+                /* End of IStream data. */
+                break;
+            }
+            else if (cb_status > data_limit)
+            {
+                /* Limit hit for the largest permissible data stream. */
+                status = ALT_E_FPGA_CFG_STM;
+            }
+            else
+            {
+                /* Copy in configuration data. */
+                status = alt_fpga_internal_writeaxi(buffer, cb_status
 #if ALT_FPGA_ENABLE_DMA_SUPPORT
                                                     ,
                                                     fpga_data->use_dma, fpga_data->dma_channel
 #endif
                     );
+
+                data_limit -= cb_status;
             }
-        }
-        else if (fpga_data->type == FPGA_DATA_LIST)
-        {
-            /* Flag if processing has encountered an uint32_t unaligned segment.
-               If so, that must be the last segment. */
-            bool unaligned_segment = false;
 
-            size_t i;
-            for (i = 0; i < fpga_data->mode.list.count; ++i)
+            if (status != ALT_E_SUCCESS)
             {
-                const void * buffer = fpga_data->mode.list.buffer[i];
-                size_t       length = fpga_data->mode.list.length[i];
-
-                if (length > data_limit)
-                {
-                    dprintf("FPGA[10][list]: Data limit breached; infinite loop or invalid image likely.\n");
-                    status = ALT_E_FPGA_CFG;
-                }
-                else if (unaligned_segment)
-                {
-                    dprintf("FPGA[10][list]: Previous segment unaligned; RBF segment corruption likely.\n");
-                    status = ALT_E_FPGA_CFG;
-                }
-                else
-                {
-                    status = alt_fpga_internal_writeaxi(buffer, length
-#if ALT_FPGA_ENABLE_DMA_SUPPORT
-                                                        ,
-                                                        fpga_data->use_dma, fpga_data->dma_channel
-#endif
-                        );
-
-                    data_limit -= length;
-
-                    if (length & (sizeof(uint32_t) - 1))
-                    {
-                        unaligned_segment = true;
-                    }
-                }
-
-                if (status != ALT_E_SUCCESS)
-                {
-                    break;
-                }
+                break;
             }
-        }
-        else if (fpga_data->type == FPGA_DATA_STREAM)
+
+        } while (cb_status > 0);
+    }
+
+    if (status != ALT_E_SUCCESS)
+    {
+        dprintf("FPGA: Error in step 9: Problem streaming or writing out AXI data.\n");
+        return status;
+    }
+
+    /* Step 10:
+     *  - Observe CONF_DONE and nSTATUS (active low)
+     *  - if CONF_DONE = 1 and nSTATUS = 1, configuration was successful
+     *  - if CONF_DONE = 0 and nSTATUS = 0, configuration failed */
+
+    dprintf("FPGA: === Step 10 ===\n");
+
+    status = wait_for_config_done(_ALT_FPGA_TMO_CONFIG);
+
+    if (status != ALT_E_SUCCESS)
+    {
+        if (status == ALT_E_FPGA_CRC)
         {
-            /* Flag if processing has encountered an uint32_t unaligned segment.
-               If so, that must be the last segment. */
-            bool unaligned_segment = false;
-
-            uint32_t buffer[ISTREAM_CHUNK_SIZE / sizeof(uint32_t)];
-            int32_t cb_status = 0; /* Callback status */
-
-            do
-            {
-                cb_status = fpga_data->mode.stream.callback(buffer, sizeof(buffer), fpga_data->mode.stream.context);
-
-                if (cb_status > sizeof(buffer))
-                {
-                    /* Callback data overflows buffer space. */
-                    status = ALT_E_FPGA_CFG_STM;
-                }
-                else if (cb_status < 0)
-                {
-                    /* A problem occurred when streaming data from the source. */
-                    status = ALT_E_FPGA_CFG_STM;
-                }
-                else if (cb_status == 0)
-                {
-                    /* End of IStream data. */
-                    break;
-                }
-                else if (cb_status > data_limit)
-                {
-                    /* Limit hit for the largest permissible data stream. */
-                    status = ALT_E_FPGA_CFG_STM;
-                }
-                else if (unaligned_segment)
-                {
-                    dprintf("FPGA[10][stream]: Previous segment unaligned; previous segment invalid.\n");
-                    status = ALT_E_FPGA_CFG;
-                }
-                else
-                {
-                    /* Copy in configuration data. */
-                    status = alt_fpga_internal_writeaxi(buffer, cb_status
-#if ALT_FPGA_ENABLE_DMA_SUPPORT
-                                                        ,
-                                                        fpga_data->use_dma, fpga_data->dma_channel
-#endif
-                        );
-
-                    data_limit -= cb_status;
-
-                    if (cb_status & (sizeof(uint32_t) - 1))
-                    {
-                        unaligned_segment = true;
-                    }
-                }
-
-                if (status != ALT_E_SUCCESS)
-                {
-                    break;
-                }
-
-            } while (cb_status > 0);
+            dprintf("FPGA: Error in step 10: CRC error detected.\n");
+            return ALT_E_FPGA_CRC;
+        }
+        else if (status == ALT_E_TMO)
+        {
+            dprintf("FPGA: Error in step 10: Timeout waiting for CONF_DONE + nSTATUS.\n");
+            return ALT_E_FPGA_CFG;
         }
         else
         {
-            dprintf("FPGA[10]: Invalid programming request type.\n");
-            status = ALT_E_ERROR;
+            dprintf("FPGA: Error in step 10: Configuration error CONF_DONE, nSTATUS = 0.\n");
+            return ALT_E_FPGA_CFG;
         }
     }
 
-    /*
-     * Step 11:
-     * Wait for ConfigCompletion
-     // Wait: ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN = 1 or ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN = 0.
-     // If ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN = 0: goto step 1.
-     // If ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN = 1: configuration passed. yay!
-     */
-
-    if (status == ALT_E_SUCCESS)
-    {
-        int i = 10000;
-
-        dprintf("FPGA[cfg]: === Step 11 === (starting i = %d).\n", i);
-
-        do
-        {
-            uint32_t imgcfg = alt_read_word(ALT_FPGAMGR_IMGCFG_STAT_ADDR);
-
-            if (!(imgcfg & ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_SET_MSK))
-            {
-                dprintf("FPGA[11]: Error: F2S_NSTAT_PIN = 0.\n");
-                status = ALT_E_ERROR;
-                break;
-            }
-            else if (imgcfg & ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_SET_MSK)
-            {
-                /* yay! */
-                break;
-            }
-
-        } while (--i);
-
-        if (i == 0)
-        {
-            dprintf("FPGA[11]: Timeout waiting for config completion result.\n");
-            status = ALT_E_TMO;
-        }
-        else
-        {
-            dprintf("FPGA[11]: i = %d.\n", i);
-        }
-    }
-
-    /*
-     * Step 12:
-     * Write dclkcnt = 0xf.
-     // Write: ALT_FPGAMGR_DCLKCNT_ADDR = 0xf.
-     // Wait: ALT_FPGAMGR_DCLKSTAT_ADDR = 1.
-     */
-
-    if (status == ALT_E_SUCCESS)
-    {
-        int i = 10000;
-        dprintf("FPGA[cfg]: === Step 12 === (starting i = %d).\n", i);
-
-        /* Clear the DCLKSTAT.dcntdone before starting. */
-        if (alt_read_word(ALT_FPGAMGR_DCLKSTAT_ADDR))
-        {
-            alt_write_word(ALT_FPGAMGR_DCLKSTAT_ADDR, ALT_FPGAMGR_DCLKSTAT_DCNTDONE_SET_MSK);
-        }
-
-        alt_write_word(ALT_FPGAMGR_DCLKCNT_ADDR, 0xf);
-
-        /* Now poll until DCLKSTAT.dcntdone = 1*/ 
-        while ((alt_read_word(ALT_FPGAMGR_DCLKSTAT_ADDR) & ALT_FPGAMGR_DCLKSTAT_DCNTDONE_SET_MSK) == 0)
-        {
-            if (!--i)
-            {
-                dprintf("FPGA[12]: Timeout waiting for DCLKSTAT.DCNTDONE.\n");
-                status = ALT_E_TMO;
-                break;
-            }
-        }
-
-        if (i != 0)
-        {
-            /* Cleanup DCLKSTAT.dcntdone status. */
-            alt_write_word(ALT_FPGAMGR_DCLKSTAT_ADDR, ALT_FPGAMGR_DCLKSTAT_DCNTDONE_SET_MSK);
-            dprintf("FPGA[12]: i = %d.\n", i);
-        }
-    }
-
-    /*
-     * Step 13:
-     * Wait for initialization sequence to complete.
-     // Wait: ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD = 1
-     */
-
-    if (status == ALT_E_SUCCESS)
-    {
-        dprintf("FPGA[cfg]: === Step 13 ===\n");
-
-        status = wait_for_fpga_status(ALT_FPGA_STATUS_F2S_USERMODE, true, 10000);
-
-        if (status != ALT_E_SUCCESS)
-        {
-            dprintf("FPGA[13]: Timeout waiting for F2S_USERMOD = 1.\n");
-        }
-    }
-
-    return status;
+    return ALT_E_SUCCESS;
 }
 
+/*
+ * Helper function which does handles the common steps for Full Buffer or
+ * IStream FPGA configuration.
+ * */
 static ALT_STATUS_CODE alt_fpga_internal_configure(FPGA_DATA_t * fpga_data)
 {
     ALT_STATUS_CODE status = ALT_E_SUCCESS;
+    uint32_t ctrl_reg;
 
-    /* HPS should be on control before configuration. */
-    if (g_fpgaState.cpu_in_control == false)
+    int cfgwidth = 0;
+    int cdratio  = 0;
+    ALT_STATUS_CODE data_status;
+
+    /* Verify preconditions.
+     * This is a minor difference from the configure instructions given by the NPP. */
+
+    /* Verify that HPS has control of the FPGA control block. */
+    if (alt_fpga_control_is_enabled() != true)
     {
-        dprintf("FPGA[cfg]: precondition not met: CPU not in control.\n");
         return ALT_E_FPGA_NO_SOC_CTRL;
     }
 
-    /* FPGA should not be in reset before attempting configuration. */
-    if (g_fpgaState.reset_asserted)
+    /* Detect FPGA power status. */
+    if (alt_fpga_state_get() == ALT_FPGA_STATE_POWER_OFF)
     {
-        dprintf("FPGA[cfg]: precondition not met: FPGA reset asserted.\n");
+        return ALT_E_FPGA_PWR_OFF;
+    }
+
+    dprintf("FPGA: Configure() !!!\n");
+
+    /* The FPGA CTRL register cache */
+
+    ctrl_reg = alt_read_word(ALT_FPGAMGR_CTL_ADDR);
+
+    /* Step 1:
+     *  - Set CTRL.CFGWDTH, CTRL.CDRATIO to match cfg mode
+     *  - Set CTRL.NCE to 0 */
+
+    dprintf("FPGA: === Step 1 ===\n");
+
+    switch (alt_fpga_cfg_mode_get())
+    {
+    case ALT_FPGA_CFG_MODE_PP16_FAST_NOAES_NODC:
+        cfgwidth = 16;
+        cdratio  = 1;
+        break;
+    case ALT_FPGA_CFG_MODE_PP16_FAST_AES_NODC:
+        cfgwidth = 16;
+        cdratio  = 2;
+        break;
+    case ALT_FPGA_CFG_MODE_PP16_FAST_AESOPT_DC:
+        cfgwidth = 16;
+        cdratio  = 4;
+        break;
+    case ALT_FPGA_CFG_MODE_PP16_SLOW_NOAES_NODC:
+        cfgwidth = 16;
+        cdratio  = 1;
+        break;
+    case ALT_FPGA_CFG_MODE_PP16_SLOW_AES_NODC:
+        cfgwidth = 16;
+        cdratio  = 2;
+        break;
+    case ALT_FPGA_CFG_MODE_PP16_SLOW_AESOPT_DC:
+        cfgwidth = 16;
+        cdratio  = 4;
+        break;
+    case ALT_FPGA_CFG_MODE_PP32_FAST_NOAES_NODC:
+        cfgwidth = 32;
+        cdratio  = 1;
+        break;
+    case ALT_FPGA_CFG_MODE_PP32_FAST_AES_NODC:
+        cfgwidth = 32;
+        cdratio  = 4;
+        break;
+    case ALT_FPGA_CFG_MODE_PP32_FAST_AESOPT_DC:
+        cfgwidth = 32;
+        cdratio  = 8;
+        break;
+    case ALT_FPGA_CFG_MODE_PP32_SLOW_NOAES_NODC:
+        cfgwidth = 32;
+        cdratio  = 1;
+        break;
+    case ALT_FPGA_CFG_MODE_PP32_SLOW_AES_NODC:
+        cfgwidth = 32;
+        cdratio  = 4;
+        break;
+    case ALT_FPGA_CFG_MODE_PP32_SLOW_AESOPT_DC:
+        cfgwidth = 32;
+        cdratio  = 8;
+        break;
+    default:
         return ALT_E_ERROR;
     }
 
-    /*
-     * Step 1:
-     * Verify MSEL is 000 or 001.
-     */
+    dprintf("FPGA: CDRATIO  = %x\n", cdratio);
+    dprintf("FPGA: CFGWIDTH = %s\n", cfgwidth == 16 ? "16" : "32");
 
-    dprintf("FPGA[cfg]: === Step 1 === (skipped due to precondition)\n");
-
-    /*
-     * Step 2:
-     * Determine the CFGWIDTH and CDRATIO from the programming mode and write to HW.
-     */
-
-    dprintf("FPGA[cfg]: === Step 2 === (skipped due to precondition)\n");
-
-    /*
-     * Step 3:
-     * Verify no other devices are interfering with programming.
-     */
-
-    dprintf("FPGA[cfg]: === Step 3 === (skipped due to precondition)\n");
-
-    /*
-     * Step 4:
-     * Deassert signal drives before taking over those overrides.
-     */
-
-    dprintf("FPGA[cfg]: === Step 4 === (skipped due to precondition)\n");
-
-    /*
-     * Step 5:
-     * Enable overrides for DATA / DCLK / NCONFIG.
-     * Disable overrides for NSTATUS / CONF_DONE.
-     */
-
-    dprintf("FPGA[cfg]: === Step 5 === (skipped due to precondition)\n");
-
-    /*
-     * Step 6:
-     * Drive chip select.
-     */
-
-    dprintf("FPGA[cfg]: === Step 6 === (skipped due to precondition)\n");
-
-    /*
-     * Step 7:
-     * Repeat step 3, just in case.
-     */
-
-    dprintf("FPGA[cfg]: === Step 7 === (skipped due to precondition)\n");
-
-    /*
-     * Step 8:
-     * Reset the configuration.
-     // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG = 0
-     // Wait: ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN = 0
-     *
-     // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG = 1
-     // Wait: ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN = 1
-     *
-     // Verify: ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN = 0
-     // Verify: ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE = 1
-     */
-
-    dprintf("FPGA[cfg]: === Step 8 ===\n");
-
-    alt_clrbits_word(ALT_FPGAMGR_IMGCFG_CTL_00_ADDR, ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK);
-    status = wait_for_fpga_status(ALT_FPGA_STATUS_F2S_NSTATUS_PIN, false, 100000);
-    /* Handle any error conditions after reset request has been withdrawn.
-       This is to avoid bailing out with reset assert requested. */
-    
-    alt_setbits_word(ALT_FPGAMGR_IMGCFG_CTL_00_ADDR, ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK);
-
-    /* This is the error handler from above, step 8a. */
-    if (status != ALT_E_SUCCESS)
+    /* Adjust CTRL for the CDRATIO */
+    ctrl_reg &= ALT_FPGAMGR_CTL_CDRATIO_CLR_MSK;
+    switch (cdratio)
     {
-        dprintf("FPGA[8]: Error: Timeout waiting for F2S_NSTAT_PIN = 0.\n");
-        return ALT_E_FPGA_CFG;
-    }
-    
-    status = wait_for_fpga_status(ALT_FPGA_STATUS_F2S_NSTATUS_PIN, true, 100000);
-
-    if (status != ALT_E_SUCCESS)
-    {
-        dprintf("FPGA[8]: Error: Timeout waiting for F2S_NSTAT_PIN = 1.\n");
-        return ALT_E_FPGA_CFG;
-    }
-
-    if ((alt_read_word(ALT_FPGAMGR_IMGCFG_STAT_ADDR) & (ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_SET_MSK | ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_SET_MSK))
-        != ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_OE_SET_MSK)
-    {
-        dprintf("FPGA[8]: Error: F2S_CONDONE_PIN != 0 or F2S_CONDONE_OE != 1.\n");
+    case 1:
+        ctrl_reg |= ALT_FPGAMGR_CTL_CDRATIO_SET(ALT_FPGAMGR_CTL_CDRATIO_E_X1);
+        break;
+    case 2: /* Unused; included for completeness. */
+        ctrl_reg |= ALT_FPGAMGR_CTL_CDRATIO_SET(ALT_FPGAMGR_CTL_CDRATIO_E_X2);
+        break;
+    case 4:
+        ctrl_reg |= ALT_FPGAMGR_CTL_CDRATIO_SET(ALT_FPGAMGR_CTL_CDRATIO_E_X4);
+        break;
+    case 8:
+        ctrl_reg |= ALT_FPGAMGR_CTL_CDRATIO_SET(ALT_FPGAMGR_CTL_CDRATIO_E_X8);
+        break;
+    default:
         return ALT_E_ERROR;
     }
 
-    /*
-     * Step 9:
-     * Enable DCLK and DATA path.
-     // Write: ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA = 1
-     // Write: ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL = 1
-     */
-
-    dprintf("FPGA[cfg]: === Step 9 ===\n");
-
-    alt_setbits_word(ALT_FPGAMGR_IMGCFG_CTL_02_ADDR,
-                     ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_SET_MSK | ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_SET_MSK);
-
-    /*
-     * Helper function for Steps 10 - 13.
-     */
-
-    status = alt_fpga_internal_configure_idata(fpga_data);
-
-    /*
-     * Step 14:
-     * Stop DATA and DCLK path.
-     // Write: ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA = 0
-     // Write: ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL = 0
-     */
-
-    dprintf("FPGA[cfg]: === Step 14 ===\n");
-
-    alt_clrbits_word(ALT_FPGAMGR_IMGCFG_CTL_02_ADDR,
-                     ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_SET_MSK | ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_CTL_SET_MSK);
-    
-    /*
-     * Step 15:
-     * Disable chip select.
-     // Write: ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NCE = 1
-     */
-
-    dprintf("FPGA[cfg]: === Step 15 === (skipped due to post condition)\n");
-
-    /*
-     * Step 16:
-     * Disable overrides for DATA / DCLK / NCONFIG
-     // Write: ALT_FPGAMGR_IMGCFG_CTL_01_S2F_NEN_CFG = 1
-     // Write: ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NEN_NCFG = 1
-     */
-
-    dprintf("FPGA[cfg]: === Step 16 === (skipped due to post condition)\n");
-    
-    /*
-     * Step 17:
-     * Final check.
-     // Verify: ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD = 1
-     // Verify: ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN = 1
-     // Verify: ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN = 1
-     */
-
-    if (status == ALT_E_SUCCESS)
+    /* Adjust CTRL for CFGWIDTH */
+    switch (cfgwidth)
     {
-        dprintf("FPGA[cfg]: === Step 17 ===\n");
+    case 16:
+        ctrl_reg &= ALT_FPGAMGR_CTL_CFGWDTH_CLR_MSK;
+        break;
+    case 32:
+        ctrl_reg |= ALT_FPGAMGR_CTL_CFGWDTH_SET_MSK;
+        break;
+    default:
+        return ALT_E_ERROR;
+    }
 
-        if ((alt_read_word(ALT_FPGAMGR_IMGCFG_STAT_ADDR) & (ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_SET_MSK | ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_SET_MSK | ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_SET_MSK))
-            != (ALT_FPGAMGR_IMGCFG_STAT_F2S_USERMOD_SET_MSK | ALT_FPGAMGR_IMGCFG_STAT_F2S_NSTAT_PIN_SET_MSK | ALT_FPGAMGR_IMGCFG_STAT_F2S_CONDONE_PIN_SET_MSK))
+    /* Set NCE to 0. */
+    ctrl_reg &= ALT_FPGAMGR_CTL_NCE_CLR_MSK;
+
+    alt_write_word(ALT_FPGAMGR_CTL_ADDR, ctrl_reg);
+
+    /* Step 2:
+     *  - Set CTRL.EN to 1 */
+
+    dprintf("FPGA: === Step 2 (skipped due to precondition) ===\n");
+
+    /* Step 3:
+     *  - Set CTRL.NCONFIGPULL to 1 to put FPGA in reset */
+
+    dprintf("FPGA: === Step 3 ===\n");
+
+    ctrl_reg |= ALT_FPGAMGR_CTL_NCFGPULL_SET_MSK;
+    alt_write_word(ALT_FPGAMGR_CTL_ADDR, ctrl_reg);
+
+    /* Step 4:
+     *  - Wait for STATUS.MODE to report FPGA is in reset phase */
+
+    dprintf("FPGA: === Step 4 ===\n");
+
+    status = wait_for_fpga_state(ALT_FPGA_STATE_RESET, _ALT_FPGA_TMO_STATE);
+    /* Handle any error conditions after reset has been unasserted. */
+
+    /* Step 5:
+     *  - Set CONTROL.NCONFIGPULL to 0 to release FPGA from reset */
+
+    dprintf("FPGA: === Step 5 ===\n");
+
+    ctrl_reg &= ALT_FPGAMGR_CTL_NCFGPULL_CLR_MSK;
+    alt_write_word(ALT_FPGAMGR_CTL_ADDR, ctrl_reg);
+
+    if (status != ALT_E_SUCCESS)
+    {
+        /* This is a failure from Step 4. */
+        dprintf("FPGA: Error in step 4: Wait for RESET timeout.\n");
+        return ALT_E_FPGA_CFG;
+    }
+
+    /* Step 6:
+     *  - Wait for STATUS.MODE to report FPGA is in configuration phase */
+
+    dprintf("FPGA: === Step 6 ===\n");
+
+    status = wait_for_fpga_state(ALT_FPGA_STATE_CFG, _ALT_FPGA_TMO_STATE);
+
+    if (status != ALT_E_SUCCESS)
+    {
+        dprintf("FPGA: Error in step 6: Wait for CFG timeout.\n");
+        return ALT_E_FPGA_CFG;
+    }
+
+    /* Step 7:
+     *  - Clear nSTATUS interrupt in CB Monitor */
+
+    dprintf("FPGA: === Step 7 ===\n");
+
+    alt_write_word(ALT_FPGAMGR_MON_GPIO_PORTA_EOI_ADDR,
+                   ALT_MON_GPIO_PORTA_EOI_NS_SET(ALT_MON_GPIO_PORTA_EOI_NS_E_CLR));
+
+    /* Step 8:
+     *  - Set CTRL.AXICFGEN to 1 to enable config data on AXI slave bus */
+
+    dprintf("FPGA: === Step 8 ===\n");
+
+    ctrl_reg |= ALT_FPGAMGR_CTL_AXICFGEN_SET_MSK;
+    alt_write_word(ALT_FPGAMGR_CTL_ADDR, ctrl_reg);
+
+    /*
+     * Helper function to handle steps 9 - 10.
+     * */
+
+    data_status = alt_fpga_internal_configure_idata(fpga_data);
+
+    /* Step 11:
+     *  - Set CTRL.AXICFGEN to 0 to disable config data on AXI slave bus */
+
+    dprintf("FPGA: === Step 11 ===\n");
+
+    ctrl_reg &= ALT_FPGAMGR_CTL_AXICFGEN_CLR_MSK;
+    alt_write_word(ALT_FPGAMGR_CTL_ADDR, ctrl_reg);
+
+    /* Step 12:
+     *  - Write 4 to DCLKCNT
+     *  - Wait for STATUS.DCNTDONE = 1
+     *  - Clear W1C bit in STATUS.DCNTDONE */
+
+    dprintf("FPGA: === Step 12 ===\n");
+
+    status = dclk_set_and_wait_clear(4, _ALT_FPGA_TMO_DCLK_CONST + 4 * _ALT_FPGA_TMO_DCLK_MUL);
+    if (status != ALT_E_SUCCESS)
+    {
+        dprintf("FPGA: Error in step 12: Wait for dclk(4) timeout.\n");
+
+        /* The error here is probably a result of an error in the FPGA data. */
+        if (data_status != ALT_E_SUCCESS)
         {
-            dprintf("FPGA[17]: Error: F2S_USERMOD != 1 or F2S_NSTAT_PIN != 1 or F2S_CONDONE_PIN != 1.\n");
-            return ALT_E_ERROR;
+            return data_status;
+        }
+        else
+        {
+            return ALT_E_FPGA_CFG;
         }
     }
 
-    return status;
+#if _ALT_FPGA_USE_DCLK
+
+    /* Extra steps for Configuration with DCLK for Initialization Phase (4.2.1.2) */
+
+    /* Step 14 (using 4.2.1.2 steps), 15 (using 4.2.1.2 steps)
+     *  - Write 0x5000 to DCLKCNT
+     *  - Poll until STATUS.DCNTDONE = 1, write 1 to clear */
+
+    dprintf("FPGA: === Step 14 (4.2.1.2) ===\n");
+    dprintf("FPGA: === Step 15 (4.2.1.2) ===\n");
+    
+    status = dclk_set_and_wait_clear(0x5000, _ALT_FPGA_TMO_DCLK_CONST + 0x5000 * _ALT_FPGA_TMO_DCLK_MUL);
+    if (status == ALT_E_TMO)
+    {
+        dprintf("FPGA: Error in step 15 (4.2.1.2): Wait for dclk(0x5000) timeout.\n");
+
+        /* The error here is probably a result of an error in the FPGA data. */
+        if (data_status != ALT_E_SUCCESS)
+        {
+            return data_status;
+        }
+        else
+        {
+            return ALT_E_FPGA_CFG;
+        }
+    }
+
+#endif
+
+    /* Step 13:
+     *  - Wait for STATUS.MODE to report USER MODE */
+
+    dprintf("FPGA: === Step 13 ===\n");
+
+    status = wait_for_fpga_state(ALT_FPGA_STATE_USER_MODE, _ALT_FPGA_TMO_STATE);
+    if (status == ALT_E_TMO)
+    {
+        dprintf("FPGA: Error in step 13: Wait for state = USER_MODE timeout.\n");
+
+        /* The error here is probably a result of an error in the FPGA data. */
+        if (data_status != ALT_E_SUCCESS)
+        {
+            return data_status;
+        }
+        else
+        {
+            return ALT_E_FPGA_CFG;
+        }
+    }
+
+    /* Step 14:
+     *  - Set CTRL.EN to 0 */
+
+    dprintf("FPGA: === Step 14 (skipped due to precondition) ===\n");
+
+    /* Return data_status. status is used for the setup of the FPGA parameters
+     * and should be successful. Any errors in programming the FPGA is
+     * returned in data_status. */
+    return data_status;
 }
 
-ALT_STATUS_CODE alt_fpga_configure(const void * buf,
-                                   size_t len)
+ALT_STATUS_CODE alt_fpga_configure(const void* cfg_buf, 
+                                   size_t cfg_buf_len)
 {
     FPGA_DATA_t fpga_data;
     fpga_data.type             = FPGA_DATA_FULL;
-    fpga_data.mode.full.buffer = buf;
-    fpga_data.mode.full.length = len;
-
-#if ALT_FPGA_ENABLE_DMA_SUPPORT
-    fpga_data.use_dma          = false;
-#endif
-
-    return alt_fpga_internal_configure(&fpga_data);
-}
-
-ALT_STATUS_CODE alt_fpga_configure_list(const void ** buf_list,
-                                        const size_t * len_list,
-                                        size_t list_count)
-{
-    FPGA_DATA_t fpga_data;
-    fpga_data.type             = FPGA_DATA_LIST;
-    fpga_data.mode.list.buffer = buf_list;
-    fpga_data.mode.list.length = len_list;
-    fpga_data.mode.list.count  = list_count;
-
+    fpga_data.mode.full.buffer = cfg_buf;
+    fpga_data.mode.full.length = cfg_buf_len;
 #if ALT_FPGA_ENABLE_DMA_SUPPORT
     fpga_data.use_dma          = false;
 #endif
@@ -985,99 +935,50 @@ ALT_STATUS_CODE alt_fpga_configure_list(const void ** buf_list,
 }
 
 #if ALT_FPGA_ENABLE_DMA_SUPPORT
-
-ALT_STATUS_CODE alt_fpga_configure_dma(const void * buf,
-                                       size_t len,
+ALT_STATUS_CODE alt_fpga_configure_dma(const void* cfg_buf, 
+                                       size_t cfg_buf_len,
                                        ALT_DMA_CHANNEL_t dma_channel)
 {
     FPGA_DATA_t fpga_data;
     fpga_data.type             = FPGA_DATA_FULL;
-    fpga_data.mode.full.buffer = buf;
-    fpga_data.mode.full.length = len;
+    fpga_data.mode.full.buffer = cfg_buf;
+    fpga_data.mode.full.length = cfg_buf_len;
     fpga_data.use_dma          = true;
     fpga_data.dma_channel      = dma_channel;
 
     return alt_fpga_internal_configure(&fpga_data);
 }
-
-ALT_STATUS_CODE alt_fpga_configure_list_dma(const void ** buf_list,
-                                            const size_t * len_list,
-                                            size_t list_count,
-                                            ALT_DMA_CHANNEL_t dma_channel)
-{
-    FPGA_DATA_t fpga_data;
-    fpga_data.type             = FPGA_DATA_LIST;
-    fpga_data.mode.list.buffer = buf_list;
-    fpga_data.mode.list.length = len_list;
-    fpga_data.mode.list.count  = list_count;
-    fpga_data.use_dma          = true;
-    fpga_data.dma_channel      = dma_channel;
-
-    return alt_fpga_internal_configure(&fpga_data);
-}
-
 #endif
 
 ALT_STATUS_CODE alt_fpga_istream_configure(alt_fpga_istream_t cfg_stream,
                                            void * user_data)
 {
     FPGA_DATA_t fpga_data;
-    fpga_data.type = FPGA_DATA_STREAM;
-    fpga_data.mode.stream.callback = cfg_stream;
-    fpga_data.mode.stream.context  = user_data;
-
+    fpga_data.type                = FPGA_DATA_ISTREAM;
+    fpga_data.mode.istream.stream = cfg_stream;
+    fpga_data.mode.istream.data   = user_data;
 #if ALT_FPGA_ENABLE_DMA_SUPPORT
-    fpga_data.use_dma              = false;
+    fpga_data.use_dma             = false;
 #endif
 
     return alt_fpga_internal_configure(&fpga_data);
 }
 
 #if ALT_FPGA_ENABLE_DMA_SUPPORT
-
 ALT_STATUS_CODE alt_fpga_istream_configure_dma(alt_fpga_istream_t cfg_stream,
                                                void * user_data,
                                                ALT_DMA_CHANNEL_t dma_channel)
 {
     FPGA_DATA_t fpga_data;
-    fpga_data.type = FPGA_DATA_STREAM;
-    fpga_data.mode.stream.callback = cfg_stream;
-    fpga_data.mode.stream.context  = user_data;
-    fpga_data.use_dma              = true;
-    fpga_data.dma_channel          = dma_channel;
+    fpga_data.type                = FPGA_DATA_ISTREAM;
+    fpga_data.mode.istream.stream = cfg_stream;
+    fpga_data.mode.istream.data   = user_data;
+    fpga_data.use_dma             = true;
+    fpga_data.dma_channel         = dma_channel;
 
     return alt_fpga_internal_configure(&fpga_data);
 }
-
 #endif
-
-ALT_STATUS_CODE alt_fpga_int_enable(uint32_t mask)
-{
-    /* Writing 0 will cause the interrupt to be unmasked. */
-    alt_clrbits_word(ALT_FPGAMGR_INTR_MSK_ADDR, mask);
-
-    return ALT_E_SUCCESS;
-}
-
-ALT_STATUS_CODE alt_fpga_int_disable(uint32_t mask)
-{
-    /* Writing 1 will cause the interrupt to be masked. */
-    alt_setbits_word(ALT_FPGAMGR_INTR_MSK_ADDR, mask);
-
-    return ALT_E_SUCCESS;
-}
-
-uint32_t alt_fpga_int_get(void)
-{
-    return alt_read_word(ALT_FPGAMGR_INTR_MSKED_STAT_ADDR);
-}
-
-ALT_STATUS_CODE alt_fpga_int_clear(uint32_t mask)
-{
-    alt_write_word(ALT_FPGAMGR_INTR_MSKED_STAT_ADDR, mask);
-
-    return ALT_E_SUCCESS;
-}
 
 uint32_t alt_fpga_gpi_read(uint32_t mask)
 {
@@ -1091,10 +992,80 @@ uint32_t alt_fpga_gpi_read(uint32_t mask)
 
 ALT_STATUS_CODE alt_fpga_gpo_write(uint32_t mask, uint32_t value)
 {
-    if (mask != 0)
+    if (mask == 0)
     {
-        alt_replbits_word(ALT_FPGAMGR_GPO_ADDR, mask, value);
+        return ALT_E_SUCCESS;
     }
+
+    alt_write_word(ALT_FPGAMGR_GPO_ADDR, (alt_read_word(ALT_FPGAMGR_GPO_ADDR) & ~mask) | (value & mask));
+
+    return ALT_E_SUCCESS;
+}
+
+ALT_STATUS_CODE alt_fpga_man_irq_disable(ALT_FPGA_MON_STATUS_t mon_stat_mask)
+{
+    uint32_t current;
+
+    /* Ensure only bits 11:0 are set. */
+    if (mon_stat_mask & ~((1 << 12) - 1))
+    {
+        return ALT_E_BAD_ARG;
+    }
+    current = alt_read_word(ALT_FPGAMGR_MON_GPIO_INTEN_ADDR);
+
+    current &= ~((uint32_t)mon_stat_mask) & ((1 << 12) - 1);
+    alt_write_word(ALT_FPGAMGR_MON_GPIO_INTEN_ADDR, current);
+
+    return ALT_E_SUCCESS;
+}
+
+ALT_STATUS_CODE alt_fpga_man_irq_enable(ALT_FPGA_MON_STATUS_t mon_stat_mask)
+{
+    /* Ensure only bits 11:0 are set. */
+    if (mon_stat_mask & ~((1 << 12) - 1))
+    {
+        return ALT_E_BAD_ARG;
+    }
+
+    alt_setbits_word(ALT_FPGAMGR_MON_GPIO_INTEN_ADDR, mon_stat_mask);
+
+    return ALT_E_SUCCESS;
+}
+
+uint32_t alt_fpga_man_irq_type_get(ALT_FPGA_MON_STATUS_t mon_stat_mask)
+{
+    return alt_read_word(ALT_FPGAMGR_MON_GPIO_INTTYPE_LEVEL_ADDR) & mon_stat_mask;
+}
+
+ALT_STATUS_CODE alt_fpga_man_irq_type_set(ALT_FPGA_MON_STATUS_t mon_stat_mask,
+                                          ALT_FPGA_MON_STATUS_t mon_stat_config)
+{
+    /* Ensure only bits 11:0 are set. */
+    if (mon_stat_mask & ~((1 << 12) - 1))
+    {
+        return ALT_E_BAD_ARG;
+    }
+
+    alt_replbits_word(ALT_FPGAMGR_MON_GPIO_INTTYPE_LEVEL_ADDR, mon_stat_mask, mon_stat_config);
+
+    return ALT_E_SUCCESS;
+}
+
+uint32_t alt_fpga_man_irq_pol_get(ALT_FPGA_MON_STATUS_t mon_stat_mask)
+{
+    return alt_read_word(ALT_FPGAMGR_MON_GPIO_INT_POL_ADDR) & mon_stat_mask;
+}
+
+ALT_STATUS_CODE alt_fpga_man_irq_pol_set(ALT_FPGA_MON_STATUS_t mon_stat_mask,
+                                         ALT_FPGA_MON_STATUS_t mon_stat_config)
+{
+    /* Ensure only bits 11:0 are set. */
+    if (mon_stat_mask & ~((1 << 12) - 1))
+    {
+        return ALT_E_BAD_ARG;
+    }
+
+    alt_replbits_word(ALT_FPGAMGR_MON_GPIO_INT_POL_ADDR, mon_stat_mask, mon_stat_config);
 
     return ALT_E_SUCCESS;
 }

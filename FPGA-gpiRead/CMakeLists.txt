@@ -10,5 +10,4 @@ hwlib.h
 socal.h
 alt_fpgamgr.h
 alt_printf.h
-alt_fpgamgrdata.h
 )

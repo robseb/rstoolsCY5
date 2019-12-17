@@ -9,6 +9,5 @@ hps.h
 hwlib.h
 socal.h
 alt_fpgamgr.h
-alt_fpgamgrdata.h
 alt_printf.h
 )
