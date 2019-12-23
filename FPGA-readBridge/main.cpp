@@ -16,8 +16,10 @@
 #include <sstream>
 using namespace std;
 
+#define LWH2F_RANGE 0x07FFFF
+#define H2F_RANGE  0x07FFFF
 
-#pragma region Check user input 
+ 
 bool checkIfInputIsVailed(string input, bool DecHex)
 {
 	if (input.length() < 1) return false;
@@ -31,12 +33,11 @@ bool checkIfInputIsVailed(string input, bool DecHex)
 
 	return false;
 }
-#pragma endregion
 
 int main(int argc, const char* argv[])
 {
 	// Read a Register ofthe light Wightweight or AXI HPS to FPGA Interface
-	if (((argc >2) && (std::string(argv[1]) == "-lw")) || ((argc > 3) && (std::string(argv[1]) == "-hf")))
+	if (((argc >2) && (std::string(argv[1]) == "-lw")) || ((argc > 2) && (std::string(argv[1]) == "-hf")))
 	{
 		// read the selected Bridge Interface 
 		bool lwBdrige(std::string(argv[1]) == "-lw");
@@ -64,7 +65,7 @@ int main(int argc, const char* argv[])
 			if (lwBdrige)
 			{
 				// check the range of the lightwight Bridge Interface 
-				if (addressOffset > 2097150)
+				if (addressOffset > LWH2F_RANGE)
 				{
 					if (ConsloeOutput)
 						cout << "	ERROR: selected address is outside of"\
@@ -75,7 +76,7 @@ int main(int argc, const char* argv[])
 			else
 			{
 				// check the range of the AXI HPS to FPGA Bridge Interface 
-				if (addressOffset > 8143)
+				if (addressOffset > H2F_RANGE)
 				{
 					if (ConsloeOutput)
 						cout << "	ERROR: selected address is outside of the HPS to "\
@@ -91,7 +92,6 @@ int main(int argc, const char* argv[])
 				cout << "	ERROR: selected address input is no hex address!" << endl;
 			InputVailed = false;
 		}
-
 		
 		// only in case the input is vailed read the bridge
 		if (InputVailed)
@@ -124,7 +124,7 @@ int main(int argc, const char* argv[])
 				}
 
 				// configure a virtual memory interface to the bridge
-				bridgeMap = mmap(NULL, sysconf(_SC_PAGE_SIZE), PROT_READ, MAP_SHARED, fd, \
+				bridgeMap = mmap(NULL, lwBdrige ? LWH2F_RANGE : H2F_RANGE, PROT_READ, MAP_SHARED, fd, \
 					(lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST));
 
 				// check if opening was sucsessful
@@ -141,7 +141,7 @@ int main(int argc, const char* argv[])
 				// access to Bridge is okay 
 				// read the value to the address 
 				volatile  uint32_t* readMap = (volatile  uint32_t*) \
-					(bridgeMap + addressOffset);
+						(((uint32_t)bridgeMap) + addressOffset);
 
 				// readin the data 
 				uint32_t value = *readMap;
@@ -162,7 +162,7 @@ int main(int argc, const char* argv[])
 				}
 
 				// Close the MAP 
-				int res = munmap(bridgeMap, sysconf(_SC_PAGE_SIZE));
+				int res = munmap(bridgeMap, lwBdrige ? LWH2F_RANGE :  H2F_RANGE);
 
 				if (res < 0)
 				{
@@ -192,17 +192,20 @@ int main(int argc, const char* argv[])
 	{
 		// help output 
 		cout << "	Command to read a register on a HPS-FPGA Bridge" << endl;
+		cout << " Note: be sure that the bridge to read was enabled with the Platform Designer" << endl;
 		cout << "	FPGA-readBridge -lw [offset module address hex]" << endl;
 		cout << "		read a register on the Lightweight HPS-FPGA Brige" << endl;
 		cout << "		e.g.: FPGA-readBridge -lw 0a" << endl;
 		cout << endl;
 		cout << "	FPGA-readBridge -hf [offset module address hex]" << endl;
 		cout << "		read a register on the HPS to FPGA AXI Bridge" << endl;
-		cout << "		e.g.: FPGA-readBridge -lw 0a" << endl;
+		cout << "		e.g.: FPGA-readBridge -hf 0a" << endl;
 		cout << endl;
 		cout << "		suffix: -b -> only decimal result output" << endl;
 	}
 
+	// free the dynamic access memory
+	__VIRTUALMEM_SPACE_DEINIT();
 
 	return 0;
 }

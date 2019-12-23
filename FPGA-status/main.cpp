@@ -99,7 +99,11 @@ int main(int argc, const char* argv[])
 		cout << "   Status of the FPGA: "  << std2str(stat) << endl;
 	}
 
-
 	// Give the right to controll the FPGA
 	alt_fpga_control_disable();
+
+	// free the dynamic access memory
+	__VIRTUALMEM_SPACE_DEINIT();
+
+	return 0;
 }

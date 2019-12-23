@@ -46,42 +46,39 @@ extern "C"
 //
 //
 #define soc_cv_av
-#define LINUX_TASK_MODE
-	
-	
-#ifdef LINUX_TASK_MODE 
-	// 
-	// \desc Linux Task Mode:
-	// for normel Linux Taks- and App- devleopment 
-	// Disable this mode to the dirct memory access for Linux Driver develoment
-	// peripherie access over virtual memory
-	//
-    #include <sys/types.h>
-    #include <sys/mman.h>
-    #include <sys/stat.h>
-    #include <fcntl.h>
-	
-    volatile void* __hps_virtualAdreess_FPGAMGR;
-	volatile void* __hps_virtualAdreess_FPGAMFRDATA;
-    //
-    // macro to include the virtual Memory 
-    //
-    //
-    #define __VIRTUALMEM_SPACE_INIT()                                                                                          \
+
+// 
+// \desc Linux Task Mode:
+// for normel Linux Taks- and App- devleopment 
+// Disable this mode to the dirct memory access for Linux Driver develoment
+// peripherie access over virtual memory
+//
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+volatile void* __hps_virtualAdreess_FPGAMGR;
+volatile void* __hps_virtualAdreess_FPGAMFRDATA;
+volatile int __fd;
+
+//
+// macro to include the virtual Memory 
+//
+//
+#define __VIRTUALMEM_SPACE_INIT()                                                                                          \
         int fd;                                                                                                                \
         fd = open("/dev/mem", (O_RDWR | O_SYNC));                                                                              \
-	__hps_virtualAdreess_FPGAMFRDATA  = mmap(NULL, 1,(PROT_READ | PROT_WRITE), MAP_SHARED, fd, ALT_FPGAMGRDATA_OFST);      \
-	__hps_virtualAdreess_FPGAMGR = mmap(NULL, 1,(PROT_READ | PROT_WRITE), MAP_SHARED, fd, ALT_FPGAMGR_OFST)             
-   
+	__hps_virtualAdreess_FPGAMFRDATA  = mmap(NULL, 0x04,(PROT_READ | PROT_WRITE), MAP_SHARED, fd, ALT_FPGAMGRDATA_OFST);      \
+	__hps_virtualAdreess_FPGAMGR = mmap(NULL, 0x1000,(PROT_READ | PROT_WRITE), MAP_SHARED, fd, ALT_FPGAMGR_OFST)             
+
+#define __VIRTUALMEM_SPACE_DEINIT()                                                                                           \
+        munmap((void*) __hps_virtualAdreess_FPGAMFRDATA, 0x04);                                                               \
+        munmap((void*) __hps_virtualAdreess_FPGAMGR, 0x1000);                                                                 \
+        close(__fd)
 
 
-#endif
-
-#ifndef LINUX_TASK_MODE
-
-#define __VIRTUALMEM_SPACE_INIT()  while(0)
-
-#endif 
 
 /** 
 

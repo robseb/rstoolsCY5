@@ -20,6 +20,10 @@ using namespace std;
 #define HEX_INPUT 0
 #define BIN_INPUT 2
 
+#define LWH2F_RANGE 0x07FFFF
+#define H2F_RANGE  0x07FFFF
+
+
 #pragma region Check user input 
 bool checkIfInputIsVailed(string input, bool DecHex)
 {
@@ -38,8 +42,15 @@ bool checkIfInputIsVailed(string input, bool DecHex)
 
 int main(int argc, const char* argv[])
 {
+	// Debugging Test values 
+	//argv[1] = "-hf";
+	//argv[2] =(const char*) "0"; // Address 
+	//argv[3] = (const char*)"123"; // Value
+	//argc = 3;
+
+
 	// Read to the Light Wightweight or AXI HPS to FPGA Interface
-	if (((argc > 3) && (std::string(argv[1]) == "-lw")) || ((argc > 3) && (std::string(argv[1]) == "-hf")))
+	if (((argc >= 3) && (std::string(argv[1]) == "-lw")) || ((argc >= 3) && (std::string(argv[1]) == "-hf")))
 	{
 		// read the selected Bridge Interface 
 		bool lwBdrige(std::string(argv[1]) == "-lw");
@@ -63,7 +74,6 @@ int main(int argc, const char* argv[])
 		case DEC_INPUT:
 			if ((argc > 4) && (std::string(argv[4]) == "-b"))
 				ConsloeOutput = false;
-
 			ValueString = argv[3];
 			break;
 		case HEX_INPUT:
@@ -81,9 +91,8 @@ int main(int argc, const char* argv[])
 
 		/// Check the user inputs ///
 
-		string AddresshexString = argv[2];
+		string AddresshexString =argv[2];
 		uint32_t addressOffset = 0;
-
 
 		uint32_t ValueInput = 0;
 		uint64_t ValueInputTemp = ValueInput;
@@ -102,7 +111,7 @@ int main(int argc, const char* argv[])
 			if (lwBdrige)
 			{
 				// check the range of the lightwight Bridge Interface 
-				if (addressOffset > 2097150)
+				if (addressOffset > LWH2F_RANGE)
 				{
 					if (ConsloeOutput)
 						cout << "	ERROR: selected address is outside of"\
@@ -113,7 +122,7 @@ int main(int argc, const char* argv[])
 			else
 			{
 				// check the range of the AXI HPS to FPGA Bridge Interface 
-				if (addressOffset > 8143)
+				if (addressOffset > H2F_RANGE)
 				{
 					if (ConsloeOutput)
 						cout << "	ERROR: selected address is outside of the HPS to "\
@@ -159,7 +168,7 @@ int main(int argc, const char* argv[])
 		}
 		else
 		{
-			// fort DEC and HEX
+			// for DEC and HEX
 			// check if the address hex input is vailed
 
 			if (checkIfInputIsVailed(ValueString, !(DecHexBin == HEX_INPUT)))
@@ -205,7 +214,6 @@ int main(int argc, const char* argv[])
 					cout << "	Value:	 Bit Pos:" << BitPosValue << " Output:" << SetResetBit << endl;
 				else
 					cout << "new Value:	     " << ValueInput << " [0x" << hex << ValueInput << "]" << dec << endl;
-
 			}
 
 			do
@@ -227,7 +235,7 @@ int main(int argc, const char* argv[])
 				}
 
 				// configure a virtual memory interface to the bridge
-				bridgeMap = mmap(NULL, sysconf(_SC_PAGE_SIZE), PROT_WRITE | PROT_READ, MAP_SHARED, fd, \
+				bridgeMap = mmap(NULL,(lwBdrige ? LWH2F_RANGE : H2F_RANGE) , PROT_WRITE | PROT_READ, MAP_SHARED, fd, \
 					(lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST));
 
 				// check if opening was sucsessful
@@ -244,7 +252,7 @@ int main(int argc, const char* argv[])
 				// access to Bridge is okay 
 				// write the value to the address 
 				volatile  uint32_t* write_bridge = (volatile  uint32_t*) \
-					(bridgeMap + addressOffset);
+						((bridgeMap) + addressOffset);
 
 				// print also the old value of the selected register
 				if (ConsloeOutput)
@@ -263,7 +271,7 @@ int main(int argc, const char* argv[])
 					*write_bridge = ValueInput;
 
 				// Close the MAP 
-				int res = munmap(bridgeMap, sysconf(_SC_PAGE_SIZE));
+				int res = munmap(bridgeMap, (lwBdrige ? LWH2F_RANGE : H2F_RANGE));
 
 				if (res < 0)
 				{
@@ -294,6 +302,7 @@ int main(int argc, const char* argv[])
 		// help output 
 		cout << "	Command write to address of a HPS-FPGA Bridge" << endl;
 		cout << "	address" << endl;
+		cout << " Note: be sure that the bridge to write was enabled with the Platform Designer" << endl;
 		cout << "	FPGA-readBridge -lw [offset module address hex]" << endl;
 		cout << "		read the register on the Lightweight HPS-FPGA Brige" << endl;
 		cout << "		e.g.: FPGA-writeBridge -lw 0a" << endl;
@@ -313,6 +322,9 @@ int main(int argc, const char* argv[])
 		cout << "						Succses:1" << endl;
 	}
 
+
+	// free the dynamic access memory
+	__VIRTUALMEM_SPACE_DEINIT();
 
 	return 0;
 }

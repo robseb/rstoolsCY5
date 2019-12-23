@@ -49,7 +49,6 @@ int main(int argc, const char* argv[])
 
 	else if ((argc > 1) && (std::string(argv[1]) == "-d")) 
 			cout << gpi;
-
 	else
 	{
 		// Print the MSEL Value as detailed string 
@@ -72,6 +71,9 @@ int main(int argc, const char* argv[])
 
 	// Give the right to controll the FPGA
 	alt_fpga_control_disable();
+
+	// free the dynamic access memory
+	__VIRTUALMEM_SPACE_DEINIT();
 
 	return 0;
 }
