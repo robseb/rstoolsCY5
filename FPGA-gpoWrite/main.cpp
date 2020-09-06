@@ -1,7 +1,7 @@
 /**
  * @file    main.cpp
  * @brief	FPGA-gpoWrite
- * @author  Robin Sebastian (https://github.com/robseb)
+ * @author  Robin Sebastian (https://github.com/robseb) (git@robseb.de)
  * @mainpage
  * rstools application to write the general purpose outline
  * to the FPGA fabric
@@ -28,6 +28,13 @@ bool checkIfInputIsVailed(string input, bool DecHex)
 {
 	if ((input.length() < 1) || (input.length() > 8)) return false;
 	uint16_t i = 0;
+
+	// remove suffix "0x"
+	if ((input.find_first_of("0x", 0) == 0) && (!DecHex))
+	{
+		input.replace(0, 2, "");
+	}
+
 	for (i = 0; i < input.length(); i++)
 	{
 		if (i != input.find_first_of(DecHex ? "0123456789" :"0123456789abcdef", i)) break;
@@ -153,8 +160,8 @@ int main(int argc, const char* argv[])
 	}
 	else 
 	{
-		cout << "	Command to write the general-purpose output signals (gpo) to " << endl;
-		cout << "	the FPGA fabric " << endl;
+		cout << "	Command to write the general-purpose output signals (gpo) " << endl;
+		cout << "	registers to the FPGA fabric " << endl;
 		cout << "	The HPS get write a 32 Bit register to the FPGA" << endl;
 		cout << "	FPGA-gpoWrite -h [uint]" << endl;
 		cout << "		writing the whole 32 Bit gpo as HEX" << endl;

@@ -1,7 +1,7 @@
 /**
  * @file    main.cpp
  * @brief   FPGA-writeConfig
- * @author  Robin Sebastian (https://github.com/robseb)
+ * @author  Robin Sebastian (https://github.com/robseb) (git@robseb.de)
  * @mainpage
  * rstools application to write a new configuration to 
  * the FPGA fabric 
@@ -118,14 +118,14 @@ int main(int argc, const char* argv[])
 	else 
 	{
 		cout << "	Command to change the FPGA fabric configuration" << endl;
-		cout << "	for Cyclone V use following RBF (.rbf) Config File Setings" << endl;
+		cout << "	for Cyclone V use following RBF (.rbf) config file settings" << endl;
 		cout << "	MSEL=00100: PP16 with no AES and no Data compression" << endl;
 		cout << "	MSEL=00101: PP16 with AES and no Data compression" << endl;
-		cout << "	FPGA-writeConfig -f [config rbf file path] {-b [optinal]}" << endl;
+		cout << "	FPGA-writeConfig -f [config rbf file path] {-b [optional]}" << endl;
 		cout << "		change the FPGA config with a selected .rbf file" << endl;
-		cout << "	FPGA-writeConfig -r {-b [optinal]}" << endl;
+		cout << "	FPGA-writeConfig -r {-b [optional]}" << endl;
 		cout << "		restore to the boot up FPGA configuration" << endl;
-		cout << "		this Conf File is located: /usr/rsyocto/running_bootloader_fpgaconfig.rbf" << endl;
+		cout << "		this conf File is located: /usr/rsyocto/running_bootloader_fpgaconfig.rbf" << endl;
 		cout << "		suffix: -b -> only decimal result output"<<endl;
 		cout << "						Error:  0" << endl;
 		cout << "						Succses:1" << endl;

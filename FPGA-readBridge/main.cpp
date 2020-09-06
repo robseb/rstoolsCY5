@@ -1,9 +1,9 @@
 /**
  * @file    main.cpp
  * @brief	FPGA-readBridge
- * @author  Robin Sebastian (https://github.com/robseb)
+ * @author  Robin Sebastian (https://github.com/robseb) (git@robseb.de)
  * @mainpage
- * rstools application to read any bridge to FPGA
+ * rstools application to read any HSP-to-FPGA Bridges or the MPU address space
  * address
  */
 
@@ -14,21 +14,48 @@
 #include <iostream>
 #include <unistd.h>
 #include <sstream>
+#include <thread>					// Required for putting task to sleep 
+#include <chrono>					// Required for putting task to sleep 
+
 using namespace std;
 
-#define LWH2F_RANGE 0x07FFFF
-#define H2F_RANGE  0x07FFFF
+// Bridge Interfaces Base addresses 
+#define LWHPSFPGA_OFST  0xff200000 // LWHPS2FPGA Bridge 
+#define HPSFPGA_OFST    0xC0000000 // HPS2FPGA Bridge 
+#define MPU_OFSET		0x0        // MPU (HPS Address space)
 
- 
+// Bridge interface End address 
+#define LWHPSFPGA_END   0xFF3FFFFF
+#define HPSFPGA_END     0xFBFFFFFF
+#define MPU_END         0xFFFFFFFF
+
+// Bridge interface range (allowed input offset)
+#define LWH2F_RANGE    (LWHPSFPGA_END - LWHPSFPGA_OFST)
+#define H2F_RANGE      (HPSFPGA_END - HPSFPGA_OFST)
+#define MPU_RANGE      (MPU_END - MPU_OFSET)
+
+#define MAP_SIZE 4096UL
+#define MAP_MASK (MAP_SIZE - 1)
+
+// Auto refresh Mode settings
+#define REFRECHMODE_DELAY_MS	50
+#define REFRECHMODE_DURATION_MS 15000
+#define REFRECHMODE_MAX_COUNT   (REFRECHMODE_DURATION_MS/REFRECHMODE_DELAY_MS)
+
 bool checkIfInputIsVailed(string input, bool DecHex)
 {
 	if (input.length() < 1) return false;
 	uint16_t i = 0;
-	for (i = 0; i < input.length(); i++)
+	// remove suffix "0x"
+	if ((input.find_first_of("0x",0) == 0) && (!DecHex))
 	{
-		if (i != input.find_first_of(DecHex ? "0123456789" : "0123456789abcdef", i)) break;
+		input.replace(0, 2, "");
 	}
 
+	for (i = 0; i < input.length(); i++)
+	{
+		if (i != input.find_first_of(DecHex ? "0123456789" : "0123456789abcdefABCDEF", i)) break;
+	}
 	if (i == input.length()) return true;
 
 	return false;
@@ -36,19 +63,33 @@ bool checkIfInputIsVailed(string input, bool DecHex)
 
 int main(int argc, const char* argv[])
 {
-	// Read a Register ofthe light Wightweight or AXI HPS to FPGA Interface
-	if (((argc >2) && (std::string(argv[1]) == "-lw")) || ((argc > 2) && (std::string(argv[1]) == "-hf")))
+	// Read a Register of the light Lightweight or AXI HPS to FPGA Interface
+	if (((argc >2) && (std::string(argv[1]) == "-lw")) || ((argc > 2) && (std::string(argv[1]) == "-hf")) \
+		|| ((argc > 2) && (std::string(argv[1]) == "-mpu")))
 	{
-		// read the selected Bridge Interface 
-		bool lwBdrige(std::string(argv[1]) == "-lw");
+		// Read the selected Bridge Interface 
+		uint8_t address_space = 0; // 0: HPS2FPGA | 1: LWHPS2FPGA | 2: MPU
+		bool lwBdrige = false;
+
+		if (std::string(argv[1]) == "-lw") 
+		{
+			address_space = 1;
+			lwBdrige = true;
+		}
+		else  if(std::string(argv[1]) == "-mpu")
+		    address_space = 2;
 
 		bool ConsloeOutput = true;
-
+		bool refreshMode = false;
 		string ValueString;
 
-		// check if only decimal output is enabeled 
+		// check if only decimal output is enabled 
 		if ((argc > 3) && (std::string(argv[3]) == "-b"))
 			ConsloeOutput = false;
+
+		// Check if the refreshMode was enabled
+		if ((argc > 3) && (std::string(argv[3]) == "-r"))
+			refreshMode = true;
 
 		/// Check the user inputs ///
 		string AddresshexString = argv[2];
@@ -61,21 +102,10 @@ int main(int argc, const char* argv[])
 			istringstream buffer(AddresshexString);
 			buffer >> hex >> addressOffset;
 
-			// address inside range?
-			if (lwBdrige)
+			// HPS2FPGA
+			if (address_space == 0)
 			{
-				// check the range of the lightwight Bridge Interface 
-				if (addressOffset > LWH2F_RANGE)
-				{
-					if (ConsloeOutput)
-						cout << "	ERROR: selected address is outside of"\
-						"the Lightwight Bridge range!" << endl;
-					InputVailed = false;
-				}
-			}
-			else
-			{
-				// check the range of the AXI HPS to FPGA Bridge Interface 
+				// check the range of the AXI HPS-to-FPGA Bridge Interface 
 				if (addressOffset > H2F_RANGE)
 				{
 					if (ConsloeOutput)
@@ -84,27 +114,62 @@ int main(int argc, const char* argv[])
 					InputVailed = false;
 				}
 			}
+			// LWHPS2FPGA
+			else if (address_space==1)
+			{
+				// check the range of the Lightweight HPS-to-FPGA Bridge Interface 
+				if (addressOffset > LWH2F_RANGE)
+				{
+					if (ConsloeOutput)
+						cout << "	ERROR: selected address is outside of"\
+						"the Lightweight HPS-to-FPGA Bridge range!" << endl;
+					InputVailed = false;
+				}
+			}
+			// MPU
+			else
+			{
+				// check the range of the MPU address space
+				if (addressOffset > MPU_RANGE)
+				{
+					if (ConsloeOutput)
+						cout << "	ERROR: selected address is outside MPU (HPS) address range!" << endl;
+					InputVailed = false;
+				}
+			}
 		}
 		else
 		{
-			// address input is not vailed
+			// address input is not vadid
 			if (ConsloeOutput)
 				cout << "	ERROR: selected address input is no hex address!" << endl;
 			InputVailed = false;
 		}
-		
-		// only in case the input is vailed read the bridge
+		uint32_t address;
+		if (address_space < 2)
+			address = (lwBdrige ? LWHPSFPGA_OFST : HPSFPGA_OFST) + addressOffset;
+		else
+			address = addressOffset;
+
+		// only in case the input is valid read the bridge
 		if (InputVailed)
 		{
 			if (ConsloeOutput)
 			{
-				cout << "		-- Read registers on the FPGA part " << endl;
-				cout << "	Bridge:      " << (lwBdrige ? "Lightwight HPS to FPGA" : "HPS to FPGA AXI") << endl;
-				cout << "	Brige Base:  0x" << hex << (lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST) << dec << endl;
-				cout << "	your Offset: 0x" << hex << addressOffset << dec << endl;
-				cout << "	Address:     0x" << hex << ((lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST) + addressOffset) << dec << endl;
+				if (address_space < 2)
+				{
+					cout << "	------- Read a FPGA Register via a HPS-to-FPGA Bridge -------" << endl;
+					cout << "	Bridge:      " << (lwBdrige ? "Lightweight HPS-to-FPGA" : "HPS-to-FPGA") << endl;
+					cout << "	Brige Base:  0x" << hex << (lwBdrige ? LWHPSFPGA_OFST : HPSFPGA_OFST) << dec << endl;
+					cout << "	Your Offset: 0x" << hex << addressOffset << dec << endl;
+					cout << "	Address:     0x" << hex << address << dec << endl;
+				}
+				else 
+				{
+					cout << "	-------     Read MPU (HPS) memory address register  -------" << endl;
+					cout << "	Address:     0x" << hex << address << dec << endl;
+				}
 			}
-
 			do
 			{
 				void* bridgeMap;
@@ -123,58 +188,96 @@ int main(int argc, const char* argv[])
 					break;
 				}
 
-				// configure a virtual memory interface to the bridge
-				bridgeMap = mmap(NULL, lwBdrige ? LWH2F_RANGE : H2F_RANGE, PROT_READ, MAP_SHARED, fd, \
-					(lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST));
-
-				// check if opening was sucsessful
+				bridgeMap = mmap(NULL, MAP_SIZE, PROT_READ, MAP_SHARED, fd, \
+						address & ~MAP_MASK);
+				// check if opening was successfully
 				if (bridgeMap == MAP_FAILED)
 				{
 					if (ConsloeOutput)
-						cout << "ERROR: Accesing the virtual memory failed!" << endl;
+						cout << "ERROR: Accessing the virtual memory failed!" << endl;
 					else
 						cout << 0;
 					close(fd);
 					break;
 				}
-				
-				// access to Bridge is okay 
-				// read the value to the address 
-				volatile  uint32_t* readMap = (volatile  uint32_t*) \
-						(((uint32_t)bridgeMap) + addressOffset);
-
-				// readin the data 
-				uint32_t value = *readMap;
-
-				if (ConsloeOutput)
+				void* readMap = bridgeMap + (address & MAP_MASK);
+				uint16_t delay_count = 0;
+				do
 				{
-					// print also the old value of the selected register
-					cout << "	Value:	     " << value << " [0x" << hex << value << "]" << dec << endl;
-					for (uint32_t i = 0; i < 32; i++)
+					// Read the address 
+					uint32_t value = *((uint32_t*)readMap);
+
+					if (ConsloeOutput)
 					{
-						cout << "	val[" << (i < 10 ? " " : "") <<i<<"] ="<< (value &(1 << i) ? 1 : 0) << endl;
+						cout << "-------------------------------------------------------------------------------------" << endl;
+						cout << "			      Value: " << value << " [0x" << hex << value << "]" << dec << endl;
+						cout << "-------------------------------------------------------------------------------------" << endl;
+						cout << "No  |";
+						for (uint16_t i = 31; i > 15; i--)
+						{
+							cout << " " << i << " |";
+						}
+						cout << endl << "Bit |";
+						for (uint16_t i = 31; i > 15; i--)
+						{
+							cout << "  " << (value & (1 << i) ? 1 : 0) << " |";
+						}
+						cout << endl;
+						cout << "-------------------------------------------------------------------------------------" << endl;
+
+						cout << "No  |";
+						for (int16_t i = 15; i >= 0; i--)
+						{
+							if (i > 9)
+								cout << " " << i << " |";
+							else
+								cout << " 0" << i << " |";
+						}
+						cout << endl << "Bit |";
+						for (int16_t i = 15; i >= 0; i--)
+						{
+							cout << "  " << (value & (1 << i) ? 1 : 0) << " |";
+						}
+						cout << endl;
+						cout << "-------------------------------------------------------------------------------------" << endl;
 					}
-				}
-				else
-				{
-					// output only the value as decimal 
-					cout << value;
-				}
+					else
+					{
+						// output only the value as decimal 
+						cout << value;
+					}
+
+					if (!refreshMode)
+						break;
+					else
+					{
+						delay_count++;
+						// Print the refrech status
+						cout << "Auto Refrech Mode for " << REFRECHMODE_DURATION_MS << "ms [" << delay_count << \
+							"/" << REFRECHMODE_MAX_COUNT << "]" << endl;
+
+						// C++11: Put this task to sleep 
+						std::this_thread::sleep_until(std::chrono::system_clock::now() + \
+							std::chrono::milliseconds(REFRECHMODE_DELAY_MS));
+						// Remove the last 10 rows 
+						if (delay_count < REFRECHMODE_MAX_COUNT)
+							cout << "\033[F\033[F\033[F\033[F\033[F\033[F\033[F\033[F\033[F\033[F";
+					}
+
+				} while (delay_count<REFRECHMODE_MAX_COUNT);
 
 				// Close the MAP 
-				int res = munmap(bridgeMap, lwBdrige ? LWH2F_RANGE :  H2F_RANGE);
-
-				if (res < 0)
+				if (munmap(bridgeMap, MAP_SIZE) < 0)
 				{
 					if (ConsloeOutput)
 						cout << "ERROR: Closing of shared memory failed!" << endl;
 				}
 
-				// close the driver port 
+				// Close the driver port 
 				close(fd);
 
 				if (ConsloeOutput)
-					cout << "Reading was successful" << endl;
+					cout << "Reading was successfully" << endl;
 				else
 					cout << 1;
 
@@ -182,7 +285,7 @@ int main(int argc, const char* argv[])
 		}
 		else
 		{
-			// the user input is not okay 
+			// User input is not okay 
 			if (!ConsloeOutput)
 				cout << 0;
 		}
@@ -191,21 +294,26 @@ int main(int argc, const char* argv[])
 	else
 	{
 		// help output 
-		cout << "	Command to read a register on a HPS-FPGA Bridge" << endl;
-		cout << " Note: be sure that the bridge to read was enabled with the Platform Designer" << endl;
-		cout << "	FPGA-readBridge -lw [offset module address hex]" << endl;
-		cout << "		read a register on the Lightweight HPS-FPGA Brige" << endl;
-		cout << "		e.g.: FPGA-readBridge -lw 0a" << endl;
-		cout << endl;
-		cout << "	FPGA-readBridge -hf [offset module address hex]" << endl;
-		cout << "		read a register on the HPS to FPGA AXI Bridge" << endl;
-		cout << "		e.g.: FPGA-readBridge -hf 0a" << endl;
-		cout << endl;
-		cout << "		suffix: -b -> only decimal result output" << endl;
-	}
+		cout << "-------------------------------------------------------------------------------------" << endl;
+		cout << "|	Command to read a 32-bit register of a HPS-to-FPGA Bridge	         	    |" << endl;			
+		cout << "|		or of the entire MPU (HPS) Memory space				    |" << endl;
+		cout << "|  Note: Be sure that the bridge to read is enabled within the Platform Designer    |" << endl;
+		cout << "-------------------------------------------------------------------------------------" << endl;
+		cout << "|$	FPGA-readBridge -lw [offset address in hex]					" << endl;
+		cout << "|		read a 32-bit register of the Lightweight HPS-to-FPGA Bridge		" << endl;
+		cout << "|		e.g.: FPGA-readBridge -lw 0A							" << endl;
+		cout << "|$	FPGA-readBridge -hf [offset address in hex]				" << endl;
+		cout << "|		read a 32-bit register of the HPS-to-FPGA AXI Bridge	" << endl;
+		cout << "|		e.g.: FPGA-readBridge -hf 8C							" << endl;
+		cout << "|$	FPGA-readBridge -mpu [module address in hex]" << endl;
+		cout << "|		read a 32-bit register for the entire MPU (HPS) memory space" << endl;
+		cout << "|		e.g.: FPGA-readBridge -mpu 87" << endl;
+		cout << "|		Suffix: -b -> only decimal result output" << endl;
+		cout << "|		Suffix: -r -> Auto refrech the value for 15sec" << endl;
+		cout << "|$	FPGA-readBridge -lw|hf|mpu| <offset address in hex> -b|r" << endl;
+		cout << "-------------------------------------------------------------------------------------" << endl;
 
-	// free the dynamic access memory
-	__VIRTUALMEM_SPACE_DEINIT();
+	}
 
 	return 0;
 }

@@ -1,7 +1,7 @@
 /**
  * @file    main.cpp
  * @brief   FPGA-status
- * @author  Robin Sebastian (https://github.com/robseb)
+ * @author  Robin Sebastian (https://github.com/robseb) (git@robseb.de)
  * @mainpage
  * rstools application to read the Status of the FPGA Fabric
  * with FPGA Manager

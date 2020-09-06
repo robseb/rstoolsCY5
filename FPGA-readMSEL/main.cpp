@@ -1,7 +1,7 @@
 /**
  * @file    main.cpp
  * @brief	FPGA-readMSEL 
- * @author  Robin Sebastian (https://github.com/robseb)
+ * @author  Robin Sebastian (https://github.com/robseb) (git@robseb.de)
  * @mainpage
  * rstools application to read the FPGA MSEL Switch with the
  * FPGA Manager
@@ -182,7 +182,7 @@ int main(int argc, const char* argv[])
 		cout << "-- Read the MSEL-Switch Status with the FPGA Manager of Intel Cyclone V  --" << endl;
 		cout << "      MSEL-switch postion: " << endl << cfg2str(st) << endl;
 		cout << "\nNote: cdratio: Clock-to-data ratio field" << endl;
-		cout << "		 cfgwdth: configuration data width bit" << endl;
+		cout << "      cfgwdth: Configuration data width bit" << endl;
 	}
 	
 	// Give the right to controll the FPGA

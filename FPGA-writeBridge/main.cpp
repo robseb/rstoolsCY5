@@ -1,9 +1,9 @@
 /**
  * @file    main.cpp
- * @brief	FPGA-writeBridge
- * @author  Robin Sebastian (https://github.com/robseb)
+ * @brief	FPGA-writeBridge 
+ * @author  Robin Sebastian (https://github.com/robseb) (git@robseb.de)
  * @mainpage
- * rstools application to write to any HPS-FPGA Bridge
+ * rstools application to write to any HSP-to-FPGA Bridges or the MPU address space
  * address
  */
 
@@ -20,15 +20,36 @@ using namespace std;
 #define HEX_INPUT 0
 #define BIN_INPUT 2
 
-#define LWH2F_RANGE 0x07FFFF
-#define H2F_RANGE  0x07FFFF
+// Bridge Interfaces Base addresses 
+#define LWHPSFPGA_OFST  0xff200000 // LWHPS2FPGA Bridge 
+#define HPSFPGA_OFST    0xC0000000 // HPS2FPGA Bridge 
+#define MPU_OFSET		0x0        // MPU (HPS Address space)
 
+// Bridge interface End address 
+#define LWHPSFPGA_END   0xFF3FFFFF
+#define HPSFPGA_END     0xFBFFFFFF
+#define MPU_END         0xFFFFFFFF
+
+// Bridge interface range (allowed input offset)
+#define LWH2F_RANGE    (LWHPSFPGA_END - LWHPSFPGA_OFST)
+#define H2F_RANGE      (HPSFPGA_END - HPSFPGA_OFST)
+#define MPU_RANGE      (MPU_END - MPU_OFSET)
+
+#define MAP_SIZE 4096UL
+#define MAP_MASK (MAP_SIZE - 1)
 
 #pragma region Check user input 
 bool checkIfInputIsVailed(string input, bool DecHex)
 {
 	if (input.length() < 1) return false;
 	uint16_t i = 0;
+
+	// remove suffix "0x"
+	if ((input.find_first_of("0x", 0) == 0) && (!DecHex))
+	{
+		input.replace(0, 2, "");
+	}
+
 	for (i = 0; i < input.length(); i++)
 	{
 		if (i != input.find_first_of(DecHex ? "0123456789" : "0123456789abcdef", i)) break;
@@ -48,12 +69,17 @@ int main(int argc, const char* argv[])
 	//argv[3] = (const char*)"123"; // Value
 	//argc = 3;
 
-
 	// Read to the Light Wightweight or AXI HPS to FPGA Interface
-	if (((argc >= 3) && (std::string(argv[1]) == "-lw")) || ((argc >= 3) && (std::string(argv[1]) == "-hf")))
+	if (((argc >= 3) && (std::string(argv[1]) == "-lw")) || ((argc >= 3) && (std::string(argv[1]) == "-hf"))|| \
+	    ((argc >= 3) && (std::string(argv[1]) == "-mpu")))
 	{
 		// read the selected Bridge Interface 
-		bool lwBdrige(std::string(argv[1]) == "-lw");
+		bool lwBdrige = false;
+		uint8_t address_space = 0; // 0: HPS2FPGA | 1: LWHPS2FPGA | 2: MPU
+		if (std::string(argv[1]) == "-lw")
+			lwBdrige = true;
+		else if (std::string(argv[1]) == "-mpu")
+			address_space = 2;
 
 		/// check the value input type (Dec or Hex) ///
 		// 1: DEC Value input | 0: HEX Dec Input | 2: Binary Bit Set/Reset 
@@ -107,26 +133,38 @@ int main(int argc, const char* argv[])
 			istringstream buffer(AddresshexString);
 			buffer >> hex >> addressOffset;
 
-			// address inside range?
-			if (lwBdrige)
+			// HPS2FPGA
+			if (address_space == 0)
 			{
-				// check the range of the lightwight Bridge Interface 
-				if (addressOffset > LWH2F_RANGE)
-				{
-					if (ConsloeOutput)
-						cout << "	ERROR: selected address is outside of"\
-						"the Lightwight Bridge range!" << endl;
-					InputVailed = false;
-				}
-			}
-			else
-			{
-				// check the range of the AXI HPS to FPGA Bridge Interface 
+				// check the range of the AXI HPS-to-FPGA Bridge Interface 
 				if (addressOffset > H2F_RANGE)
 				{
 					if (ConsloeOutput)
 						cout << "	ERROR: selected address is outside of the HPS to "\
 						"FPGA AXI Bridge range!" << endl;
+					InputVailed = false;
+				}
+			}
+			// LWHPS2FPGA
+			else if (address_space == 1)
+			{
+				// check the range of the Lightweight HPS-to-FPGA Bridge Interface 
+				if (addressOffset > LWH2F_RANGE)
+				{
+					if (ConsloeOutput)
+						cout << "	ERROR: selected address is outside of"\
+						"the Lightweight HPS-to-FPGA Bridge range!" << endl;
+					InputVailed = false;
+				}
+			}
+			// MPU
+			else
+			{
+				// check the range of the MPU address space
+				if (addressOffset > MPU_RANGE)
+				{
+					if (ConsloeOutput)
+						cout << "	ERROR: selected address is outside MPU (HPS) address range!" << endl;
 					InputVailed = false;
 				}
 			}
@@ -199,21 +237,29 @@ int main(int argc, const char* argv[])
 			}
 		}
 
+		uint32_t address;
+		if (address_space < 2)
+			address = (lwBdrige ? LWHPSFPGA_OFST : HPSFPGA_OFST) + addressOffset;
+		else
+			address = addressOffset;
 		// only in case the input is vailed write the request to the light wight bus
 		if (InputVailed)
 		{
 			if (ConsloeOutput)
 			{
-				cout << "		-- Write following through a Bridge--" << endl;
-				cout << "	Bridge:      " << (lwBdrige ? "Lightwight HPS to FPGA" : "HPS to FPGA AXI") << endl;
-				cout << "	Brige Base:  0x" << hex << (lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST) << dec << endl;
-				cout << "	your Offset: 0x" << hex << addressOffset << dec << endl;
-				cout << "	Address:     0x" << hex << ((lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST) + addressOffset) << dec << endl;
-
-				if (DecHexBin == BIN_INPUT)
-					cout << "	Value:	 Bit Pos:" << BitPosValue << " Output:" << SetResetBit << endl;
+				if (address_space < 2)
+				{
+					cout << "	------- Write to a FPGA Register via a HPS-to-FPGA Bridge -------" << endl;
+					cout << "	Bridge:      " << (lwBdrige ? "Lightweight HPS-to-FPGA" : "HPS-to-FPGA") << endl;
+					cout << "	Brige Base:  0x" << hex << (lwBdrige ? LWHPSFPGA_OFST : HPSFPGA_OFST) << dec << endl;
+					cout << "	Your Offset: 0x" << hex << addressOffset << dec << endl;
+					cout << "	Address:     0x" << hex << address << dec << endl;
+				}
 				else
-					cout << "new Value:	     " << ValueInput << " [0x" << hex << ValueInput << "]" << dec << endl;
+				{
+					cout << "	-------    Write to a MPU (HPS) memory address register  -------" << endl;
+					cout << "	Address:     0x" << hex << address << dec << endl;
+				}
 			}
 
 			do
@@ -234,9 +280,9 @@ int main(int argc, const char* argv[])
 					break;
 				}
 
-				// configure a virtual memory interface to the bridge
-				bridgeMap = mmap(NULL,(lwBdrige ? LWH2F_RANGE : H2F_RANGE) , PROT_WRITE | PROT_READ, MAP_SHARED, fd, \
-					(lwBdrige ? ALT_LWFPGASLVS_OFST : ALT_H2F_OFST));
+				// configure a virtual memory interface to the bridge or mpu
+				bridgeMap = mmap(NULL, MAP_SIZE, PROT_READ, MAP_SHARED, fd, \
+					address & ~MAP_MASK);
 
 				// check if opening was sucsessful
 				if (bridgeMap == MAP_FAILED)
@@ -252,7 +298,7 @@ int main(int argc, const char* argv[])
 				// access to Bridge is okay 
 				// write the value to the address 
 				volatile  uint32_t* write_bridge = (volatile  uint32_t*) \
-						((bridgeMap) + addressOffset);
+						((bridgeMap) + address);
 
 				// print also the old value of the selected register
 				if (ConsloeOutput)
@@ -271,9 +317,7 @@ int main(int argc, const char* argv[])
 					*write_bridge = ValueInput;
 
 				// Close the MAP 
-				int res = munmap(bridgeMap, (lwBdrige ? LWH2F_RANGE : H2F_RANGE));
-
-				if (res < 0)
+				if (munmap(bridgeMap, MAP_SIZE) < 0)
 				{
 					if (ConsloeOutput)
 						cout << "ERROR: Closing of shared memory failed!" << endl;
@@ -283,7 +327,7 @@ int main(int argc, const char* argv[])
 				close(fd);
 
 				if (ConsloeOutput)
-					cout << "Writing was successful" << endl;
+					cout << "Writing was successfully" << endl;
 			/*	else
 					cout << 1;*/
 
@@ -300,26 +344,29 @@ int main(int argc, const char* argv[])
 	else
 	{
 		// help output 
-		cout << "	Command write to address of a HPS-FPGA Bridge" << endl;
-		cout << "	address" << endl;
-		cout << " Note: be sure that the bridge to write was enabled with the Platform Designer" << endl;
-		cout << "	FPGA-readBridge -lw [offset module address hex]" << endl;
-		cout << "		read the register on the Lightweight HPS-FPGA Brige" << endl;
-		cout << "		e.g.: FPGA-writeBridge -lw 0a" << endl;
-		cout << endl;
-		cout << "	FPGA-writeBridge -hf [offset module address hex] [value dec]" << endl;
-		cout << "		write to the HPS to FPGA AXI Bridge Interface with a dec values" << endl;
-		cout << "		e.g.: FPGA-writeBridge -hf 0a 255" << endl;
-		cout << "	FPGA-writeBridge -hf [offset module address hex] -h [value hex]" << endl;
-		cout << "		write to the HPS to FPGA AXI Bridge Interface with a hex values" << endl;
-		cout << "		e.g.: FPGA-writeBridge -hf 0a -h ff" << endl;
-		cout << "	FPGA-writeBridge -hf [offset module address hex] -b [Bit pos] [value]" << endl;
-		cout << "		Set or Reset a Bit on HPS to FPGA AXI Bridge register" << endl;
-		cout << "		e.g.: FPGA-writeBridge -hf 0a -b 8 0" << endl;
-		cout << endl;
-		cout << "		suffix: -b -> only decimal result output" << endl;
-		cout << "						Error:  0" << endl;
-		cout << "						Succses:1" << endl;
+		cout << "-------------------------------------------------------------------------------------" << endl;
+		cout << "|	Command to write to a 32-bit register of a HPS-to-FPGA Bridge	         	    |" << endl;
+		cout << "|		or of the entire MPU (HPS) Memory space				    |" << endl;
+		cout << "|  Note: Be sure that the bridge to write is enabled within the Platform Designer   |" << endl;
+		cout << "-------------------------------------------------------------------------------------" << endl;
+		cout << "|$	FPGA-writeBridge -lw [offset address in hex] [value in dec]					" << endl;
+		cout << "|		write to a 32-bit register of the Lightweight HPS-to-FPGA Bridge in dec	" << endl;
+		cout << "|		e.g.: FPGA-writeBridge -lw 0A 10						" << endl;
+		cout << "|$	FPGA-writeBridge -lw [offset address in hex] -h [value in hex]			" << endl;
+		cout << "|		write to a 32-bit register of the Lightweight HPS-to-FPGA Bridge in hex		" << endl;
+		cout << "|		e.g.: FPGA-writeBridge -lw 0A -h 12						" << endl;
+		cout << "|$	FPGA-writeBridge -lw [offset address in hex] -b [bit pos] [bit value] " << endl;
+		cout << "|		set a bit of the Lightweight HPS-to-FPGA Bridge		" << endl;
+		cout << "|		e.g.: FPGA-writeBridge -lw 0A -b 3 1						" << endl;
+		cout << "|$	FPGA-writeBridge -hf [offset address in hex] [value dec]				" << endl;
+		cout << "|		write to a 32-bit register of the HPS-to-FPGA AXI Bridge	" << endl;
+		cout << "|		e.g.: FPGA-writeBridge -hf 8C							" << endl;
+		cout << "|$	FPGA-writeBridge -mpu [module address in hex] [value dec]" << endl;
+		cout << "|		write to a 32-bit register for the entire MPU (HPS) memory space" << endl;
+		cout << "|		e.g.: FPGA-writeBridge -mpu 87" << endl;
+		cout << "|		Suffix: -b -> only decimal result output" << endl;
+		cout << "|$	FPGA-writeBridge -lw|hf|mpu| <offset address in hex> -h|-b|<value dec> <value hex>|<bit pos> <bit value>  -b" << endl;
+		cout << "-------------------------------------------------------------------------------------" << endl;
 	}
 
 

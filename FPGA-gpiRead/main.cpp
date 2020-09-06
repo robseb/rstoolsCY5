@@ -1,7 +1,7 @@
 /**
  * @file    main.cpp
  * @brief	FPGA-gpiRead
- * @author  Robin Sebastian (https://github.com/robseb)
+ * @author  Robin Sebastian (https://github.com/robseb) (git@robseb.de)
  * @mainpage
  * rstools application to read the general purpose input line 
  * from the FPGA 

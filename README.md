@@ -1,11 +1,14 @@
 # rstools
 
- **`rstools`is the source code of  [*meta-rstools*](https://github.com/robseb/meta-rstools).**
+ **`rstools`is the source code of the *socfpgatools* of the [*meta-intelfpga*](https://github.com/robseb/meta-intelfpga) BSP-Layer**
 
-`meta-rstools` is a Layer for the Yocto project to add a simple way for fully accessing the FPGA Manager of the Intel (ALTERA) Cyclone V SoC-FPGA (SoCFPGA).
+`meta-intelfpga` is a BSP-Layer for bringing support for *Intel* (*ALTERA*) SoC-FPGAs (*SoCFPGAs*) to the *Yocto Project*.
+The *socfpgatools* add a simple way for fully accessing the FPGA Manager of the Intel (*ALTERA*) Cyclone V SoC-FPGA (*SoCFPGA*).
 
-With a single command it is possible to change FPGA configuration or to read and write the *ARM AXI-Bridge* to the FPGA fabric. 
-The layer is a part of [*rsYocto*](https://github.com/robseb/rsyocto).
+Additionally, with a single command it is possible to read or write the *ARM AXI-Bridge* (*Lightweight HPS-to-FPGA-* (*LWHPS2FPGA*) or *HPS-to-FPGA (*HPS2FPGA*) Bridge*) to the FPGA Fabric.
+It enables to check the startus of the FPGA Fabric, write or read any address of the MPU (*HPS*) Memory space or the read and write the general purpose in- (*GPI*) and output- (*GPO*) registers. 
+
+This source code and the [*meta-intelfpga*](https://github.com/robseb/meta-intelfpga) is a part of my [*rsyocto*](https://github.com/robseb/rsyocto). A embedded Linux Distribution for *Intel* SoC-FPGAs.
 
 <br>
 
@@ -41,7 +44,7 @@ ___
         FPGA-status
         ````
      * Help- and Info- Output with the suffix `-h`  
-          ````bash
+           ````bash
           Command to read the selected FPGA configuration mode.
           This is set with the MSEL-Switch.
           FPGA-readMSEL
@@ -54,7 +57,7 @@ ___
         ````bash
         FPGA-resetFabric
         ````
-     * Help- and Info- Output with the suffix `-h`  
+     * Help output with the suffix `-h`  
           ````bash
           Command to reset the FPGA fabic
           A reset clears the current configuration
@@ -72,17 +75,17 @@ ___
         ````bash
         FPGA-writeConfig
         ````
-     * Help- and Info- Output with the suffix `-h`  
+     * Help output with the suffix `-h`  
           ````bash
             Command to change the FPGA fabric configuration
-            for Cyclone V use following RBF (.rbf) Config File Setings
+            for Cyclone V use following RBF (.rbf) config file settings
             MSEL=00100: PP16 with no AES and no Data compression
             MSEL=00101: PP16 with AES and no Data compression
-            FPGA-writeConfig -f [config rbf file path] {-b [optinal]}
+            FPGA-writeConfig -f [config rbf file path] {-b [optional]}
                     change the FPGA config with a selected .rbf file
-            FPGA-writeConfig -r {-b [optinal]}
+            FPGA-writeConfig -r {-b [optional]}
                     restore to the boot up FPGA configuration
-                    this Conf File is located: /usr/rsyocto/running_bootloader_fpgaconfig.rbf
+                    this conf File is located: /usr/rsyocto/running_bootloader_fpgaconfig.rbf
                     suffix: -b -> only decimal result output
                                                     Error:  0
                                                     Succses:1
@@ -91,51 +94,65 @@ ___
         * `MSEL= 00100`: Passive parallel x16 with no AES and Data compression
         * `MSEL= 00101`: Passive parallel x16  with AES and Data compression
 
- * **AVALON/AXI Bridge Read** 
-    * Reading a Address (32 Bit register) of the HPS-to-FPGA- or Lightweight-HPS-to-FPGA Bridge interface
+ * **LWHPS2FPGA-, HPS2FPGA-Bridge or MPU address space read** 
+    * Reading a address (*32-Bit* register) of the *HPS-to-FPGA-*, *Lightweight-HPS-to-FPGA- Bridge* or from the *MPU* (*HPS*) memory space interface
         ````bash
         FPGA-readBridge
         ````
-     * Help- and Info- Output with the suffix `-h`  
+     * Help output with the suffix `-h`  
         ````bash
-          read a register on the Lightweight HPS-FPGA Brige
-                e.g.: FPGA-readBridge -lw 0a
-
-          FPGA-readBridge -hf [offset module address hex]
-                read a register on the HPS to FPGA AXI Bridge
-                e.g.: FPGA-readBridge -lw 0a
-
-                suffix: -b -> only decimal result output
-         ````
-* **AVALON/AXI Bridge Write** 
-    * Writing a 32 Bit Value to the HPS-to-FPGA- or Lightweight-HPS-to-FPGA Bridge interface
+        -------------------------------------------------------------------------------------
+        |	Command to read a 32-bit register of a HPS-to-FPGA Bridge	            |
+        |		or of the entire MPU (HPS) Memory space				    |
+        |  Note: Be sure that the bridge to read is enabled within the Platform Designer    |
+        -------------------------------------------------------------------------------------
+        |$	FPGA-readBridge -lw [offset address in hex]					
+        |		read a 32-bit register of the Lightweight HPS-to-FPGA Bridge		
+        |		e.g.: FPGA-readBridge -lw 0A							
+        |$	FPGA-readBridge -hf [offset address in hex]				
+        |		read a 32-bit register of the HPS-to-FPGA AXI Bridge	
+        |		e.g.: FPGA-readBridge -hf 8C							
+        |$	FPGA-readBridge -mpu [module address in hex]
+        |		read a 32-bit register for the entire MPU (HPS) memory space
+        |		e.g.: FPGA-readBridge -mpu 87
+        |		Suffix: -b -> only decimal result output
+        |		Suffix: -r -> Auto refrech the value for 15sec
+        |$	FPGA-readBridge -lw|hf|mpu| <offset address in hex> -b|r
+        -------------------------------------------------------------------------------------
+        ````
+ * **LWHPS2FPGA-, HPS2FPGA-Bridge or MPU address space Read** 
+    * * Writing to a address (*32-Bit* register) of the *HPS-to-FPGA-*, *Lightweight-HPS-to-FPGA- Bridge* or from the *MPU* (*HPS*) memory space interface
         ````bash
         FPGA-writeBridge
         ````
      * Help- and Info- Output with the suffix `-h`  
         ````bash
-          Command write to address of a HPS-FPGA Bridge
-          address
-          FPGA-readBridge -lw [offset module address hex]
-                  read the register on the Lightweight HPS-FPGA Brige
-                  e.g.: FPGA-writeBridge -lw 0a
-
-          FPGA-writeBridge -hf [offset module address hex] [value dec]
-                  write to the HPS to FPGA AXI Bridge Interface with a dec values
-                  e.g.: FPGA-writeBridge -hf 0a 255
-          FPGA-writeBridge -hf [offset module address hex] -h [value hex]
-                  write to the HPS to FPGA AXI Bridge Interface with a hex values
-                  e.g.: FPGA-writeBridge -hf 0a -h ff
-          FPGA-writeBridge -hf [offset module address hex] -b [Bit pos] [value]
-                  Set or Reset a Bit on HPS to FPGA AXI Bridge register
-                  e.g.: FPGA-writeBridge -hf 0a -b 8 0
-
-                  suffix: -b -> only decimal result output
-                                                  Error:  0
-                                                  Succses:1
-         ````
-* **GPI Register Read** 
-    * Reading the 32 Bit direct access Register (written by the FPGA)
+        -------------------------------------------------------------------------------------
+        |	Command to write to a 32-bit register of a HPS-to-FPGA Bridge	            |
+        |		or of the entire MPU (HPS) Memory space				    |
+        |  Note: Be sure that the bridge to write is enabled within the Platform Designer   |
+        -------------------------------------------------------------------------------------
+        |$	FPGA-writeBridge -lw [offset address in hex] [value in dec]					
+        |		write to a 32-bit register of the Lightweight HPS-to-FPGA Bridge in dec	
+        |		e.g.: FPGA-writeBridge -lw 0A 10						
+        |$	FPGA-writeBridge -lw [offset address in hex] -h [value in hex]			
+        |		write to a 32-bit register of the Lightweight HPS-to-FPGA Bridge in hex		
+        |		e.g.: FPGA-writeBridge -lw 0A -h 12						
+        |$	FPGA-writeBridge -lw [offset address in hex] -b [bit pos] [bit value] 
+        |		set a bit of the Lightweight HPS-to-FPGA Bridge		
+        |		e.g.: FPGA-writeBridge -lw 0A -b 3 1						
+        |$	FPGA-writeBridge -hf [offset address in hex] [value dec]				
+        |		write to a 32-bit register of the HPS-to-FPGA AXI Bridge	
+        |		e.g.: FPGA-writeBridge -hf 8C							
+        |$	FPGA-writeBridge -mpu [module address in hex] [value dec]
+        |		write to a 32-bit register for the entire MPU (HPS) memory space
+        |		e.g.: FPGA-writeBridge -mpu 87
+        |		Suffix: -b -> only decimal result output
+        |$	FPGA-writeBridge -lw|hf|mpu| <offset address in hex> -h|-b|<value dec> <value hex>|<bit pos> <bit value>  -b
+        -------------------------------------------------------------------------------------
+        ````
+* **GPI Register Read (*GPI*)** 
+    * Reading the 32-Bit direct access Register (*written by the FPGA*)
         ````bash
         FPGA-gpiRead
         ````
@@ -149,8 +166,8 @@ ___
               FPGA-gpiRead -d
                       read gpi as decimal value
          ````
-* **GPO Register Write** 
-    * Writing the 32 Bit direct access Register to the FPGA
+* **GPO Register Write (*GPO*)** 
+    * Writing the 32-Bit direct access Register to the FPGA
         ````bash
         FPGA-gpoWrite
         ````
@@ -184,8 +201,8 @@ For informations how to use Microsoft Visual Studio 2019 for embedded Linux deve
 # Author
 * **Robin Sebastian**
 
-*meta-rstools* and *rstools* are projects, that I have fully developed on my own. No companies are involved in this projects.
-Today I'm a Master Student of electronic engineering with the major embedded systems. 
+*rstools*  and *meta-intelfpa* are projects, that I have fully developed on my own. No companies are involved in my projects. 
+I’m recently graduated as a master in electrical engineering with the major embedded systems (M. Sc.).
 
 [![Gitter](https://badges.gitter.im/rsyocto/community.svg)](https://gitter.im/rsyocto/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Email me!](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](mailto:git@robseb.de)
