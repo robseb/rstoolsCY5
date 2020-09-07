@@ -67,6 +67,7 @@ int main(int argc, const char* argv[])
 	///////// init the Virtual Memory for I/O access /////////
 	__VIRTUALMEM_SPACE_INIT();
 
+
 	/////////	 init the FPGA Manager	 /////////
 	alt_fpga_init();
 
