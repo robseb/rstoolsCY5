@@ -10,11 +10,9 @@ It enables to check the startus of the FPGA Fabric, write or read any address of
 
 This source code and the [*meta-intelfpga*](https://github.com/robseb/meta-intelfpga) is a part of my [*rsyocto*](https://github.com/robseb/rsyocto). A embedded Linux Distribution for *Intel* SoC-FPGAs.
 
+Dies ist ein Test 
+
 <br>
-
-![Alt text](FPGAConfigurationAction.gif?raw=true "Write FPGA Configuration")
-
-**Write the FPGA configuration with a single Linux command** 
 
 ___
 ## Features 
