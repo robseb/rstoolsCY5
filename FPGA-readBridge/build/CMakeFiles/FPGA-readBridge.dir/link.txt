@@ -1,0 +1,1 @@
+/usr/bin/c++  -g  -rdynamic CMakeFiles/FPGA-readBridge.dir/main.o  -o FPGA-readBridge 

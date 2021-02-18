@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/root/rstoolsCY5/FPGA-readBridge/hps.h
+sys/types.h
+-
+sys/mman.h
+-
+sys/stat.h
+-
+fcntl.h
+-
+unistd.h
+-
+
+/home/root/rstoolsCY5/FPGA-readBridge/main.cpp
+cstdio
+-
+hps.h
+/home/root/rstoolsCY5/FPGA-readBridge/hps.h
+string.h
+-
+fstream
+-
+iostream
+-
+unistd.h
+-
+sstream
+-
+thread
+-
+chrono
+-
+

@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/root/rstoolsCY5/FPGA-readBridge/build",
+  "command": "/usr/bin/c++    -g   -o CMakeFiles/FPGA-readBridge.dir/main.o -c /home/root/rstoolsCY5/FPGA-readBridge/main.cpp",
+  "file": "/home/root/rstoolsCY5/FPGA-readBridge/main.cpp"
+}
+]
