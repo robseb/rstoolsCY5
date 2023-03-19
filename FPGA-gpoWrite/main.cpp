@@ -7,6 +7,11 @@
  * to the FPGA fabric
  */
 
+
+volatile void* __hps_virtualAdreess_FPGAMGR;
+volatile void* __hps_virtualAdreess_FPGAMFRDATA;
+volatile int __fd;
+
 #include <cstdio>
 #include "alt_fpga_manager.h"
 #include "hps.h"
@@ -15,10 +20,6 @@
 #include <iostream>
 #include <bitset>
 #include <sstream>
-
-extern void* __hps_virtualAdreess_FPGAMGR;
-extern void* __hps_virtualAdreess_FPGAMFRDATA;
-extern int __fd;
 
 using namespace std;
 
