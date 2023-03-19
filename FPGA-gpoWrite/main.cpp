@@ -16,6 +16,10 @@
 #include <bitset>
 #include <sstream>
 
+extern void* __hps_virtualAdreess_FPGAMGR;
+extern void* __hps_virtualAdreess_FPGAMFRDATA;
+extern int __fd;
+
 using namespace std;
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
