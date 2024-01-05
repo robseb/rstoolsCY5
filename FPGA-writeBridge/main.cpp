@@ -14,6 +14,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <sstream>
+#include <cstdint>
 using namespace std;
 
 #define DEC_INPUT 1

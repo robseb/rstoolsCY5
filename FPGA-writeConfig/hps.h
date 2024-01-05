@@ -70,8 +70,8 @@ extern "C"
     // macro to include the virtual Memory 
     //
     //
-    #define __VIRTUALMEM_SPACE_INIT()                                                                                          \                                                                                                            \
-            fd = open("/dev/mem", (O_RDWR | O_SYNC));                                                                              \
+    #define __VIRTUALMEM_SPACE_INIT()                                                                                          \
+            __fd = open("/dev/mem", (O_RDWR | O_SYNC));                                                                              \
 	    __hps_virtualAdreess_FPGAMFRDATA  = mmap(NULL, 0x04,(PROT_READ | PROT_WRITE), MAP_SHARED, __fd, ALT_FPGAMGRDATA_OFST);      \
 	    __hps_virtualAdreess_FPGAMGR = mmap(NULL, 0x1000,(PROT_READ | PROT_WRITE), MAP_SHARED, __fd, ALT_FPGAMGR_OFST)             
 
